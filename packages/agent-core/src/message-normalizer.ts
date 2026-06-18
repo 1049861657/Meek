@@ -1,9 +1,15 @@
-import { ChatCompletionMessageParam } from 'openai/resources/chat/completions.mjs';
-import { InternalMessage } from './types.js';
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions.mjs';
+import type { InternalMessage } from './types.js';
 
 const INTERNAL_FIELD_KEYS = ['_source', '_internal', '_timestamp'] as const;
 
-const CANCELLED_TOOL_RESULT = '(cancelled)';
+/** 取消 mid-tool 时缺失 tool_result 的占位内容 */
+export const CANCELLED_TOOL_RESULT = '(cancelled)';
+
+export interface ToolCallPairingIssue {
+  assistantIndex: number;
+  missingToolCallIds: string[];
+}
 
 function stripInternalFields(message: InternalMessage): ChatCompletionMessageParam {
   const copy = { ...message } as Record<string, unknown>;
@@ -71,6 +77,48 @@ function mergeMessageContent(
 }
 
 /**
+ * 扫描 InternalMessage 链，返回 assistant.tool_calls 缺少 tool_result 的条目。
+ * 发送 API 前由 `normalizeMessages` 自动补齐 `(cancelled)`。
+ */
+export function findUnpairedToolCallIds(
+  messages: readonly InternalMessage[]
+): ToolCallPairingIssue[] {
+  const issues: ToolCallPairingIssue[] = [];
+
+  for (let index = 0; index < messages.length; index += 1) {
+    const message = messages[index];
+    if (message?.role !== 'assistant' || !hasToolCalls(message)) {
+      continue;
+    }
+
+    const assistantWithTools = message as InternalMessage & {
+      tool_calls: { id: string }[];
+    };
+    const expectedIds = assistantWithTools.tool_calls.map((toolCall) => toolCall.id);
+    const fulfilledIds = new Set<string>();
+
+    let scan = index + 1;
+    while (scan < messages.length && messages[scan]?.role === 'tool') {
+      const toolMessage = messages[scan];
+      const toolCallId = toolMessage
+        ? (toolMessage as { tool_call_id?: string }).tool_call_id
+        : undefined;
+      if (toolCallId) {
+        fulfilledIds.add(toolCallId);
+      }
+      scan += 1;
+    }
+
+    const missingToolCallIds = expectedIds.filter((id) => !fulfilledIds.has(id));
+    if (missingToolCallIds.length > 0) {
+      issues.push({ assistantIndex: index, missingToolCallIds });
+    }
+  }
+
+  return issues;
+}
+
+/**
  * 补齐 assistant.tool_calls 缺失的 tool_result（取消 mid-tool 时常见）
  */
 function fillMissingToolResults(messages: ChatCompletionMessageParam[]): ChatCompletionMessageParam[] {
@@ -87,7 +135,7 @@ function fillMissingToolResults(messages: ChatCompletionMessageParam[]): ChatCom
     if (message.role === 'assistant' && hasToolCalls(message)) {
       output.push(message);
       const assistantWithTools = message as ChatCompletionMessageParam & {
-        tool_calls: Array<{ id: string }>;
+        tool_calls: { id: string }[];
       };
       const expectedIds = assistantWithTools.tool_calls.map((toolCall) => toolCall.id);
       const fulfilledIds = new Set<string>();
@@ -154,3 +202,10 @@ export function normalizeMessages(messages: readonly InternalMessage[]): ChatCom
   const withToolResults = fillMissingToolResults(stripped);
   return mergeConsecutiveSameRole(withToolResults);
 }
+
+/** API 发送前消息规范化（任务书 MessageNormalizer 入口） */
+export const MessageNormalizer = {
+  CANCELLED_TOOL_RESULT,
+  normalize: normalizeMessages,
+  findUnpairedToolCallIds,
+} as const;

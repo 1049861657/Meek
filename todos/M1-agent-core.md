@@ -2,7 +2,7 @@
 
 
 
-> **状态**：进行中（M1-01 已完成）  
+> **状态**：进行中（M1-04 已完成，M1-05 未开始）  
 
 > **周期**：3 ~ 4 人周（2 人）  
 
@@ -53,55 +53,55 @@
 
 ## M1-02 消息链与规范化
 
+> **Meek 约束**：仅流式 `chatStream` → `runAgentLoop({ stream: true })`；**不迁移**非流式 `chat()` / `POST /api/chat`（见 M1-06-01 跳过）。
 
+- [x] **M1-02-01** InternalMessage 类型（含 tool_calls、tool、reasoning 元数据）
 
-- [ ] **M1-02-01** InternalMessage 类型（含 tool_calls、tool、reasoning 元数据）
+- [x] **M1-02-02** `MessageNormalizer`：API 发送前 transform（`normalizeMessages`）
 
-- [ ] **M1-02-02** `MessageNormalizer`：API 发送前 transform
+- [x] **M1-02-03** tool_call ↔ tool_result 配对校验（`findUnpairedToolCallIds` + 补齐 `(cancelled)`）
 
-- [ ] **M1-02-03** tool_call ↔ tool_result 配对校验
+- [x] **M1-02-04** 取消/中断后状态清理（`ToolCallManager.finalizeAllToolCalls` + normalizer）
 
-- [ ] **M1-02-04** 取消/中断后状态清理
-
-- [ ] **M1-02-05** 非流式 `chat()` 与流式 `chatStream` 共用同一 loop 定义
+- [~] **M1-02-05** ~~非流式 `chat()` 与流式共用 loop~~ — **Meek 跳过**（仅 `chatStream`）
 
 
 
 ## M1-03 System Tools
 
+> **Meek**：01～06 在 `@meek/agent-core`（M1-01）；07 为 Web BFF 路由。
 
+- [x] **M1-03-01** `SystemToolRegistry` 注册表（`system-tools/system-tool-registry.ts`）
 
-- [ ] **M1-03-01** `SystemToolRegistry` 注册表
+- [x] **M1-03-02** `todo-tool`（计划浮层 + transcript 治理）
 
-- [ ] **M1-03-02** `todo-tool`（计划浮层 + transcript 治理）
+- [x] **M1-03-03** `read-persisted-output` + `path-safety`
 
-- [ ] **M1-03-03** `read-persisted-output` + `path-safety`
+- [x] **M1-03-04** `ToolExecutor`：统一 execute + 错误包装（`tool-executor.ts` → `ToolExecutor.normalizeResult`）
 
-- [ ] **M1-03-04** `ToolExecutor`：统一 execute + 错误包装
+- [x] **M1-03-05** `streaming-tool-scheduler`（并行 tool 调度）
 
-- [ ] **M1-03-05** `streaming-tool-scheduler`（并行 tool 调度）
+- [x] **M1-03-06** 权限 ask 流程（`permission-gate` + Redis `permission-pending`）
 
-- [ ] **M1-03-06** 权限 ask 流程（对齐 `permission-gate.ts` + Redis pending）
-
-- [ ] **M1-03-07** `POST /api/chat/permission-resolve`
+- [x] **M1-03-07** `POST /api/chat/permission-resolve`
 
 
 
 ## M1-04 上下文压缩与恢复
 
+> **Meek**：01～02、04～05 在 `@meek/agent-core`；03 为 Web BFF；06 为 Worker 启动任务。
 
+- [x] **M1-04-01** Token 估算 / 消息计数（`context-budget`）
 
-- [ ] **M1-04-01** Token 估算 / 消息计数（`context-budget`）
+- [x] **M1-04-02** 三层压缩策略完整实现（microCompact / compactHistory / applyContextBeforeLlm）
 
-- [ ] **M1-04-02** 三层压缩策略完整实现
+- [x] **M1-04-03** `POST /api/chat/compact`
 
-- [ ] **M1-04-03** `POST /api/chat/compact`
+- [x] **M1-04-04** 大 tool output 落盘 + Artifact 可读回（`materializeToolOutput` + `read_persisted_output`）
 
-- [ ] **M1-04-04** 大 tool output 落盘 + Artifact 可读回
+- [x] **M1-04-05** LLM 瞬态错误退避重试（`llm-retry.ts`）
 
-- [ ] **M1-04-05** LLM 瞬态错误退避重试（`llm-retry.ts`）
-
-- [ ] **M1-04-06** Agent output 过期清理任务
+- [x] **M1-04-06** Agent output 过期清理任务（Worker 启动 `cleanupExpiredAgentOutputs`）
 
 
 
@@ -127,7 +127,7 @@
 
 
 
-- [ ] **M1-06-01** `POST /api/chat` 非流式（参考标注的调试路径，仍实现）
+- [~] **M1-06-01** ~~`POST /api/chat` 非流式~~ — **Meek 跳过**（仅 `POST /api/chat/stream`）
 
 - [ ] **M1-06-02** `POST /api/chat/stream` — `registerSink` → `publishInbound`（**必须走队列**）
 

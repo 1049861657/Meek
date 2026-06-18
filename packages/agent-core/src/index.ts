@@ -21,7 +21,8 @@ export type {
 } from './types.js';
 export { TOOL_OUTPUT_ARTIFACT_TYPE } from './types.js';
 
-export { normalizeMessages } from './message-normalizer.js';
+export { normalizeMessages, MessageNormalizer, CANCELLED_TOOL_RESULT, findUnpairedToolCallIds } from './message-normalizer.js';
+export type { ToolCallPairingIssue } from './message-normalizer.js';
 export {
   applyPromptPipelineToMessages,
   buildAssembledSystemPreview,
@@ -91,7 +92,7 @@ export {
 } from './permission-session.js';
 
 export { ToolCallManager } from './tool-call-manager.js';
-export { normalizeToolResult } from './tool-executor.js';
+export { normalizeToolResult, ToolExecutor } from './tool-executor.js';
 export { StreamingToolScheduler } from './streaming-tool-scheduler.js';
 export type { StreamingToolExecuteFn } from './streaming-tool-scheduler.js';
 
@@ -181,6 +182,7 @@ export {
 export { AiProvider } from './providers/ai-provider.js';
 export {
   aiService,
+  ensureProvidersInitialized,
   getProviderForUser,
   initializeProviders,
   invalidateProviderCache,

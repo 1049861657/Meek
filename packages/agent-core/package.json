@@ -3,10 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./permission": {
+      "types": "./dist/entrypoints/permission.d.ts",
+      "default": "./dist/entrypoints/permission.js"
+    },
+    "./context": {
+      "types": "./dist/entrypoints/context.d.ts",
+      "default": "./dist/entrypoints/context.js"
+    },
+    "./provider": {
+      "types": "./dist/entrypoints/provider.d.ts",
+      "default": "./dist/entrypoints/provider.js"
     }
   },
   "main": "./dist/index.js",

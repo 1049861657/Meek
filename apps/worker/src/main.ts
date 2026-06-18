@@ -1,4 +1,5 @@
 import { createServer, type Server } from 'node:http';
+import { cleanupExpiredAgentOutputs } from '@meek/agent-core/context';
 import { getRedisUrl, loadRootEnv } from '@meek/shared';
 import { startChannels } from './channels/bootstrap';
 import { startMessageBus } from './message-bus/bootstrap';
@@ -6,8 +7,10 @@ import { startMessageBus } from './message-bus/bootstrap';
 loadRootEnv();
 const WORKER_PORT = 4001;
 
-function main(): void {
+async function main(): Promise<void> {
   getRedisUrl();
+
+  await cleanupExpiredAgentOutputs();
 
   const messageBus = startMessageBus();
   startChannels();
@@ -40,7 +43,7 @@ function main(): void {
 }
 
 try {
-  main();
+  void main();
 } catch (err: unknown) {
   console.error('Worker startup failed:', err);
   process.exit(1);

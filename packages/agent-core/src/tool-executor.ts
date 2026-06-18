@@ -76,3 +76,8 @@ export function normalizeToolResult(input: {
     ...(isError ? { isMcpError: true } : {})
   };
 }
+
+/** 工具结果规范化入口（任务书 ToolExecutor） */
+export const ToolExecutor = {
+  normalizeResult: normalizeToolResult,
+} as const;

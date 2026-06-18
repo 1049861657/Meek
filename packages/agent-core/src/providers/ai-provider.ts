@@ -1,11 +1,10 @@
 import { OpenAI as OpenAIClient } from 'openai';
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions.mjs';
-import {
+import type {
   AgentLoopProvider,
   AgentPermissionContext,
-  runAgentLoop
 } from '../agent-loop.js';
-import { ToolCallManager } from '../tool-call-manager.js';
+import type { ToolCallManager } from '../tool-call-manager.js';
 import { normalizeMessages } from '../message-normalizer.js';
 import {
   ChatResponse,
@@ -17,13 +16,11 @@ import {
   ChatTool,
   UsageInfo
 } from '../types.js';
-import {
-  buildMainModelContextPreview,
-  compactHistory,
-  type CompactSummarizeResult,
+import type {
+  CompactSummarizeResult,
   ContextPreviewResult,
-  type MainModelContextPreviewOptions
-} from '../context-budget.js';
+  MainModelContextPreviewOptions,
+} from '../context-compact.js';
 import {
   ChatConfig,
   ContextConfig,
@@ -398,66 +395,6 @@ export class AiProvider {
   }
 
   /**
-   * 处理聊天请求
-   * @param message 用户消息或消息历史
-   * @param model 模型名称
-   * @param temperature 温度参数
-   * @param maxTokens 最大生成令牌数
-   * @param enableTools 是否启用工具
-   * @param enablePrompts 是否启用提示词
-   * @returns 处理结果
-   */
-  async chat(
-    message: string | InternalMessage[],
-    model: string = this.config.defaultModel,
-    temperature: number = this.chatConfig.defaultTemperature,
-    maxTokens: number = this.chatConfig.defaultMaxTokens,
-    enableTools: boolean = this.toolsConfig.enableMCPTools,
-    enablePrompts: boolean = this.toolsConfig.enablePrompts,
-    maxToolCallRounds: number = ToolsConfig.maxToolCallRounds,
-    requestId: string = '',
-    enableAutoCompact?: boolean,
-    compactModel?: string,
-    permissionCtx?: AgentPermissionContext
-  ): Promise<ChatResponse> {
-    try {
-      const messages = await this.formatMessages(
-        message,
-        enableTools,
-        enablePrompts,
-        undefined,
-        undefined,
-        requestId
-      );
-      const memoryContext = resolveMemoryPipelineContext(messages, {
-        skipMemory: undefined
-      });
-      const chatTools = await this.getToolDefinitions(enableTools);
-      const summarizeFn = this.resolveSummarizeFn(enableAutoCompact, compactModel);
-
-      return await runAgentLoop({
-        messages,
-        chatTools,
-        model,
-        temperature,
-        maxTokens,
-        maxToolCallRounds,
-        stream: false,
-        requestId,
-        summarizeFn,
-        onChunk: () => {},
-        provider: this.getAgentLoopProvider(),
-        permission: permissionCtx,
-        memoryContext
-      });
-    } catch (error: unknown) {
-      const errMessage = error instanceof Error ? error.message : String(error);
-      Logger.error('OPENAI', `[${this.providerName}] 聊天API调用失败:`, error);
-      throw new Error(`${this.providerName} API错误: ${errMessage}`);
-    }
-  }
-
-  /**
    * 为 compactHistory 调用 LLM 生成摘要文本
    */
   private async summarizeForCompact(
@@ -508,19 +445,22 @@ export class AiProvider {
     model: string,
     signal?: AbortSignal
   ): (messages: InternalMessage[]) => Promise<InternalMessage[]> {
-    return async (messages: InternalMessage[]) =>
-      compactHistory(messages, async (serialized) =>
+    return async (messages: InternalMessage[]) => {
+      const { compactHistory } = await import('../context-compact.js');
+      return compactHistory(messages, async (serialized) =>
         this.summarizeForCompact(serialized, model, signal)
       );
+    };
   }
 
   /**
    * 上下文预览（P1-01-06，无 LLM）
    */
-  previewMainModelContext(
+  async previewMainModelContext(
     messages: InternalMessage[],
     options: MainModelContextPreviewOptions
-  ): ContextPreviewResult {
+  ): Promise<ContextPreviewResult> {
+    const { buildMainModelContextPreview } = await import('../context-compact.js');
     return buildMainModelContextPreview(messages, options);
   }
 
@@ -532,6 +472,7 @@ export class AiProvider {
     compactModel?: string,
     signal?: AbortSignal
   ): Promise<InternalMessage[]> {
+    const { compactHistory } = await import('../context-compact.js');
     const summarizeModel = resolveCompactModel(compactModel, this.config.defaultModel);
     return compactHistory(messages, async (serialized) =>
       this.summarizeForCompact(serialized, summarizeModel, signal)
@@ -813,6 +754,8 @@ export class AiProvider {
           ? { userId: persistUserId, chatSessionId }
           : undefined;
 
+      const { runAgentLoop } = await import('../agent-loop.js');
+
       return await runAgentLoop({
         messages,
         chatTools,
@@ -820,6 +763,7 @@ export class AiProvider {
         temperature,
         maxTokens,
         maxToolCallRounds,
+        stream: true,
         signal,
         requestId,
         summarizeFn,

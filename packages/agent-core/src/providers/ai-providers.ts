@@ -52,6 +52,7 @@ export async function getProviderForUser(
   userId: string | null,
   vendor?: string
 ): Promise<AiProvider | undefined> {
+  await ensureProvidersInitialized();
   try {
     const bucket = await getBucket(userId);
     if (vendor && bucket.services.has(vendor)) return bucket.services.get(vendor);
@@ -150,6 +151,11 @@ export async function reloadAiProviders(
   }
 }
 
-initializeProviders().catch(error => {
-  Logger.error('AI', '自动初始化AI提供商服务失败:', error);
-});
+// 懒初始化：禁止模块加载时副作用（对齐 MCP SDK / Turbo Compiled Package 实践）
+let initPromise: Promise<void> | null = null;
+
+/** 首次 getProviderForUser 前可显式预热；幂等 */
+export function ensureProvidersInitialized(): Promise<void> {
+  initPromise ??= initializeProviders();
+  return initPromise;
+}
