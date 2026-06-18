@@ -7,16 +7,18 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./root-env": {
+      "types": "./dist/root-env.d.ts",
+      "default": "./dist/root-env.js"
     }
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "lint": "eslint src"
   },
   "dependencies": {
-    "dotenv": "^17.4.2",
+    "@next/env": "^16.2.9",
     "ioredis": "^5.11.1"
   },
   "devDependencies": {

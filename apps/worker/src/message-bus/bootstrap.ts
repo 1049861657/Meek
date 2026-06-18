@@ -1,12 +1,25 @@
+import {
+  closeInboundMessageBus,
+  closeMessageBusRedisConnections,
+  resolveInboundWorkerConcurrency,
+  startInboundWorker,
+} from '@meek/message-bus';
+
+import { processInboundJob } from './inbound-worker.js';
+
 export interface MessageBusHandle {
   close(): Promise<void>;
 }
 
-/** M0 占位：M1 实现 Inbound Worker 订阅队列 */
 export function startMessageBus(): MessageBusHandle {
+  const concurrency = resolveInboundWorkerConcurrency();
+  const worker = startInboundWorker(processInboundJob, concurrency);
+
   return {
     async close(): Promise<void> {
-      // M1: close BullMQ worker
+      await worker.close();
+      await closeInboundMessageBus();
+      await closeMessageBusRedisConnections();
     },
   };
 }

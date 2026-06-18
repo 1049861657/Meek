@@ -1,8 +1,15 @@
-import { loadRootEnv } from '@meek/shared';
+import { getResolvedDatabaseUrl } from '@meek/shared/root-env';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-loadRootEnv();
 import { PrismaClient } from './generated/prisma/client';
+
+const PKG_DIR = dirname(fileURLToPath(import.meta.url));
+
+function getDatabaseUrl(): string {
+  return getResolvedDatabaseUrl(PKG_DIR);
+}
 
 class PrismaInstance {
   private static instance: PrismaClient;
@@ -10,7 +17,7 @@ class PrismaInstance {
   static getInstance(): PrismaClient {
     if (!PrismaInstance.instance) {
       const adapter = new PrismaBetterSqlite3({
-        url: process.env.DATABASE_URL!,
+        url: getDatabaseUrl(),
       });
       PrismaInstance.instance = new PrismaClient({ adapter });
     }

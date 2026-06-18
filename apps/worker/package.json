@@ -4,15 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/main.ts",
+    "dev": "node --env-file=../../.env --import tsx/esm --watch src/main.ts",
     "build": "tsc",
     "start": "node dist/main.js",
     "lint": "eslint src"
   },
   "dependencies": {
     "@meek/agent-core": "workspace:*",
-    "@meek/shared": "workspace:*",
-    "dotenv": "^17.4.2"
+    "@meek/db": "workspace:*",
+    "@meek/message-bus": "workspace:*",
+    "@meek/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^25.9.3",

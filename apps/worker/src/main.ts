@@ -1,10 +1,9 @@
 import { createServer, type Server } from 'node:http';
 import { cleanupExpiredAgentOutputs } from '@meek/agent-core/context';
-import { getRedisUrl, loadRootEnv } from '@meek/shared';
-import { startChannels } from './channels/bootstrap';
-import { startMessageBus } from './message-bus/bootstrap';
+import { getRedisUrl } from '@meek/shared';
+import { startChannels } from './channels/bootstrap.js';
+import { startMessageBus } from './message-bus/bootstrap.js';
 
-loadRootEnv();
 const WORKER_PORT = 4001;
 
 async function main(): Promise<void> {

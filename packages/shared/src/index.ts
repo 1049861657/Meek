@@ -5,7 +5,24 @@ export type {
   PermissionMode,
   ResolvedProfile,
 } from './agent-types';
-export { findMonorepoRoot, loadRootEnv } from './load-env';
+export type {
+  ChatFeatureConfig,
+  ContextFeatureConfig,
+  FeatureConfigApiFailure,
+  FeatureConfigApiResponse,
+  FeatureConfigApiSuccess,
+  HistoryFeatureConfig,
+  HookFeatureConfig,
+  LogFeatureConfig,
+  PermissionFeatureConfig,
+  PublicFeatureConfig,
+  PublicMemoryFeatureConfig,
+  QuickMessage,
+  QuickMessagesPayload,
+  RecoveryFeatureConfig,
+  SystemToolDescriptor,
+  ToolsFeatureConfig,
+} from './feature-config.types';
 export {
   closeRedisConnections,
   getIdempotencyRedisConnection,

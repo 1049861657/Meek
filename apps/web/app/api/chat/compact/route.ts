@@ -1,12 +1,8 @@
-import { loadRootEnv } from '@meek/shared';
-
 import { handleCompactChat, type CompactChatBody } from '@/lib/chat/compact';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: Request): Promise<Response> {
-  loadRootEnv();
-
   try {
     const body = (await req.json()) as CompactChatBody;
     const result = await handleCompactChat(body, null);

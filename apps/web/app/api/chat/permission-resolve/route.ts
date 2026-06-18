@@ -1,5 +1,3 @@
-import { loadRootEnv } from '@meek/shared';
-
 import {
   handlePermissionResolve,
   type PermissionResolveBody,
@@ -8,8 +6,6 @@ import {
 export const runtime = 'nodejs';
 
 export async function POST(req: Request): Promise<Response> {
-  loadRootEnv();
-
   try {
     const body = (await req.json()) as PermissionResolveBody;
     const result = await handlePermissionResolve(body);

@@ -41,7 +41,7 @@ Meek/
 
 ## 迁移进度
 
-见 [`todos/README.md`](todos/README.md)。当前阶段：**M1 agent-core**（M1-04 已完成，M1-05 进行中）。
+见 [`todos/README.md`](todos/README.md)。当前阶段：**M2 MCP 平台**（M1 / MS1 已完成）。
 
 ## 参考
 

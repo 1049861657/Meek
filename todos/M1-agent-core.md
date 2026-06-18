@@ -2,7 +2,7 @@
 
 
 
-> **状态**：进行中（M1-04 已完成，M1-05 未开始）  
+> **状态**：已完成  
 
 > **周期**：3 ~ 4 人周（2 人）  
 
@@ -109,13 +109,13 @@
 
 
 
-- [ ] **M1-05-01** `hook-runner.ts` + `hook-config-loader.ts`
+- [x] **M1-05-01** `hook-runner.ts` + `hook-config-loader.ts`
 
-- [ ] **M1-05-02** `hook-builtin.ts`
+- [x] **M1-05-02** `hook-builtin.ts`
 
-- [ ] **M1-05-03** `chat-persist-hook.ts`
+- [x] **M1-05-03** `chat-persist-hook.ts`
 
-- [ ] **M1-05-04** `memory-retain-hook.ts`
+- [x] **M1-05-04** `memory-retain-hook.ts`
 
 
 
@@ -129,15 +129,15 @@
 
 - [~] **M1-06-01** ~~`POST /api/chat` 非流式~~ — **Meek 跳过**（仅 `POST /api/chat/stream`）
 
-- [ ] **M1-06-02** `POST /api/chat/stream` — `registerSink` → `publishInbound`（**必须走队列**）
+- [x] **M1-06-02** `POST /api/chat/stream` — `registerSink` → `publishInbound`（**必须走队列**）
 
-- [ ] **M1-06-03** `POST /api/chat/context-preview`
+- [x] **M1-06-03** `POST /api/chat/context-preview`
 
-- [ ] **M1-06-04** `GET /api/tools/list`
+- [x] **M1-06-04** `GET /api/tools/list`
 
-- [ ] **M1-06-05** `runtime=nodejs`、`maxDuration=300`
+- [x] **M1-06-05** `runtime=nodejs`、`maxDuration=300`
 
-- [ ] **M1-06-06** 请求体对齐 `normalize-web-inbound.ts`
+- [x] **M1-06-06** 请求体对齐 `normalize-web-inbound.ts`
 
 
 
@@ -149,17 +149,17 @@
 
 
 
-- [ ] **M1-07-01** `inbound-queue.ts` / `publishInbound` + `inbound-worker.ts`（消费 web envelope）
+- [x] **M1-07-01** `inbound-queue.ts` / `publishInbound` + `inbound-worker.ts`（消费 web envelope）
 
-- [ ] **M1-07-02** `outbound-router.ts` / `outbound-sink-registry.ts`
+- [x] **M1-07-02** `outbound-router.ts` / `outbound-sink-registry.ts`
 
-- [ ] **M1-07-03** `web-channel.adapter.ts` — SSE `begin|chunk|usage|context_compacted|done|error`
+- [x] **M1-07-03** `web-channel.adapter.ts` — SSE `begin|chunk|usage|context_compacted|done|error`
 
-- [ ] **M1-07-04** `normalize-web-inbound.ts` + `session-key.ts`（web 前缀）
+- [x] **M1-07-04** `normalize-web-inbound.ts` + `session-key.ts`（web 前缀）
 
-- [ ] **M1-07-05** `inbound-envelope.ts` 类型（web channel）
+- [x] **M1-07-05** `inbound-envelope.ts` 类型（web channel）
 
-- [ ] **M1-07-06** worker 内执行 `agent-core` loop；web Route 仅 Auth + 挂 SSE Sink
+- [x] **M1-07-06** worker 内执行 `agent-core` loop；web Route 仅 Auth + 挂 SSE Sink
 
 
 
@@ -167,11 +167,11 @@
 
 
 
-- [ ] **M1-08-01** `GET /api/config/features`
+- [x] **M1-08-01** `GET /api/config/features`
 
-- [ ] **M1-08-02** Feature flags 类型（`packages/shared`）
+- [x] **M1-08-02** Feature flags 类型（`packages/shared`）
 
-- [ ] **M1-08-03** `GET /api/config/quick-messages`（种子只读）
+- [x] **M1-08-03** `GET /api/config/quick-messages`（种子只读）
 
 
 
@@ -183,11 +183,11 @@
 
 
 
-- [ ] **M1-09-01** `fetch` + `ReadableStream` SSE 客户端 + 消息列表最小渲染
+- [x] **M1-09-01** `fetch` + `ReadableStream` SSE 客户端 + 消息列表最小渲染
 
-- [ ] **M1-09-02** 发送 / 停止 / 错误态
+- [x] **M1-09-02** 发送 / 停止 / 错误态
 
-- [ ] **M1-09-03** Tool 卡片最小可视（对齐 `tool-cards.js` 状态，M3 补全样式）
+- [x] **M1-09-03** Tool 卡片最小可视（对齐 `tool-cards.js` 状态，M3 补全样式）
 
 
 
@@ -199,17 +199,17 @@
 
 
 
-- [ ] `publishInbound` 可在日志中追踪（对照参考 `ai.controller.ts:212`）
+- [x] `publishInbound` 可在日志中追踪（对照参考 `ai.controller.ts:212`）
 
-- [ ] 10+ 轮 tool call 上下文不断
+- [x] 10+ 轮 tool call 上下文不断
 
-- [ ] 审计链可对照 `audit.ts` + `logs/app.log`
+- [x] 审计链可对照 `audit.ts` + `logs/app.log`
 
-- [ ] SSE 事件类型与 `web-channel.adapter.ts` 一致
+- [x] SSE 事件类型与 `web-channel.adapter.ts` 一致
 
-- [ ] 权限 ask 流程可打断并 resume
+- [x] 权限 ask 流程可打断并 resume
 
-- [ ] 三层压缩与 compact API 可用
+- [x] 三层压缩与 compact API 可用
 
 
 

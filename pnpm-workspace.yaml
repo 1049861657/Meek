@@ -3,8 +3,9 @@ packages:
   - 'packages/*'
 allowBuilds:
   '@prisma/engines': false
-  better-sqlite3: false
+  better-sqlite3: true
   esbuild: false
+  msgpackr-extract: false
   prisma: false
   sharp: false
 minimumReleaseAgeExclude:
