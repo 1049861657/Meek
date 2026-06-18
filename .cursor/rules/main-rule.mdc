@@ -1,0 +1,30 @@
+# Meek
+
+## 目录
+- `apps/web/` Next.js App Router | `apps/worker/` MCP/Queue/渠道
+- `packages/` agent-core、mcp-client、config-plane、db、shared
+- `prisma/` schema | `todos/` 迁移任务书 | `docs/` 架构调研
+
+## 命名
+- 类 PascalCase | 方法/变量 camelCase | 常量 UPPER_SNAKE_CASE | 文件 kebab-case
+- interface/type PascalCase，**禁止 I 前缀**
+
+## TS
+- 公共函数显式返回类型；禁 `any`，用 `unknown` 收窄
+- 命名导出；禁 default export
+- import 顺序：node → 第三方 → 项目内；相对路径带 `.js`
+
+## 迁移
+- 参考 SSOT：`../MCP-Client/src/` + `frontend/src/`（**非** MCP-Client/todos）
+- Agent Skill：`.cursor/skills/migrate/SKILL.md`
+- 默认 parity migrate；**优化仅用户明确要求时**
+
+## 包管理
+- **pnpm**；禁 npm/yarn
+
+## Windows 终端（Agent）
+- PowerShell；禁 CMD 专用语法
+
+## 其他
+- 最小 diff；魔法数进 config
+- 文件过长按职责拆分

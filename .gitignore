@@ -1,0 +1,59 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# 构建产物
+dist/
+build/
+out/
+.next/
+.turbo/
+*.tsbuildinfo
+
+# 日志
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 环境变量（保留 .env.example）
+.env
+.env.*
+!.env.example
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# IDE / 编辑器
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 测试 / 覆盖率
+coverage/
+.nyc_output/
+
+# 数据库（本地 SQLite）
+*.db
+*.db-journal
+prisma/dev.db
+prisma/dev.db-journal
+
+# Prisma 生成物（若输出到 packages/db 外，按实际路径调整）
+**/generated/
+
+# Agent 大工具输出落盘（对齐 MCP-Client）
+.agent-outputs/
+
+# Vercel（若部署 web）
+.vercel/
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
