@@ -1,0 +1,27 @@
+{
+  "name": "meek",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.7"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "pnpm db:generate && turbo run build",
+    "lint": "turbo run lint",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "dotenv": "^17.4.2",
+    "eslint": "^10.5.0",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "prisma": "^7.8.0",
+    "turbo": "^2.9.18",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1"
+  }
+}

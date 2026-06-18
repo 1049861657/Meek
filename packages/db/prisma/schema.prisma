@@ -1,0 +1,304 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum ProviderType {
+  OPENAI
+}
+
+// 远程 MCP 使用 Streamable HTTP
+enum ConnectionType {
+  STDIO
+  HTTP
+}
+
+// T2 配置平面路由渠道（与 ChannelId 一致）
+enum ConfigChannelId {
+  web
+  feishu
+  dingtalk
+}
+
+// Agent 权限模式
+enum PermissionMode {
+  open
+  interactive
+  locked
+}
+
+// ---------------------------------------------------------------------------
+// Config-plane models
+// 配置平面：账号级表（Setting/AIProvider/MCPServer）用 userId 做 per-user 隔离与 nil 继承；
+// 渠道级表（AgentProfile/RouteRule）为全局配置，扩展多租户用 tenantId。
+// 账号级表故意不对 userId 加外键约束（userId=null 为 seed 基线）。
+// ---------------------------------------------------------------------------
+
+// 通用键值设置
+model Setting {
+  id        String   @id @default(cuid())
+  /// null = seed；非 null = per-user 覆盖
+  userId    String?
+  key       String
+  value     Json
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, key])
+  @@map("setting")
+}
+
+// AI 提供商
+model AIProvider {
+  id           String       @id @default(cuid())
+  /// null = seed；非 null = per-user 覆盖
+  userId       String?
+  name         String
+  type         ProviderType
+  apiUrl       String
+  apiKey       String
+  defaultModel String
+  models       AIModel[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@unique([userId, name])
+  @@map("ai_provider")
+}
+
+// AI 模型（value/label 沿用前端 select 控件惯例）
+model AIModel {
+  id         String     @id @default(cuid())
+  value      String
+  label      String
+  providerId String
+  provider   AIProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, value])
+  @@map("ai_model")
+}
+
+// MCP 服务器
+model MCPServer {
+  id             String         @id @default(cuid())
+  /// null = seed；非 null = per-user 覆盖
+  userId         String?
+  serverId       String
+  name           String
+  /// 是否启用（即 MCPClientManager 是否尝试连接）
+  enabled        Boolean
+  connectionType ConnectionType
+  command        String?
+  args           Json?
+  mcpUrl         String?
+  headers        Json?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([userId, serverId])
+  @@map("mcp_server")
+}
+
+// MCP 远程服务器 OAuth 凭据（随 MCPServer 按 userId 隔离）
+model MCPServerAuth {
+  id             String    @id @default(cuid())
+  /// null = seed；非 null = per-user
+  userId         String?
+  serverId       String
+  tokens         Json?
+  expiresAt      DateTime?
+  clientInfo     Json?
+  codeVerifier   String?
+  discoveryState Json?
+  /// OAuth PKCE 临时 state 值，用于 callback 路由查找对应 serverId
+  oauthState     String?
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([userId, serverId])
+  @@index([oauthState])
+  @@map("mcp_server_auth")
+}
+
+// T2：Agent 能力档案（渠道级全局配置；扩展多租户用 tenantId）
+model AgentProfile {
+  id                String         @id @default(cuid())
+  profileId         String         @unique
+  displayName       String
+  vendor            String?
+  defaultModel      String
+  temperature       Float?
+  maxTokens         Int?
+  enableTools       Boolean        @default(true)
+  enablePrompts     Boolean        @default(true)
+  maxToolCallRounds Int            @default(25)
+  /// open | interactive | locked；IM 管理端仅 open / locked
+  permissionMode    PermissionMode @default(locked)
+  enableAutoCompact Boolean?
+  compactModel      String?
+  /// 绑定的 MCP serverId 列表（JSON 数组，应用层解析）
+  mcpServerIds      Json           @default("[]")
+  toolPrompt        String?
+  /// 预留：多租户隔离键（当前未使用）
+  tenantId          String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@map("agent_profile")
+}
+
+// T2：入站路由规则（渠道级全局；boundUserId 指向账号配置桶）
+model RouteRule {
+  id          String          @id @default(cuid())
+  /// IM 渠道绑定账号，非 null 时以该账号身份解析 Provider/MCP
+  boundUserId String?
+  channel     ConfigChannelId
+  matchKey    String
+  /// 业务键引用 AgentProfile.profileId
+  profileId   String
+  priority    Int             @default(100)
+  enabled     Boolean         @default(true)
+  /// 预留：多租户隔离键（当前未使用）
+  tenantId    String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@unique([channel, matchKey])
+  /// 热路径：按渠道 + enabled 扫描，按优先级排序
+  @@index([channel, enabled, priority])
+  @@map("route_rule")
+}
+
+// ---------------------------------------------------------------------------
+// Quick messages
+// ---------------------------------------------------------------------------
+
+model QuickMessage {
+  id       String @id @default(cuid())
+  sortId   Int    @unique
+  content  String
+  result   String
+  category String @default("默认")
+
+  @@map("quick_message")
+}
+
+// ---------------------------------------------------------------------------
+// Auth models（better-auth 管理，保持原命名约定）
+// ---------------------------------------------------------------------------
+
+model User {
+  id              String        @id
+  name            String
+  email           String
+  emailVerified   Boolean       @default(false)
+  image           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  username        String?
+  displayUsername String?
+  role            String?
+  banned          Boolean?      @default(false)
+  banReason       String?
+  banExpires      DateTime?
+  sessions        Session[]
+  accounts        Account[]
+  chatSessions    ChatSession[]
+
+  @@unique([email])
+  @@unique([username])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ---------------------------------------------------------------------------
+// Chat models（T4）
+// ---------------------------------------------------------------------------
+
+// 聊天会话（仅已登录用户；guest 走浏览器 IndexedDB 不入库）。
+// 区别于 better-auth Session（登录会话）与 Bus sessionKey（消息总线分区键）。
+model ChatSession {
+  id                  String        @id @default(cuid())
+  userId              String
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title               String?
+  compactBaselineJson Json?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  messages            ChatMessage[]
+
+  @@index([userId])
+  @@map("chat_session")
+}
+
+// 聊天消息。append-only：写入后不更新不删除，重试产生新消息；仅随会话级联删除
+model ChatMessage {
+  id            String      @id @default(cuid())
+  sessionId     String
+  session       ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role          String
+  content       String?
+  toolCallsJson Json?
+  reasoning     String?
+  createdAt     DateTime    @default(now())
+
+  @@index([sessionId, createdAt])
+  @@map("chat_message")
+}

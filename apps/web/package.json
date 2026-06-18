@@ -1,0 +1,31 @@
+{
+  "name": "@meek/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint app components lib"
+  },
+  "dependencies": {
+    "@better-auth/prisma-adapter": "^1.6.19",
+    "@meek/db": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "better-auth": "^1.6.19",
+    "next": "^16.2.9",
+    "openai": "^6.44.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.1",
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "tailwindcss": "^4.3.1",
+    "typescript": "^6.0.3"
+  }
+}

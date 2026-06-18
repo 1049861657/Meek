@@ -1,0 +1,96 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand: #1976d2;
+  --color-brand-dark: #115293;
+  --color-brand-light: #e3f2fd;
+  --color-page-bg: #f5f7f9;
+  --spacing-navbar: 50px;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  background: var(--color-page-bg);
+  color: #333;
+}
+
+body.has-navbar {
+  padding-top: var(--spacing-navbar);
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  height: var(--spacing-navbar);
+  align-items: stretch;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  background: var(--color-brand);
+  color: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.navbar__links {
+  display: flex;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__link {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  margin: 0;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.15s;
+}
+
+.navbar__link:hover {
+  background: rgb(255 255 255 / 0.1);
+  text-decoration: none;
+}
+
+.navbar__link.is-active {
+  background: rgb(255 255 255 / 0.2);
+  font-weight: 500;
+}
+
+.navbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 12px;
+}
+
+.page-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.page-shell h1 {
+  margin: 0 0 12px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.page-shell p {
+  margin: 0;
+  color: #666;
+}

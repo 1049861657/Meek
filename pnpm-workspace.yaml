@@ -1,0 +1,11 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+allowBuilds:
+  '@prisma/engines': false
+  better-sqlite3: false
+  esbuild: false
+  prisma: false
+  sharp: false
+minimumReleaseAgeExclude:
+  - openai@6.44.0
