@@ -2,7 +2,7 @@
 
 
 
-> **状态**：未开始  
+> **状态**：进行中（M1-01 已完成）  
 
 > **周期**：3 ~ 4 人周（2 人）  
 
@@ -33,21 +33,21 @@
 
 
 
-- [ ] **M1-01-01** 定义 `ChatAgentOptions`、`ResolvedProfile` 类型（`packages/shared`）
+- [x] **M1-01-01** 定义 `ChatAgentOptions`、`ResolvedProfile` 类型（`packages/shared`）
 
-- [ ] **M1-01-02** 移植 `runAgentLoop` / `AgentLoopProvider`（对齐 `agent-loop.ts`；**按职责拆文件**，行为不变）
+- [x] **M1-01-02** 移植 `runAgentLoop` / `AgentLoopProvider`（对齐 `agent-loop.ts`；**按职责拆文件**，行为不变）
 
-- [ ] **M1-01-03** `stopWhen` / `maxToolCallRounds` 可配置（对齐 `feature-config`）
+- [x] **M1-01-03** `stopWhen` / `maxToolCallRounds` 可配置（对齐 `feature-config`）
 
-- [ ] **M1-01-04** Prompt Pipeline 分段组装（对齐 `prompt-pipeline.ts`）
+- [x] **M1-01-04** Prompt Pipeline 分段组装（对齐 `prompt-pipeline.ts`）
 
-- [ ] **M1-01-05** Provider 抽象：`openai` 包 OpenAI 兼容（对齐 `ai-provider.ts`、`ai-providers.ts`）
+- [x] **M1-01-05** Provider 抽象：`openai` 包 OpenAI 兼容（对齐 `ai-provider.ts`、`ai-providers.ts`）
 
-- [ ] **M1-01-06** `onStepFinish` 结构化 audit 日志
+- [x] **M1-01-06** `onStepFinish` 结构化 audit 日志
 
-- [ ] **M1-01-07** `usage-telemetry` 采集与 SSE 透出字段
+- [x] **M1-01-07** `usage-telemetry` 采集与 SSE 透出字段
 
-- [ ] **M1-01-08** 现查 `agent-harness/` 其余文件（`permission-session.ts`、`loop-state.ts`、`streaming-tool-scheduler.ts` 等）全部纳入
+- [x] **M1-01-08** 现查 `agent-harness/` 其余文件（`permission-session.ts`、`loop-state.ts`、`streaming-tool-scheduler.ts` 等）全部纳入
 
 
 
