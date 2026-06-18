@@ -44,6 +44,9 @@ importers:
       '@meek/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@meek/mcp-runtime':
+        specifier: workspace:*
+        version: link:../../packages/mcp-runtime
       '@meek/message-bus':
         specifier: workspace:*
         version: link:../../packages/message-bus
@@ -99,6 +102,9 @@ importers:
       '@meek/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@meek/mcp-runtime':
+        specifier: workspace:*
+        version: link:../../packages/mcp-runtime
       '@meek/message-bus':
         specifier: workspace:*
         version: link:../../packages/message-bus
@@ -153,6 +159,31 @@ importers:
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
+      '@types/node':
+        specifier: ^25.9.3
+        version: 25.9.3
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/mcp-runtime:
+    dependencies:
+      '@meek/agent-core':
+        specifier: workspace:*
+        version: link:../agent-core
+      '@meek/db':
+        specifier: workspace:*
+        version: link:../db
+      '@meek/shared':
+        specifier: workspace:*
+        version: link:../shared
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.29.0
+        version: 1.29.0(zod@4.4.3)
+      lru-cache:
+        specifier: ^11.5.1
+        version: 11.5.1
+    devDependencies:
       '@types/node':
         specifier: ^25.9.3
         version: 25.9.3

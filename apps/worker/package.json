@@ -12,6 +12,7 @@
   "dependencies": {
     "@meek/agent-core": "workspace:*",
     "@meek/db": "workspace:*",
+    "@meek/mcp-runtime": "workspace:*",
     "@meek/message-bus": "workspace:*",
     "@meek/shared": "workspace:*"
   },

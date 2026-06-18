@@ -28,7 +28,7 @@ MCP-Client **已落地源码** → Meek 全量重写（Next.js 16 + Worker + Bul
 | `frontend/src/*` | `apps/web` |
 | `src/api/*`、`src/app.ts` | `apps/web` API + `apps/worker` |
 | `src/core/agent-harness/` | `packages/agent-core` |
-| `src/core/mcp/`、`src/mcp-servers/` | `packages/mcp-client` |
+| `src/core/mcp/`、`src/mcp-servers/` | `packages/mcp-runtime` |
 | `src/config-plane/` | `packages/config-plane` |
 | `src/message-bus/`、`src/channels/` | `apps/worker` |
 | `prisma/schema.prisma` | `packages/db`（14 model） |

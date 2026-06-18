@@ -3,6 +3,7 @@ import { betterAuth } from 'better-auth';
 import { admin, multiSession, username } from 'better-auth/plugins';
 import { adminAc, userAc } from 'better-auth/plugins/admin/access';
 import { prisma } from '@meek/db';
+import { resolveDefaultWebOrigin } from '@meek/shared';
 
 import { hashPassword, verifyPassword } from './password-hasher';
 
@@ -10,6 +11,10 @@ export const SUPERADMIN_ROLE = 'SUPERADMIN';
 export const USER_ROLE = 'USER';
 
 export const auth = betterAuth({
+  baseURL: {
+    allowedHosts: ['localhost:*', '127.0.0.1:*', '*.vercel.app'],
+    fallback: resolveDefaultWebOrigin(),
+  },
   database: prismaAdapter(prisma, { provider: 'sqlite' }),
   emailAndPassword: {
     enabled: true,

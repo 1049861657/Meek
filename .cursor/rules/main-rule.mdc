@@ -2,7 +2,7 @@
 
 ## 目录
 - `apps/web/` Next.js App Router | `apps/worker/` MCP/Queue/渠道
-- `packages/` agent-core、mcp-client、config-plane、db、shared
+- `packages/` agent-core、mcp-runtime、config-plane、db、shared
 - `prisma/` schema | `todos/` 迁移任务书 | `docs/` 架构调研
 
 ## 命名

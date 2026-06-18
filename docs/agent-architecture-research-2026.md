@@ -28,8 +28,8 @@
                              │
         ┌────────────────────┼────────────────────┐
         ▼                    ▼                    ▼
-  packages/agent-core   packages/mcp-client   packages/db
-  (控制面)              (MCP SDK 封装)         (Prisma)
+  packages/agent-core   packages/mcp-runtime   packages/db
+  (控制面)              (MCP 连接运行时)        (Prisma)
         │                    │
         └──────── 移植 agent-harness + @modelcontextprotocol/sdk ────────┘
 ```
@@ -40,7 +40,7 @@
 |------|------|------|
 | 前端框架 | **Next.js 16 + React 19** | App Router 成熟；Turbopack 默认；内置 MCP DevTools（`/_next/mcp`） |
 | Agent 运行时 | **移植 `agent-harness`** + `openai` Provider（ADR-006） | 与参考同形；Web 走 BullMQ + 参考 SSE |
-| MCP 连接 | **`@modelcontextprotocol/sdk`** + 自研 `packages/mcp-client` | 与参考一致；HTTP/stdio 均此包；多服聚合自研 |
+| MCP 连接 | **`@modelcontextprotocol/sdk`** + 自研 `packages/mcp-runtime` | 与参考一致；HTTP/stdio 均此包；多服聚合自研 |
 | 控制面 | **自研 `packages/agent-core`** | MCP-Client 的 Harness 能力（压缩/权限/Config Plane）无现成框架覆盖 |
 | 持久化 | **Prisma + SQLite**（可换 PostgreSQL） | 对齐参考产品数据模型 |
 | 认证 | **better-auth**（Next.js adapter） | 参考产品已验证 |
@@ -56,7 +56,7 @@
 |-----------------|---------------|
 | `frontend/` Vanilla MPA | `apps/web` React 组件 + App Router 页面 |
 | `src/core/agent-harness/` | `packages/agent-core`（AI SDK Agent 接口 + 自研扩展） |
-| `src/core/mcp/` | `packages/mcp-client`（`@modelcontextprotocol/sdk`） |
+| `src/core/mcp/` | `packages/mcp-runtime`（`@modelcontextprotocol/sdk`） |
 | `src/api/` | `apps/api` Route Handlers |
 | `src/message-bus/` + `src/channels/` | `apps/worker` |
 | `src/config-plane/` | `packages/config-plane` |
@@ -248,7 +248,7 @@ Meek/
 │   └── worker/                 # Node.js 常驻 — Agent/MCP/Queue/Channels
 ├── packages/
 │   ├── agent-core/             # 移植 agent-harness 控制面
-│   ├── mcp-client/             # 多服连接、OAuth、状态机
+│   ├── mcp-runtime/            # 多服连接、OAuth、状态机
 │   ├── config-plane/           # Profile/Route 解析
 │   ├── db/                     # Prisma client + schema
 │   └── shared/                 # 类型、Zod schema、常量
@@ -336,7 +336,7 @@ worker 启动
 
 LLM 调用 **`openai` 包**（与参考一致）。
 
-### 4.6 MCP 层（packages/mcp-client）
+### 4.6 MCP 层（packages/mcp-runtime）
 
 **双轨集成**：
 

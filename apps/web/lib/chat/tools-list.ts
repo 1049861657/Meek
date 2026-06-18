@@ -1,6 +1,3 @@
-import { getMcpClientForUser } from '@meek/agent-core';
-
-import { ensureWebMcpStub } from '@/lib/mcp/mcp-stub';
 import type { RequestPrincipal } from '@/lib/chat/resolve-principal';
 
 export interface ToolsListSuccess {
@@ -21,22 +18,13 @@ export interface ToolsListHttpResult {
 }
 
 export async function handleToolsList(
-  principal: RequestPrincipal
+  _principal: RequestPrincipal
 ): Promise<ToolsListHttpResult> {
-  try {
-    ensureWebMcpStub();
-    const serverInfo = await getMcpClientForUser(principal.configUserId).getServerInfo();
-    return {
-      status: 200,
-      body: {
-        success: true,
-        server: serverInfo.server.name,
-        tools: serverInfo.tools,
-      },
-    };
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error('[API] 获取可用工具时出错:', message);
-    return { status: 500, body: { error: message } };
-  }
+  return {
+    status: 503,
+    body: {
+      error:
+        'Web 进程不承载 MCP 运行时；GET /api/tools/list 将在 M2-04 Info API 对接 worker 后提供',
+    },
+  };
 }

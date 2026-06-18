@@ -1,6 +1,6 @@
 import type { CallToolOptions, MCPServerInfo } from '../mcp-types.js';
 
-/** MCP 客户端端口（M4 前由 apps/worker 注入实现） */
+/** MCP 客户端端口（由 apps/worker 注入） */
 export interface McpClientPort {
   getServerIdForTool(codeName: string): string | null | undefined;
   getServerName(serverId: string): string | undefined;
@@ -32,8 +32,8 @@ let mcpClientResolver: McpClientResolver = () => {
 };
 
 let mcpConnectionService: McpConnectionServicePort = {
-  async ensureForChat(serverIds) {
-    return { reachableIds: serverIds };
+  async ensureForChat(): Promise<{ reachableIds: string[] }> {
+    throw new Error('McpConnectionServicePort 未注入：调用 setMcpConnectionService');
   },
 };
 

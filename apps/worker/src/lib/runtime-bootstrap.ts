@@ -7,8 +7,11 @@ import {
   type AIProvider,
   type AIProvidersConfigType,
 } from '@meek/agent-core';
+import { getMcpClientForUser as getRuntimeMcpClient } from '@meek/mcp-runtime';
 
-import { createNoopMcpClient } from './mcp-noop.js';
+import { bootstrapMcpConfig, loadMcpConfig } from './mcp-config-bootstrap.js';
+import { createMcpClientPort } from './mcp-adapter.js';
+import { wireMcpConnectionService } from './mcp-connection-bridge.js';
 
 async function readDefaultProviderName(userId: string | null): Promise<string | null> {
   const row = await prisma.setting.findFirst({
@@ -70,16 +73,24 @@ export async function ensureWorkerRuntime(configUserId: string | null = null): P
   if (workerRuntimeInitialized) {
     return;
   }
-  setMcpClientResolver(() => createNoopMcpClient());
+  await bootstrapMcpConfig();
+  setMcpClientResolver((userId) => createMcpClientPort(getRuntimeMcpClient(userId)));
+  wireMcpConnectionService();
   await loadAiProvidersConfig(configUserId);
   await initializeProviders();
   workerRuntimeInitialized = true;
+}
+
+export async function ensureWorkerRuntimeForUser(configUserId: string | null): Promise<void> {
+  await ensureWorkerRuntime(configUserId);
+  await loadMcpConfig(configUserId);
+  await loadAiProvidersConfig(configUserId);
 }
 
 export async function getHarnessProvider(
   configUserId: string | null,
   vendor?: string
 ): Promise<Awaited<ReturnType<typeof getProviderForUser>>> {
-  await ensureWorkerRuntime(configUserId);
+  await ensureWorkerRuntimeForUser(configUserId);
   return getProviderForUser(configUserId, vendor);
 }

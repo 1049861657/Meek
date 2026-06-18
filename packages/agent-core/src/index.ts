@@ -213,6 +213,7 @@ export {
   setMcpConfig,
   setToolPromptSetting,
 } from './ports/settings-port.js';
+export type { McpConfig } from './ports/settings-port.js';
 export {
   getToolPreferencesService,
   setToolPreferencesStore,

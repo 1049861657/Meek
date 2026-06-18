@@ -1,4 +1,5 @@
 import { retainConversation } from './ports/memory-port.js';
+import { isHindsightMemoryConfigured } from './config/feature-config.js';
 import { buildRetainContent } from './memory-pipeline-context.js';
 import type { InternalMessage } from './types.js';
 import { registerHook } from './hook-runner.js';
@@ -10,7 +11,7 @@ function isInternalMessageArray(value: unknown): value is InternalMessage[] {
 /** P3-02-B：会话结束异步 retain */
 export function registerMemoryRetainHook(): void {
   registerHook('SessionEnd', async (payload) => {
-    if (payload.skipMemory === true) {
+    if (payload.skipMemory === true || !isHindsightMemoryConfigured()) {
       return { exit_code: 0, message: '' };
     }
 

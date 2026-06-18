@@ -23,7 +23,7 @@ MCP-Client 实际栈：
 |----|------|
 | Agent 控制面 | **移植** `src/core/agent-harness/` → `packages/agent-core` |
 | LLM | **`openai` 包**（与参考一致） |
-| MCP（HTTP + stdio） | **`@modelcontextprotocol/sdk`** + 自研连接池 / ToolNameCodec / OAuth（对齐 `src/core/mcp/`） |
+| MCP（HTTP + stdio） | **`@modelcontextprotocol/sdk`** + 自研 `packages/mcp-runtime`（连接池 / ToolNameCodec / OAuth，对齐 `src/core/mcp/`） |
 | Web 聊天 | **BullMQ 入站** + 参考 SSE + React 移植 `stream-handler` |
 | **不引入** | `ai`、`@ai-sdk/react`、`@ai-sdk/mcp`、`ToolLoopAgent`、`useChat` |
 

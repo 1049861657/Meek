@@ -23,22 +23,20 @@ export interface MemoryPort {
   ): void;
 }
 
-const noopMemoryPort: MemoryPort = {
-  async retainConversation() {
-    /* M4 前 noop */
+let memoryPort: MemoryPort = {
+  async retainConversation(): Promise<void> {
+    throw new Error('MemoryPort 未注入：调用 setMemoryPort');
   },
-  async recallForPrompt() {
-    return '';
+  async recallForPrompt(): Promise<string> {
+    throw new Error('MemoryPort 未注入：调用 setMemoryPort');
   },
   resolveHindsightBankId(_channel, key) {
     return `meek:${key}`;
   },
   logMemoryRecallSkipped() {
-    /* noop */
+    /* 跳过记录：不依赖 Memory 后端 */
   },
 };
-
-let memoryPort: MemoryPort = noopMemoryPort;
 
 export function setMemoryPort(port: MemoryPort): void {
   memoryPort = port;

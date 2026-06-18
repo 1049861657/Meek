@@ -48,8 +48,8 @@
 | MCP-Client | Meek |
 |------------|------|
 | `src/core/agent-harness/*` | `packages/agent-core/` |
-| `src/core/mcp/*` | `packages/mcp-client/` |
-| `src/mcp-servers/*` | `apps/worker/mcp-servers/` 或 `packages/mcp-client/servers/` |
+| `src/core/mcp/*` | `packages/mcp-runtime/` |
+| `src/mcp-servers/*` | `apps/worker/mcp-servers/` 或 `packages/mcp-runtime/servers/` |
 | `src/core/memory/*` | `packages/agent-core/memory/` |
 | `src/config-plane/*` | `packages/config-plane/` |
 | `src/message-bus/*` | `apps/worker/message-bus/` |

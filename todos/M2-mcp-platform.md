@@ -14,27 +14,27 @@
 
 ---
 
-## M2-01 packages/mcp-client
+## M2-01 packages/mcp-runtime
 
-- [ ] **M2-01-01** `McpConnectionPool`：serverId → 连接实例
-- [ ] **M2-01-02** HTTP + stdio 传输：**`@modelcontextprotocol/sdk`**（对齐 `server-connection.ts`；stdio **仅 worker**）
-- [ ] **M2-01-03** 连接状态机：`connecting | connected | needs-auth | failed`
-- [ ] **M2-01-04** 断线重连 + 工具列表 TTL 缓存
-- [ ] **M2-01-05** `ToolNameCodec`：多服工具名唯一化
-- [ ] **M2-01-06** `tool-policy.service` 工具策略过滤
+- [x] **M2-01-01** `McpConnectionPool`：serverId → 连接实例
+- [x] **M2-01-02** HTTP + stdio 传输：**`@modelcontextprotocol/sdk`**（对齐 `server-connection.ts`；stdio **仅 worker**）
+- [x] **M2-01-03** 连接状态机：`connecting | connected | needs-auth | failed`
+- [x] **M2-01-04** 断线重连 + 工具列表 TTL 缓存
+- [x] **M2-01-05** `ToolNameCodec`：多服工具名唯一化
+- [x] **M2-01-06** `tool-policy.service` 工具策略过滤
 
 ## M2-02 MCP 配置存储
 
-- [ ] **M2-02-01** Prisma：`MCPServer`、`MCPServerAuth` 读写
-- [ ] **M2-02-02** seed 基线（userId=null）+ per-user 覆盖
-- [ ] **M2-02-03** CRUD service（Settings 页复用）
+- [x] **M2-02-01** Prisma：`MCPServer`、`MCPServerAuth` 读写
+- [x] **M2-02-02** seed 基线（userId=null）+ per-user 覆盖
+- [x] **M2-02-03** CRUD service（Settings 页复用）
 
 ## M2-03 OAuth
 
-- [ ] **M2-03-01** PKCE 流程（Streamable HTTP）
-- [ ] **M2-03-02** `GET /api/server/:id/oauth/authorize`
-- [ ] **M2-03-03** `GET /api/mcp/oauth/callback`
-- [ ] **M2-03-04** Token 持久化 + 刷新
+- [x] **M2-03-01** PKCE 流程（Streamable HTTP）
+- [x] **M2-03-02** `GET /api/server/:id/oauth/authorize`
+- [x] **M2-03-03** `GET /api/mcp/oauth/callback`
+- [x] **M2-03-04** Token 持久化 + 刷新
 
 ## M2-04 Info API
 

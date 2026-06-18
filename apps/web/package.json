@@ -13,6 +13,7 @@
     "@better-auth/prisma-adapter": "^1.6.19",
     "@meek/agent-core": "workspace:*",
     "@meek/db": "workspace:*",
+    "@meek/mcp-runtime": "workspace:*",
     "@meek/message-bus": "workspace:*",
     "@meek/shared": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",

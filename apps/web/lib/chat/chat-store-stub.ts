@@ -1,10 +1,9 @@
 import type { InternalMessage } from '@meek/agent-core';
 
-/** M4 前：已登录会话历史由服务端组装（noop 返回空历史） */
 export async function assembleContextMessages(
   _userId: string,
   _chatSessionId: string,
   _options?: { messageHistoryCount?: number }
 ): Promise<InternalMessage[]> {
-  return [];
+  throw new Error('会话历史未实现：M4 ChatStore 注入后由服务端组装');
 }
