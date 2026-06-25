@@ -1,3 +1,5 @@
+import { Spinner } from '@/components/ui/spinner';
+
 export function PageLoadingSpinner({
   message = '加载中…',
 }: {
@@ -5,7 +7,7 @@ export function PageLoadingSpinner({
 }): React.ReactElement {
   return (
     <div className="page-loading" role="status" aria-live="polite">
-      <div className="ui-spinner ui-spinner--lg" aria-hidden="true" />
+      <Spinner size="lg" />
       <p className="page-loading__text">{message}</p>
     </div>
   );

@@ -6,9 +6,9 @@ import { prisma } from '@meek/db';
 import { resolveDefaultWebOrigin } from '@meek/shared';
 
 import { hashPassword, verifyPassword } from './password-hasher';
+import { SUPERADMIN_ROLE, USER_ROLE } from '@/lib/auth/constants';
 
-export const SUPERADMIN_ROLE = 'SUPERADMIN';
-export const USER_ROLE = 'USER';
+export { SUPERADMIN_ROLE, USER_ROLE } from '@/lib/auth/constants';
 
 export const auth = betterAuth({
   baseURL: {

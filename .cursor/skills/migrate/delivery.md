@@ -23,7 +23,7 @@
 | `run_in_background` | `false` |
 | `description` | `Migrate delivery gate` |
 
-此时 subagent 同时掌握 **Diff + 参考源码 + 任务书**，信息最全——除硬性门禁外，**应主动提出优化建议**（见下），供主 AI 裁决；subagent **不得**自行改代码或 todos。
+此时 subagent 同时掌握 **Diff + 参考源码 + 任务书**，信息最全——除硬性门禁外，**应主动提出优化建议**（见下），供主 AI 裁决；subagent **不得**自行改代码或 todos。门禁默认对照工作区未提交变更（`Diff: uncommitted changes`），勿因无 commit 拒审。
 
 ### 传给 subagent 的 prompt 模板
 

@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import { Navbar } from '@/components/navbar';
+import { UiRoot } from '@/components/ui/ui-root';
+import { AuthProvider } from '@/providers/auth-provider';
 import './globals.css';
 
 export const metadata = {
@@ -15,8 +17,11 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="has-navbar">
-        <Navbar />
-        {children}
+        <AuthProvider>
+          <Navbar />
+          {children}
+          <UiRoot />
+        </AuthProvider>
       </body>
     </html>
   );

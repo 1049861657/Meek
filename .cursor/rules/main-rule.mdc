@@ -12,7 +12,7 @@
 ## TS
 - 公共函数显式返回类型；禁 `any`，用 `unknown` 收窄
 - 命名导出；禁 default export
-- import 顺序：node → 第三方 → 项目内；相对路径带 `.js`
+- import 顺序：node → 第三方 → 项目内；`packages/*`/`worker` 相对路径带 `.js`，`apps/web` 用 `@/*` 无后缀、禁 client 引 `@/lib/auth` 与 `lib/auth.ts` 内 `./auth/`
 
 ## 迁移
 - 参考 SSOT：`../MCP-Client/src/` + `frontend/src/`（**非** MCP-Client/todos）

@@ -117,15 +117,15 @@ apps/web/
 
 参考：`frontend/src/shared/ui/*`、`shared/theme.css`
 
-- [ ] **M3-01-01** Tailwind v4 主题令牌（`theme.css` → `globals.css`）
-- [ ] **M3-01-02** Button / Toggle / Spinner
-- [ ] **M3-01-03** OverlayModal（`overlay-modal.js`）
-- [ ] **M3-01-04** ConfirmDialog（Settings/Info/Admin 共用）
-- [ ] **M3-01-05** DropdownSelect / Segmented / Stepper
-- [ ] **M3-01-06** Toast / Tooltip / StatusChip / EmptyState
-- [ ] **M3-01-07** FormField / InputDialog / StatusPill / ChipGroup
-- [ ] **M3-01-08** StatusDot（Info 连接态）
-- [ ] **M3-01-09** safe text 工具（对齐 `escape-html.js`）
+- [x] **M3-01-01** Tailwind v4 主题令牌（`theme.css` → `globals.css`）
+- [x] **M3-01-02** Button / Toggle / Spinner
+- [x] **M3-01-03** OverlayModal（`overlay-modal.js`）
+- [x] **M3-01-04** ConfirmDialog（Settings/Info/Admin 共用）
+- [x] **M3-01-05** DropdownSelect / Segmented / Stepper
+- [x] **M3-01-06** Toast / Tooltip / StatusChip / EmptyState
+- [x] **M3-01-07** FormField / InputDialog / StatusPill / ChipGroup
+- [x] **M3-01-08** StatusDot（Info 连接态）
+- [x] **M3-01-09** safe text 工具（对齐 `escape-html.js`）
 
 ---
 
@@ -133,14 +133,14 @@ apps/web/
 
 参考：`shared/navbar.js`、`auth/*`、`shared/fetch-json.js`
 
-- [ ] **M3-02-01** Navbar 链接 + 路由高亮
-- [ ] **M3-02-02** Navbar `GET /api/client-info` 名/版本
-- [ ] **M3-02-03** SUPERADMIN 链接显隐
-- [ ] **M3-02-04** `lib/auth/session.ts`（对齐 `auth/session.js`）
-- [ ] **M3-02-05** AuthModal + LoginForm + NavAuth
-- [ ] **M3-02-06** AuthShell：`data-auth` + `data-requires-auth` guest 写拦截
-- [ ] **M3-02-07** `lib/api/fetch-json.ts` + 统一错误 toast
-- [ ] **M3-02-08** `AuthProvider`：登录/登出整页 refresh；init-once 会话 SSOT
+- [x] **M3-02-01** Navbar 链接 + 路由高亮
+- [x] **M3-02-02** Navbar `GET /api/client-info` 名/版本
+- [x] **M3-02-03** SUPERADMIN 链接显隐
+- [x] **M3-02-04** `lib/auth/session.ts`（对齐 `auth/session.js`）
+- [x] **M3-02-05** AuthModal + LoginForm + NavAuth
+- [x] **M3-02-06** AuthShell：`data-auth` + `data-requires-auth` guest 写拦截
+- [x] **M3-02-07** `lib/api/fetch-json.ts` + 统一错误 toast
+- [x] **M3-02-08** `AuthProvider`：登录/登出整页 refresh；init-once 会话 SSOT
 
 ---
 
@@ -185,6 +185,8 @@ apps/web/
 
 ### M3-03-C Modal ×9（03-30～03-38，`dynamic()` lazy）
 
+> **M3-01 落点**：用 React `OverlayModal` 的 `open`/`onClose` 受控模式；**不移植**参考 `openOverlayModal` / `bindOverlayModalClose` imperative API。
+
 | DOM id | 参考 | 任务 |
 |--------|------|------|
 | `history-modal` | `history-modal.js` | 03-30 |
@@ -198,7 +200,7 @@ apps/web/
 | `prompts-modal` | `prompt-editor.js` | 03-38 |
 
 - [ ] **M3-03-30** HistoryModal — 搜索、批量删、加载会话
-- [ ] **M3-03-31** SettingsModal — 模型/权限/MCP 开关/恢复默认
+- [ ] **M3-03-31** SettingsModal — 模型/权限/MCP 开关/恢复默认（Toggle 用受控 `ToggleSwitch`，不移植 `bindToggle`）
 - [ ] **M3-03-32** ContextModal — 预览/生成/应用/清除摘要
 - [ ] **M3-03-33** SystemToolsModal
 - [ ] **M3-03-34** McpModal — probe 后保存、顶栏计数
