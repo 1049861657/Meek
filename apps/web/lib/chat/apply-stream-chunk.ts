@@ -1,4 +1,6 @@
-import type { AssistantMessage, ToolCallState } from './chat-ui-types';
+import type { AssistantMessage, PlanningItemState, ToolCallState } from './chat-ui-types';
+import { mapStepUsageToDisplay } from './usage-telemetry';
+import type { StepUsagePayload } from './usage-telemetry';
 
 function formatArgs(value: unknown): string {
   if (typeof value === 'string') {
@@ -158,15 +160,27 @@ export function applyStreamChunk(
     const index = progress.index ?? 0;
     next = {
       ...next,
-      toolCalls: updateToolCall(next.toolCalls, index, undefined, (tool) => ({
-        ...tool,
-        progress: {
-          progress: typeof progress.progress === 'number' ? progress.progress : 0,
-          ...(typeof progress.total === 'number' ? { total: progress.total } : {}),
-          ...(typeof progress.message === 'string' ? { message: progress.message } : {}),
-          ...(typeof progress.elapsed_ms === 'number' ? { elapsedMs: progress.elapsed_ms } : {}),
-        },
-      })),
+      toolCalls: updateToolCall(next.toolCalls, index, undefined, (tool) => {
+        const steps = tool.progressSteps ?? [];
+        return {
+          ...tool,
+          progress: {
+            progress: typeof progress.progress === 'number' ? progress.progress : 0,
+            ...(typeof progress.total === 'number' ? { total: progress.total } : {}),
+            ...(typeof progress.message === 'string' ? { message: progress.message } : {}),
+            ...(typeof progress.elapsed_ms === 'number' ? { elapsedMs: progress.elapsed_ms } : {}),
+          },
+          progressSteps: [
+            ...steps,
+            {
+              progress: typeof progress.progress === 'number' ? progress.progress : 0,
+              ...(typeof progress.total === 'number' ? { total: progress.total } : {}),
+              ...(typeof progress.message === 'string' ? { message: progress.message } : {}),
+              ...(typeof progress.elapsed_ms === 'number' ? { elapsedMs: progress.elapsed_ms } : {}),
+            },
+          ],
+        };
+      }),
     };
   }
 
@@ -227,6 +241,23 @@ export function applyStreamChunk(
           permissionSessionKey: pr.permissionSessionKey,
         },
       })),
+    };
+  }
+
+  const stepUsage = jsonData.step_usage;
+  if (stepUsage && typeof stepUsage === 'object') {
+    const display = mapStepUsageToDisplay(stepUsage as StepUsagePayload);
+    if (display) {
+      next = { ...next, tokenUsage: display };
+    }
+  }
+
+  const planningUpdate = jsonData.planning_update;
+  if (planningUpdate && typeof planningUpdate === 'object') {
+    const items = (planningUpdate as { items?: unknown[] }).items ?? [];
+    next = {
+      ...next,
+      planningItems: items.map((item) => ({ ...(item as PlanningItemState) })),
     };
   }
 

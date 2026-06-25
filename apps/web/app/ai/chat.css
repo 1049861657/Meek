@@ -2,9 +2,17 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - var(--spacing-navbar));
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 0 16px 16px;
+}
+
+.chat-shell {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
 }
 
 .chat-panel {
@@ -275,4 +283,362 @@
 .chat-btn--ghost {
   background: #eee;
   color: #333;
+}
+
+/* —— M3-03-B 工具栏 —— */
+.chat-panel__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 8px;
+}
+
+.chat-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.chat-toolbar__session {
+  font-size: 13px;
+  color: #666;
+  min-width: 0;
+}
+
+.chat-toolbar__session-id {
+  font-weight: 600;
+  color: #333;
+}
+
+.chat-toolbar__actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.chat-toolbar__btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+}
+
+.chat-toolbar__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chat-toolbar__badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--color-brand);
+  color: #fff;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* —— Composer 图标按钮 —— */
+.chat-composer-area {
+  padding-bottom: 4px;
+}
+
+.chat-composer__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: #444;
+  cursor: pointer;
+}
+
+.chat-composer__icon-btn--send {
+  background: var(--color-brand);
+  color: #fff;
+}
+
+.chat-composer__icon-btn--stop {
+  background: #c62828;
+  color: #fff;
+}
+
+.chat-composer__icon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* —— Markdown —— */
+.chat-markdown {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.chat-markdown pre {
+  overflow-x: auto;
+  padding: 8px;
+  border-radius: 4px;
+  background: #f5f5f5;
+}
+
+.chat-markdown code {
+  font-size: 0.9em;
+}
+
+/* —— Reasoning —— */
+.reasoning-block {
+  margin-bottom: 8px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.reasoning-block__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: #f9f9f9;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.reasoning-block__content {
+  padding: 8px 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  font-size: 12px;
+}
+
+/* —— Token usage —— */
+.chat-message__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.token-info {
+  font-size: 11px;
+  color: #888;
+}
+
+.token-meta__count {
+  font-weight: 600;
+}
+
+.token-meta__delta {
+  color: var(--color-brand);
+}
+
+/* —— Context notice —— */
+.chat-context-notice {
+  margin: 8px 0 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #fff8e1, #fff3e0);
+  border: 1px solid #ffe082;
+  font-size: 13px;
+  color: #e65100;
+}
+
+/* —— Tool card 扩展 —— */
+.tool-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.tool-card__source {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.tool-card__source--system {
+  background: #e1f5fe;
+  color: #0277bd;
+}
+
+.tool-card__source--mcp {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.tool-card__body {
+  margin-top: 8px;
+}
+
+.tool-card__progress-steps {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: #666;
+}
+
+.tool-card__permission-preview {
+  margin: 6px 0;
+  padding: 6px;
+  background: #fff;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: pre-wrap;
+}
+
+.tool-card__permission-remember {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  margin: 6px 0;
+}
+
+/* —— Todo card —— */
+.todo-tool-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px 12px;
+  border: 1px solid #b3e5fc;
+  border-radius: 8px;
+  background: #e1f5fe;
+  text-align: left;
+  cursor: pointer;
+}
+
+.todo-tool-card__title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0277bd;
+}
+
+.todo-tool-card__bar {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: #b3e5fc;
+  overflow: hidden;
+}
+
+.todo-tool-card__bar-fill {
+  display: block;
+  height: 100%;
+  background: #0288d1;
+}
+
+/* —— Planning panel —— */
+.plan-dock {
+  position: fixed;
+  right: 24px;
+  bottom: 180px;
+  z-index: 20;
+}
+
+.plan-fab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 20px;
+  background: var(--color-brand);
+  color: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+  cursor: pointer;
+}
+
+.plan-popover {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  width: 280px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 12%);
+}
+
+.plan-dock__list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.plan-dock__item {
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.plan-dock__item--completed {
+  color: #2e7d32;
+  text-decoration: line-through;
+}
+
+.plan-dock__item--in_progress {
+  color: var(--color-brand);
+  font-weight: 600;
+}
+
+.plan-dock__progress-bar {
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 2px;
+  background: #eee;
+  overflow: hidden;
+}
+
+.plan-dock__progress-fill {
+  height: 100%;
+  background: var(--color-brand);
+}
+
+.chat-message__thinking-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  border: 2px solid #ccc;
+  border-top-color: var(--color-brand);
+  border-radius: 50%;
+  animation: chat-spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes chat-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

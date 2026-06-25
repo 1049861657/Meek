@@ -1,6 +1,7 @@
 import { parseSseDataPayload } from './sse-parse';
 import { applyStreamChunk } from './apply-stream-chunk';
 import type { AssistantMessage } from './chat-ui-types';
+import { mapFinalUsageToDisplay, parseElapsedSecondsFromUsage } from './usage-telemetry';
 
 export interface StreamRuntime {
   reader: ReadableStreamDefaultReader<Uint8Array> | null;
@@ -10,10 +11,11 @@ export interface StreamRuntime {
 export interface SseStreamCallbacks {
   onBegin: (requestId: string) => void;
   onAssistantUpdate: (updater: (prev: AssistantMessage) => AssistantMessage) => void;
-  onContextCompacted: () => void;
+  onContextCompacted: (summaryContent?: string) => void;
   onUsage: (elapsedSeconds?: number) => void;
   onStreamError: (message: string) => void;
   onDone: () => void;
+  onPayload?: (payload: Record<string, unknown>) => void;
 }
 
 export interface ConsumeSseStreamResult {
@@ -48,6 +50,7 @@ export async function consumeSseStream(
     callbacks.onAssistantUpdate((prev) => {
       let next = prev;
       for (const payload of payloads) {
+        callbacks.onPayload?.(payload);
         next = applyStreamChunk(next, payload);
       }
       fullText = next.content;
@@ -69,7 +72,21 @@ export async function consumeSseStream(
     }
 
     if (name === 'context_compacted') {
-      callbacks.onContextCompacted();
+      let summaryContent: string | undefined;
+      if (eventData) {
+        try {
+          const compactData = JSON.parse(eventData) as { summaryContent?: string };
+          if (
+            typeof compactData.summaryContent === 'string' &&
+            compactData.summaryContent.length > 0
+          ) {
+            summaryContent = compactData.summaryContent;
+          }
+        } catch {
+          console.warn('[SSE] 解析 context_compacted 失败');
+        }
+      }
+      callbacks.onContextCompacted(summaryContent);
       callbacks.onAssistantUpdate((prev) => ({ ...prev, contextCompacted: true }));
       return;
     }
@@ -93,14 +110,20 @@ export async function consumeSseStream(
 
     if (name === 'usage' && eventData) {
       try {
-        const usageData = JSON.parse(eventData) as { elapsedTime?: number };
-        callbacks.onUsage(usageData.elapsedTime);
-        if (typeof usageData.elapsedTime === 'number') {
-          callbacks.onAssistantUpdate((prev) => ({
-            ...prev,
-            elapsedSeconds: usageData.elapsedTime,
-          }));
-        }
+        const usageData = JSON.parse(eventData) as {
+          elapsedTime?: string | number;
+          totalTokens?: number;
+          promptTokens?: number;
+          completionTokens?: number;
+        };
+        const elapsedSeconds = parseElapsedSecondsFromUsage(usageData);
+        callbacks.onUsage(elapsedSeconds);
+        const tokenDisplay = mapFinalUsageToDisplay(usageData);
+        callbacks.onAssistantUpdate((prev) => ({
+          ...prev,
+          ...(typeof elapsedSeconds === 'number' ? { elapsedSeconds } : {}),
+          ...(tokenDisplay ? { tokenUsage: tokenDisplay } : {}),
+        }));
       } catch {
         console.error('[SSE] 解析 usage 失败');
       }

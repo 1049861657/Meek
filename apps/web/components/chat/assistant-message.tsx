@@ -1,7 +1,11 @@
 'use client';
 
 import type { AssistantMessage } from '@/lib/chat/chat-ui-types';
+import { formatMessageTimeWithElapsed } from '@/lib/chat/time';
 
+import { ChatMarkdown } from './chat-markdown';
+import { ReasoningBlock } from './reasoning-block';
+import { TokenUsageBadge } from './token-usage-badge';
 import { ToolCallCard } from './tool-call-card';
 
 interface AssistantMessageViewProps {
@@ -15,33 +19,41 @@ interface AssistantMessageViewProps {
       permissionSessionKey: string;
     }
   ) => void;
+  onOpenPlanning?: () => void;
 }
 
+/** Assistant 消息：reasoning / tool / markdown / usage / 耗时 */
 export function AssistantMessageView({
   message,
   onResolvePermission,
+  onOpenPlanning,
 }: AssistantMessageViewProps): React.ReactElement {
+  const showThinking =
+    message.isStreaming && !message.content && message.toolCalls.length === 0;
+
   return (
     <article
-      className={`chat-message chat-message--assistant ${message.isError ? 'chat-message--error' : ''}`}
+      className={`chat-message chat-message--assistant ${message.isError ? 'chat-message--error' : ''} ${message.isStreaming ? 'chat-message--streaming' : ''}`}
     >
       <div className="chat-message__bubble">
-        {message.isStreaming && !message.content && message.toolCalls.length === 0 ? (
-          <div className="chat-message__thinking">AI 正在思考…</div>
+        {showThinking ? (
+          <div className="chat-message__thinking">
+            <span className="chat-message__thinking-spinner" aria-hidden="true" />
+            AI 正在思考…
+          </div>
         ) : null}
+
         {message.contextCompacted ? (
           <p className="chat-message__notice">上下文已自动压缩</p>
         ) : null}
-        {message.reasoning ? (
-          <details className="chat-message__reasoning">
-            <summary>推理过程</summary>
-            <pre>{message.reasoning}</pre>
-          </details>
-        ) : null}
+
+        {message.reasoning ? <ReasoningBlock reasoning={message.reasoning} /> : null}
+
         {message.toolCalls.map((tool) => (
           <ToolCallCard
             key={tool.id}
             tool={tool}
+            onOpenPlanning={onOpenPlanning}
             onResolvePermission={(toolCallId, decision, alwaysAllow) => {
               if (!tool.permission) {
                 return;
@@ -54,12 +66,17 @@ export function AssistantMessageView({
             }}
           />
         ))}
-        {message.content ? (
-          <div className="chat-message__content">{message.content}</div>
-        ) : null}
-        {typeof message.elapsedSeconds === 'number' ? (
-          <footer className="chat-message__meta">{message.elapsedSeconds} 秒</footer>
-        ) : null}
+
+        {message.content ? <ChatMarkdown content={message.content} /> : null}
+
+        <footer className="chat-message__meta">
+          {message.tokenUsage ? <TokenUsageBadge usage={message.tokenUsage} /> : null}
+          {typeof message.elapsedSeconds === 'number' ? (
+            <span className="chat-message__time">
+              {formatMessageTimeWithElapsed(message.elapsedSeconds)}
+            </span>
+          ) : null}
+        </footer>
       </div>
     </article>
   );

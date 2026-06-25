@@ -16,6 +16,13 @@ export interface ToolCallProgressState {
   elapsedMs?: number;
 }
 
+export interface ToolCallProgressStep {
+  progress: number;
+  total?: number;
+  message?: string;
+  elapsedMs?: number;
+}
+
 export interface ToolCallState {
   id: string;
   name: string;
@@ -28,12 +35,33 @@ export interface ToolCallState {
   executionTime?: number;
   permission?: PermissionRequestState;
   progress?: ToolCallProgressState;
+  progressSteps?: ToolCallProgressStep[];
+  planningItems?: PlanningItemState[];
+  revision?: number;
 }
 
 export interface UserMessage {
   id: string;
   role: 'user';
   content: string;
+}
+
+export interface TokenUsageDisplayState {
+  totalTokens: number;
+  promptTokens?: number;
+  completionTokens?: number;
+  stepDelta?: number;
+  round?: number;
+  phase: 'streaming' | 'done';
+  title: string;
+  showIncrement: boolean;
+}
+
+export interface PlanningItemState {
+  id?: string;
+  content?: string;
+  status?: string;
+  [key: string]: unknown;
 }
 
 export interface AssistantMessage {
@@ -46,6 +74,8 @@ export interface AssistantMessage {
   isError?: boolean;
   contextCompacted?: boolean;
   elapsedSeconds?: number;
+  tokenUsage?: TokenUsageDisplayState;
+  planningItems?: PlanningItemState[];
 }
 
 export type ChatMessage = UserMessage | AssistantMessage;

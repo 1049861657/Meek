@@ -150,38 +150,38 @@ apps/web/
 
 ### M3-03-A 纯逻辑（03-01～03-14，`lib/chat` 无 React）
 
-- [ ] **M3-03-01** `storage-contract.ts` — 全量键名/类型（**本节最先**）
-- [ ] **M3-03-02** 扩展 `process-sse-stream` / `apply-stream-chunk`（`stream-handler.js` 全事件）
-- [ ] **M3-03-03** `turn-collector.ts`
-- [ ] **M3-03-04** `message-history-builder.ts`
-- [ ] **M3-03-05** `config-fetch.ts`
-- [ ] **M3-03-06** 扩展 `context-messages.ts` + `chat-request-body.ts`
-- [ ] **M3-03-07** `mcp-selection.ts` + probe 封装
-- [ ] **M3-03-08** `compact-baseline-storage.ts` + compact 消费
-- [ ] **M3-03-09** `session-idb.ts`（`AIChatDatabase` v1）
-- [ ] **M3-03-10** `session-data.ts`
-- [ ] **M3-03-11** `session-store.ts`（guest/authed 双模式）
-- [ ] **M3-03-12** `session-conversation.ts`
-- [ ] **M3-03-13** `chat-orchestrator.ts`（`chat-api.js` + `app-core.js` 编排）
-- [ ] **M3-03-14** `time.ts` + `usage-telemetry.ts`
+- [x] **M3-03-01** `storage-contract.ts` — 全量键名/类型（**本节最先**）
+- [x] **M3-03-02** 扩展 `process-sse-stream` / `apply-stream-chunk`（`stream-handler.js` 全事件）
+- [x] **M3-03-03** `turn-collector.ts`
+- [x] **M3-03-04** `message-history-builder.ts`
+- [x] **M3-03-05** `config-fetch.ts`
+- [x] **M3-03-06** 扩展 `context-messages.ts` + `chat-request-body.ts`
+- [x] **M3-03-07** `mcp-selection.ts` + probe 封装
+- [x] **M3-03-08** `compact-baseline-storage.ts` + compact 消费
+- [x] **M3-03-09** `session-idb.ts`（`AIChatDatabase` v1）
+- [x] **M3-03-10** `session-data.ts`
+- [x] **M3-03-11** `session-store.ts`（guest/authed 双模式）
+- [x] **M3-03-12** `session-conversation.ts`
+- [x] **M3-03-13** `chat-orchestrator.ts`（`chat-api.js` + `app-core.js` 编排）
+- [x] **M3-03-14** `time.ts` + `usage-telemetry.ts`
 
 ### M3-03-B UI 核心（03-15～03-29）
 
-- [ ] **M3-03-15** 扩展 `use-chat-stream.ts`（保留 M1 API，接 orchestrator）
-- [ ] **M3-03-16** Chat 布局 + 工具栏（`ai.html`、`app-lifecycle.js`）
-- [ ] **M3-03-17** 工具栏图标（`icons.js`）
-- [ ] **M3-03-18** 会话名 + 新建会话 + 清除对话
-- [ ] **M3-03-19** MessageList：user / assistant / reasoning / tool
-- [ ] **M3-03-20** Renderers 注册表 + 历史 tool 回放 + todo 合并
-- [ ] **M3-03-21** Reasoning 折叠 + thinking + 耗时
-- [ ] **M3-03-22** Markdown **`dynamic()` lazy**（`markdown-stack.js`）
-- [ ] **M3-03-23** Tool 卡片状态机（pending→error + progressSteps）
-- [ ] **M3-03-24** 权限确认 → `permission-resolve`
-- [ ] **M3-03-25** 停止 / 重试 / 错误态
-- [ ] **M3-03-26** Planning 浮层 + Todo 卡片
-- [ ] **M3-03-27** Usage telemetry 展示
-- [ ] **M3-03-28** Context compact 横幅 notice
-- [ ] **M3-03-29** Composer 发送/停止/Enter
+- [x] **M3-03-15** 扩展 `use-chat-stream.ts`（保留 M1 API，接 orchestrator）
+- [x] **M3-03-16** Chat 布局 + 工具栏（`ai.html`、`app-lifecycle.js`）
+- [x] **M3-03-17** 工具栏图标（`icons.js`）
+- [x] **M3-03-18** 会话名 + 新建会话 + 清除对话
+- [x] **M3-03-19** MessageList：user / assistant / reasoning / tool
+- [x] **M3-03-20** Renderers 注册表 + 历史 tool 回放 + todo 合并
+- [x] **M3-03-21** Reasoning 折叠 + thinking + 耗时
+- [x] **M3-03-22** Markdown **`dynamic()` lazy**（`markdown-stack.js`）
+- [x] **M3-03-23** Tool 卡片状态机（pending→error + progressSteps）
+- [x] **M3-03-24** 权限确认 → `permission-resolve`
+- [x] **M3-03-25** 停止 / 重试 / 错误态
+- [x] **M3-03-26** Planning 浮层 + Todo 卡片
+- [x] **M3-03-27** Usage telemetry 展示
+- [x] **M3-03-28** Context compact 横幅 notice
+- [x] **M3-03-29** Composer 发送/停止/Enter
 
 ### M3-03-C Modal ×9（03-30～03-38，`dynamic()` lazy）
 

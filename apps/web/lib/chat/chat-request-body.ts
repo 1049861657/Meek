@@ -2,11 +2,14 @@
  * Web Chat HTTP 请求体 — 对齐 MCP-Client frontend/src/chat/chat-request-body.js
  */
 
-export type PermissionMode = 'open' | 'interactive' | 'locked';
+import type { ApiMessage } from './message-history-builder';
+import type { PermissionMode } from './storage-contract';
+
+export type { PermissionMode };
 
 export interface BuildChatStreamRequestInput {
   message: string;
-  messages?: Record<string, unknown>[];
+  messages?: ApiMessage[];
   model?: string;
   temperature: number;
   maxTokens: number;
