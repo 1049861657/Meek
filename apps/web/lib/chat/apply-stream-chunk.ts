@@ -146,6 +146,30 @@ export function applyStreamChunk(
     };
   }
 
+  const toolProgress = jsonData.tool_progress;
+  if (toolProgress && typeof toolProgress === 'object') {
+    const progress = toolProgress as {
+      index?: number;
+      progress?: number;
+      total?: number;
+      message?: string;
+      elapsed_ms?: number;
+    };
+    const index = progress.index ?? 0;
+    next = {
+      ...next,
+      toolCalls: updateToolCall(next.toolCalls, index, undefined, (tool) => ({
+        ...tool,
+        progress: {
+          progress: typeof progress.progress === 'number' ? progress.progress : 0,
+          ...(typeof progress.total === 'number' ? { total: progress.total } : {}),
+          ...(typeof progress.message === 'string' ? { message: progress.message } : {}),
+          ...(typeof progress.elapsed_ms === 'number' ? { elapsedMs: progress.elapsed_ms } : {}),
+        },
+      })),
+    };
+  }
+
   const toolCallResult = jsonData.tool_call_result;
   if (toolCallResult && typeof toolCallResult === 'object') {
     const result = toolCallResult as {

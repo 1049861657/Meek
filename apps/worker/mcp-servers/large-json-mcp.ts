@@ -2,6 +2,8 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
+/** Info 页 stdio：command=node，args=dist/mcp-servers/large-json-mcp.js（相对 worker cwd） */
+
 /** 默认条目数：序列化后约 35k+ 字符，可触发 Client 侧 materializeToolOutput（阈值 30000） */
 const DEFAULT_ITEM_COUNT = 180;
 

@@ -1,6 +1,6 @@
 /**
  * Studio 商品中心 MCP（stdio）
- * 连接：命令 npx，参数 tsx src/mcp-servers/studio-product-list-mcp.ts
+ * Info 页 stdio：command=node，args=dist/mcp-servers/product-list-mcp.js（相对 worker cwd）
  */
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -39,8 +39,8 @@ interface ProductRow {
 }
 
 function buildProduct(index: number, keyword?: string): ProductRow {
-  const category = CATEGORIES[index % CATEGORIES.length];
-  const brand = BRANDS[index % BRANDS.length];
+  const category = CATEGORIES[index % CATEGORIES.length] ?? CATEGORIES[0];
+  const brand = BRANDS[index % BRANDS.length] ?? BRANDS[0];
   const sku = `SKU-${String(100000 + index)}`;
   const baseName = keyword?.trim()
     ? `${brand} ${keyword.trim()} ${category.split('/').pop()}`

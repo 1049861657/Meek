@@ -49,7 +49,7 @@
 |------------|------|
 | `src/core/agent-harness/*` | `packages/agent-core/` |
 | `src/core/mcp/*` | `packages/mcp-runtime/` |
-| `src/mcp-servers/*` | `apps/worker/mcp-servers/` 或 `packages/mcp-runtime/servers/` |
+| `src/mcp-servers/*` | `apps/worker/mcp-servers/` → `dist/mcp-servers/`（worker 内嵌打包） |
 | `src/core/memory/*` | `packages/agent-core/memory/` |
 | `src/config-plane/*` | `packages/config-plane/` |
 | `src/message-bus/*` | `apps/worker/message-bus/` |

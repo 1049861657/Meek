@@ -26,7 +26,7 @@
 ## M2-02 MCP 配置存储
 
 - [x] **M2-02-01** Prisma：`MCPServer`、`MCPServerAuth` 读写
-- [x] **M2-02-02** seed 基线（userId=null）+ per-user 覆盖
+- [x] **M2-02-02** per-user 覆盖（无 MCP 自动 seed；Info 页手动添加）
 - [x] **M2-02-03** CRUD service（Settings 页复用）
 
 ## M2-03 OAuth
@@ -38,28 +38,29 @@
 
 ## M2-04 Info API
 
-- [ ] **M2-04-01** `GET /api/info` — 服务器/工具/连接汇总
-- [ ] **M2-04-02** `GET /api/client-info`
-- [ ] **M2-04-03** `POST /api/server/connect|switch|disconnect/:id`
-- [ ] **M2-04-04** `POST /api/server/add|update|delete`
-- [ ] **M2-04-05** `POST /api/server/reload-config`
-- [ ] **M2-04-06** Tool preferences GET/PUT
-- [ ] **M2-04-07** `POST /api/server/:id/tools/call`（Info 页测试）
-- [ ] **M2-04-08** Resources/Prompts preview 路由
+- [x] **M2-04-01** `GET /api/info` — 服务器/工具/连接汇总
+- [x] **M2-04-02** `GET /api/client-info`
+- [x] **M2-04-03** `POST /api/server/connect|switch|disconnect/:id`
+- [x] **M2-04-04** `POST /api/server/add|update|delete`
+- [x] **M2-04-05** `POST /api/server/reload-config`
+- [x] **M2-04-06** Tool preferences GET/PUT
+- [x] **M2-04-07** `POST /api/server/:id/tools/call`（Info 页测试）
+- [x] **M2-04-08** Resources/Prompts preview 路由
 
 ## M2-05 Agent 集成
 
-- [ ] **M2-05-01** Agent 启动时从 Pool 拉取 tools → 注入 `agent-core` loop
-- [ ] **M2-05-02** Workflow-scoped 工具过滤（Profile mcpServerIds）
-- [ ] **M2-05-03** MCP progress 通知 → SSE parts
-- [ ] **M2-05-04** `GET /api/mcp/servers`、`POST /api/mcp/probe`
+- [x] **M2-05-01** Agent 启动时从 Pool 拉取 tools → 注入 `agent-core` loop
+- [x] **M2-05-02** Workflow-scoped 工具过滤（Profile mcpServerIds）
+- [x] **M2-05-03** MCP progress 通知 → SSE parts
+- [x] **M2-05-04** `GET /api/mcp/servers`、`POST /api/mcp/probe`
 
 ## M2-06 内置 Demo MCP 服
 
-- [ ] **M2-06-01** `echo-mcp`：stdio 配置种子 + worker 打包
-- [ ] **M2-06-02** `large-json-mcp`：stdio 配置种子 + worker 打包
-- [ ] **M2-06-03** `product-list-mcp`：stdio 配置种子 + worker 打包
-- [ ] **M2-06-04** 三服默认 seed 写入 DB，Info 页可见
+> **Meek 落点**：`apps/worker/mcp-servers/*.ts` 经 `tsconfig.mcp-servers.json` 编译为 `dist/mcp-servers/*.js`；**不写 DB 种子**，Info 页手动添加（`command: node`，`args: dist/mcp-servers/<name>.js`，相对 worker 进程 cwd）。
+
+- [x] **M2-06-01** `echo-mcp`：源码就绪 + worker 打包
+- [x] **M2-06-02** `large-json-mcp`：源码就绪 + worker 打包
+- [x] **M2-06-03** `product-list-mcp`：源码就绪 + worker 打包
 
 ## M2-07 MCP 协议扩展
 
@@ -77,7 +78,7 @@
 ## 完成检查清单
 
 - [ ] 同时连接 2+ MCP 服，工具名不冲突
-- [ ] 内置 echo / large-json / product-list 三服均可连接并 call tool
+- [ ] Info 页手动添加后，echo / large-json / product-list 三服均可连接并 call tool
 - [ ] OAuth 远程服 authorize → callback 成功
 - [ ] Info API 返回连接状态、Tools、Resources、Prompts
 - [ ] Agent 聊天可调用远程与 stdio MCP 工具
@@ -91,4 +92,4 @@
 | `server-connection.ts` | 状态机 |
 | `mcp-oauth.ts` | PKCE |
 | `info.controller.ts` | 全部 Info 路由 |
-| `src/mcp-servers/*.ts` | 三内置 Demo MCP |
+| `src/mcp-servers/*.ts` | `apps/worker/mcp-servers/` → `dist/mcp-servers/` |

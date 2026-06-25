@@ -2,6 +2,8 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
+/** Info 页 stdio：command=node，args=dist/mcp-servers/echo-mcp.js（相对 worker cwd） */
+
 /** P2-02 info 页探针：固定 URI，仅用于 Resources 列表/预览自测，非业务数据 */
 const ECHO_PROBE_RESOURCE_URI = 'echo://probe/note';
 

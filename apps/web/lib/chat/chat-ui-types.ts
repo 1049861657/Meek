@@ -9,6 +9,13 @@ export interface PermissionRequestState {
   permissionSessionKey: string;
 }
 
+export interface ToolCallProgressState {
+  progress: number;
+  total?: number;
+  message?: string;
+  elapsedMs?: number;
+}
+
 export interface ToolCallState {
   id: string;
   name: string;
@@ -20,6 +27,7 @@ export interface ToolCallState {
   resultError?: boolean;
   executionTime?: number;
   permission?: PermissionRequestState;
+  progress?: ToolCallProgressState;
 }
 
 export interface UserMessage {

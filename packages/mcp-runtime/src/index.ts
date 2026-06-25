@@ -9,9 +9,25 @@ export {
 export { ServerConnection } from './mcp/server-connection.js';
 export { McpConfigStore, invalidateMcpConfigCache } from './services/mcp-config.store.js';
 export { McpConfigService } from './services/mcp-config.service.js';
-export { MCP_SEED_SERVERS, seedMcpBaselineIfEmpty } from './seed/mcp-seed.js';
-export type { McpSeedResult } from './seed/mcp-seed.js';
 export { McpServerAuthService } from './services/mcp-server-auth.service.js';
+export { McpInfoAssembler } from './services/mcp-info-assembler.service.js';
+export { ToolPreferencesService } from './services/tool-preferences.service.js';
+export { McpConnectionService } from './services/mcp-connection.service.js';
+export {
+  McpReachabilityService,
+  type McpPersistencePartition,
+  type McpProbeSelectionResult,
+  type McpReachabilityEntry,
+  type McpReachabilityResult,
+} from './services/mcp-reachability.service.js';
+export { clearMcpServerAuth } from './mcp/mcp-oauth.js';
+export type {
+  CallServerToolBody,
+  CallServerToolResponse,
+  McpPromptPreviewBody,
+  McpToolPreferencesStore,
+  ServerToolPreferencesBody,
+} from './types/tool-preferences.types.js';
 export {
   McpConnectionStatus,
   isMcpConnected,

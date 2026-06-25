@@ -1,4 +1,5 @@
 import type { RequestPrincipal } from '@/lib/chat/resolve-principal';
+import { workerMcpGetInfo } from '@/lib/worker/worker-client';
 
 export interface ToolsListSuccess {
   success: true;
@@ -17,14 +18,37 @@ export interface ToolsListHttpResult {
   body: ToolsListResponse;
 }
 
+interface McpInfoPayload {
+  server?: { name?: string };
+  tools?: unknown[];
+}
+
 export async function handleToolsList(
-  _principal: RequestPrincipal
+  principal: RequestPrincipal
 ): Promise<ToolsListHttpResult> {
-  return {
-    status: 503,
-    body: {
-      error:
-        'Web 进程不承载 MCP 运行时；GET /api/tools/list 将在 M2-04 Info API 对接 worker 后提供',
-    },
-  };
+  try {
+    const result = await workerMcpGetInfo(principal.configUserId);
+    if (!result.ok) {
+      return {
+        status: result.status,
+        body: { error: result.error },
+      };
+    }
+
+    const info = result.data as McpInfoPayload;
+    return {
+      status: 200,
+      body: {
+        success: true,
+        server: info.server?.name ?? '',
+        tools: info.tools ?? [],
+      },
+    };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      status: 500,
+      body: { error: message },
+    };
+  }
 }

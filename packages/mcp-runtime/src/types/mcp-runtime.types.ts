@@ -76,4 +76,5 @@ export interface MCPServerInfo {
   serverTools?: Record<string, ToolInfo[]>;
   serverResources?: Record<string, McpResourceInfo[]>;
   serverPrompts?: Record<string, McpPromptInfo[]>;
+  toolPreferences?: Record<string, Record<string, boolean>>;
 }

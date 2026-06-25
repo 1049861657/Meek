@@ -1,11 +1,12 @@
 import {
   setMcpConfig,
+  setToolPreferencesStore,
   setToolPromptSetting,
   type McpConfig,
 } from '@meek/agent-core';
 import {
   McpConfigService,
-  seedMcpBaselineIfEmpty,
+  ToolPreferencesService,
   type MCPConfigType,
 } from '@meek/mcp-runtime';
 
@@ -21,11 +22,12 @@ export async function loadMcpConfig(configUserId: string | null): Promise<MCPCon
   const config = await McpConfigService.getMCPConfig(configUserId ?? undefined);
   setMcpConfig(toPortConfig(config));
   setToolPromptSetting(config.toolPrompt);
+  const toolPreferences = await ToolPreferencesService.getAll();
+  setToolPreferencesStore(toolPreferences);
   return config;
 }
 
-/** Worker 启动：seed 基线 + 预热 guest 配置 */
+/** Worker 启动：预热 guest MCP 配置 */
 export async function bootstrapMcpConfig(): Promise<void> {
-  await seedMcpBaselineIfEmpty();
   await loadMcpConfig(null);
 }

@@ -12,6 +12,7 @@ import {
 } from '@meek/message-bus';
 
 import { getHarnessProvider, resolveDefaultModel } from '../lib/runtime-bootstrap.js';
+import { McpConnectionService } from '../lib/mcp-connection-bridge.js';
 
 const INBOUND_AI_UNAVAILABLE_MESSAGE =
   '当前渠道绑定的账号未配置可用的 AI 供应商，请联系管理员。';
@@ -64,11 +65,11 @@ async function runHarnessForEnvelope(
   requestId: string,
   signal?: AbortSignal
 ): Promise<void> {
-  const configUserId = envelope.channelMeta.userId ?? null;
+  const poolUserId = envelope.channelMeta.userId ?? null;
   const vendor = envelope.channelMeta.vendor;
-  const defaultModel = await resolveDefaultModel(configUserId);
+  const defaultModel = await resolveDefaultModel(poolUserId);
   const resolved = resolveWebProfile(envelope, defaultModel);
-  const { messages, chatOptions } = envelopeToHarnessInput(envelope);
+  const { messages } = envelopeToHarnessInput(envelope);
 
   logInboundDequeue(envelope, {
     profileId: resolved.profileId,
@@ -77,79 +78,85 @@ async function runHarnessForEnvelope(
     permissionMode: resolved.permissionMode,
   });
 
-  const service = await getHarnessProvider(configUserId, vendor);
+  const service = await getHarnessProvider(poolUserId, vendor);
   if (!service) {
     console.warn(`[BUS] Inbound Worker 跳过：无可用 AI 服务 requestId=${requestId}`);
     await routeInboundError(envelope, requestId, INBOUND_AI_UNAVAILABLE_MESSAGE);
     return;
   }
 
+  const configUserId = resolved.configUserId ?? null;
   const wallStarted = Date.now();
+  McpConnectionService.beginChatScope(configUserId, requestId);
 
-  const result = await service.chatStream(
-    messages,
-    async (chunk, done) => {
-      if (done || signal?.aborted) {
-        return;
-      }
-      if (chunk.contextCompacted) {
-        await routeContextCompacted(envelope, chunk);
-        return;
-      }
-      await routeOutbound({
-        sessionKey: envelope.sessionKey,
+  try {
+    const result = await service.chatStream(
+      messages,
+      async (chunk, done) => {
+        if (done || signal?.aborted) {
+          return;
+        }
+        if (chunk.contextCompacted) {
+          await routeContextCompacted(envelope, chunk);
+          return;
+        }
+        await routeOutbound({
+          sessionKey: envelope.sessionKey,
+          channel: 'web',
+          requestId,
+          kind: 'chunk',
+          payload: chunk,
+        });
+      },
+      resolved.model,
+      resolved.temperature,
+      resolved.maxTokens,
+      resolved.enableTools,
+      resolved.enablePrompts,
+      signal,
+      resolved.maxToolCallRounds,
+      requestId,
+      resolved.enableAutoCompact,
+      resolved.compactModel,
+      resolved,
+      {
         channel: 'web',
-        requestId,
-        kind: 'chunk',
-        payload: chunk,
-      });
-    },
-    resolved.model,
-    resolved.temperature,
-    resolved.maxTokens,
-    resolved.enableTools,
-    resolved.enablePrompts,
-    signal,
-    resolved.maxToolCallRounds,
-    requestId,
-    resolved.enableAutoCompact,
-    resolved.compactModel,
-    resolved,
-    {
-      channel: 'web',
-      sessionKey: resolvePermissionSessionKey(envelope),
-      permissionMode: resolved.permissionMode,
+        sessionKey: resolvePermissionSessionKey(envelope),
+        permissionMode: resolved.permissionMode,
+      }
+    );
+
+    if (signal?.aborted) {
+      return;
     }
-  );
 
-  if (signal?.aborted) {
-    return;
+    const elapsedTime = (Date.now() - wallStarted) / 1000;
+    await routeOutbound({
+      sessionKey: envelope.sessionKey,
+      channel: 'web',
+      requestId,
+      kind: 'usage',
+      payload: {
+        requestId,
+        ...result.usage,
+        elapsedTime: elapsedTime.toFixed(2),
+        hasReasoning: Boolean(result.reasoning_content),
+        hasTool: Boolean(result.tool_calls && result.tool_calls.length > 0),
+      },
+    });
+    await routeOutbound({
+      sessionKey: envelope.sessionKey,
+      channel: 'web',
+      requestId,
+      kind: 'done',
+      payload: {
+        requestId,
+        finish_reason: result.finish_reason,
+      },
+    });
+  } finally {
+    await McpConnectionService.releaseChatScope(configUserId, requestId);
   }
-
-  const elapsedTime = (Date.now() - wallStarted) / 1000;
-  await routeOutbound({
-    sessionKey: envelope.sessionKey,
-    channel: 'web',
-    requestId,
-    kind: 'usage',
-    payload: {
-      requestId,
-      ...result.usage,
-      elapsedTime: elapsedTime.toFixed(2),
-      hasReasoning: Boolean(result.reasoning_content),
-      hasTool: Boolean(result.tool_calls && result.tool_calls.length > 0),
-    },
-  });
-  await routeOutbound({
-    sessionKey: envelope.sessionKey,
-    channel: 'web',
-    requestId,
-    kind: 'done',
-    payload: {
-      requestId,
-      finish_reason: result.finish_reason,
-    },
-  });
 }
 
 async function processWebInboundJob(

@@ -1,16 +1,17 @@
 import { setMcpConnectionService } from '@meek/agent-core';
-import { getMcpClientForUser } from '@meek/mcp-runtime';
+import { McpConnectionService } from '@meek/mcp-runtime';
 
 export function wireMcpConnectionService(): void {
   setMcpConnectionService({
     async ensureForChat(serverIds, configUserId, chatRequestId) {
-      const client = getMcpClientForUser(configUserId);
-      client.beginChatEphemeralScope(chatRequestId);
-      const { reachableIds } = await client.partitionServerIdsByReachability(serverIds, {
-        mode: 'chat-ephemeral',
-        chatRequestId,
-      });
+      const { reachableIds } = await McpConnectionService.ensureForChat(
+        serverIds,
+        configUserId,
+        chatRequestId
+      );
       return { reachableIds };
     },
   });
 }
+
+export { McpConnectionService };
