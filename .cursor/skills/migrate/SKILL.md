@@ -3,7 +3,8 @@ name: meek-migrate
 description: >-
   Migrate MCP-Client landed source into Meek (Next.js 16 + Worker) with behavior
   parity. Use when the user says 迁移, Meek, M0-M6, 复刻, MCP-Client 参考, or asks to
-  implement a migration task with optional 优化/改进/重构.
+  implement a migration task with optional 优化/改进/重构. Delivery requires a readonly
+  generalPurpose gate subagent (not Bugbot); see delivery.md.
 paths:
   - "todos/**"
   - "apps/**"
@@ -49,7 +50,8 @@ metadata:
 [ ] 4  编码：iron-rules + main-rule
 [ ] 5  验证：routes.ts / storage-contract / pnpm build
 [ ] 6  勾选任务 + 更新 todos/README.md 进度
-[ ] 7  交付：做了什么 / 参考路径 / 差异（若有）
+[ ] 7  交付门禁：readonly generalPurpose subagent（硬性 PASS/BLOCK + Optimization proposals）
+[ ] 8  主 AI 裁决 proposals（采纳 / 写 todos / 拒绝）→ 门禁 PASS 后交付正文
 ```
 
 ## 硬约束（ADR-006）
@@ -69,11 +71,12 @@ metadata:
 | 评审 | [review.md](./review.md) |
 | 编码 | [iron-rules.md](./iron-rules.md) |
 | optimize | [optimize.md](./optimize.md) |
-| 交付 | [delivery.md](./delivery.md) |
+| 交付 | [delivery.md](./delivery.md)（**门禁 subagent 必过，禁 Bugbot**） |
 
 ## 禁止
 
 - MCP-Client `todos/` 定范围  
 - 未读参考源码就写 API/UI  
 - 改 API 路径或存储键（migrate 模式）  
+- 迁移批次新建 `apps/web/docs/` 或平行 README（约定写任务书 + 代码）  
 - `npm` / `yarn`

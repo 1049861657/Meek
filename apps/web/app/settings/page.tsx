@@ -1,8 +1,6 @@
+import { SettingsPageClient } from '@/components/settings/settings-page-client';
+
+/** RSC 壳：交互在 SettingsPageClient（M3-00-04） */
 export default function SettingsPage(): React.ReactElement {
-  return (
-    <main className="page-shell">
-      <h1>配置管理</h1>
-      <p>提供商与 MCP 配置（M0 路由壳）</p>
-    </main>
-  );
+  return <SettingsPageClient />;
 }

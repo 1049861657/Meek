@@ -2,13 +2,12 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { findMonorepoRoot } from '@meek/shared/root-env';
 import type { ClientCapabilities } from '@modelcontextprotocol/sdk/types.js';
 
+const monorepoRoot = findMonorepoRoot(path.dirname(fileURLToPath(import.meta.url)));
 const pkg = JSON.parse(
-  readFileSync(
-    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../package.json'),
-    'utf8'
-  )
+  readFileSync(path.join(monorepoRoot, 'package.json'), 'utf8')
 ) as { name: string; version: string };
 
 export function parseMcpClientRootPathsFromEnv(): string[] {
