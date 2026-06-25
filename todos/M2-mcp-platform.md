@@ -1,6 +1,7 @@
 # M2 — MCP 平台
 
-> **状态**：未开始  
+> **状态**：已完成  
+> **完成日期**：2026-06-25  
 > **周期**：2.5 ~ 3 人周（2 人）  
 > **前置**：M1 完成  
 > **参考代码**：`MCP-Client/src/core/mcp/`、`src/mcp-servers/`、`src/api/info.controller.ts`  
@@ -64,32 +65,38 @@
 
 ## M2-07 MCP 协议扩展
 
-- [ ] **M2-07-01** `mcp-sampling-handler`（Client capabilities）
-- [ ] **M2-07-02** `mcp-roots-handler`
-- [ ] **M2-07-03** listResources / listPrompts（Info 展示，不进 Harness 主路径）
+- [x] **M2-07-01** `mcp-sampling-handler`（Client capabilities）
+- [x] **M2-07-02** `mcp-roots-handler`
+- [x] **M2-07-03** listResources / listPrompts（Info 展示，不进 Harness 主路径）
 
 ## M2-08 Worker 职责边界
 
-- [ ] **M2-08-01** stdio spawn 仅 worker 执行
-- [ ] **M2-08-02** web 经 HTTP/RPC 调 worker 执行 MCP 操作
+> **架构边界（M2-04/05 已落地，08 验收）**：stdio spawn 仅在 worker 进程（`mcp-runtime` + worker 部署）；web MCP 操作仅 `worker-client` → `/internal/mcp/*`；worker internal HTTP 绑定 `127.0.0.1`。
+
+- [x] **M2-08-01** stdio spawn 仅 worker 执行
+- [x] **M2-08-02** web 经 HTTP/RPC 调 worker 执行 MCP 操作
 
 ---
 
 ## 完成检查清单
 
-- [ ] 同时连接 2+ MCP 服，工具名不冲突
-- [ ] Info 页手动添加后，echo / large-json / product-list 三服均可连接并 call tool
-- [ ] OAuth 远程服 authorize → callback 成功
-- [ ] Info API 返回连接状态、Tools、Resources、Prompts
-- [ ] Agent 聊天可调用远程与 stdio MCP 工具
-- [ ] stdio 服仅在 worker 进程内运行
+> Runtime 联机验收移交 [M6-hardening.md](./M6-hardening.md)（建议 M3 Info UI 就绪后执行；代码路径已就绪）。
+
+- [ ] 同时连接 2+ MCP 服，工具名不冲突 → **M6**
+- [ ] Info 页手动添加后，echo / large-json / product-list 三服均可连接并 call tool → **M6**
+- [ ] OAuth 远程服 authorize → callback 成功 → **M6**
+- [ ] Info API 返回连接状态、Tools、Resources、Prompts → **M6**（API 已实现）
+- [ ] Agent 聊天可调用远程与 stdio MCP 工具 → **M6**
+- [ ] stdio 服仅在 worker 进程内运行 → **M6**（架构已就绪）
 
 ## 参考对照
 
 | 参考文件 | 对齐点 |
 |----------|--------|
 | `mcp-client-manager.ts` | 聚合与缓存 |
-| `server-connection.ts` | 状态机 |
+| `mcp-sampling-handler.ts` | sampling/createMessage 骨架 |
+| `mcp-roots-handler.ts` | roots/list（`MCP_CLIENT_ROOTS`） |
+| `server-connection.ts` | 状态机；listResources / listPrompts / read / getPrompt |
 | `mcp-oauth.ts` | PKCE |
 | `info.controller.ts` | 全部 Info 路由 |
 | `src/mcp-servers/*.ts` | `apps/worker/mcp-servers/` → `dist/mcp-servers/` |

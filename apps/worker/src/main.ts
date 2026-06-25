@@ -44,8 +44,8 @@ async function main(): Promise<void> {
     });
   });
 
-  server.listen(WORKER_PORT, () => {
-    console.log(`Worker health at http://localhost:${WORKER_PORT}/health`);
+  server.listen(WORKER_PORT, '127.0.0.1', () => {
+    console.log(`Worker health at http://127.0.0.1:${WORKER_PORT}/health`);
   });
 
   const shutdown = async (signal: string): Promise<void> => {

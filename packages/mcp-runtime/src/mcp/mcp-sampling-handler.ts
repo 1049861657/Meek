@@ -20,6 +20,10 @@ function summarizeMessageContent(message: SamplingMessage): string {
   return JSON.stringify(content);
 }
 
+/**
+ * 注册 MCP sampling/createMessage 骨架处理器。
+ * 返回确定性 mock，便于 probe 或文档流程验证；未接入真实 LLM。
+ */
 export function attachMcpSamplingHandler(client: Client): void {
   client.setRequestHandler(CreateMessageRequestSchema, async (request) => {
     const messages = request.params.messages;
