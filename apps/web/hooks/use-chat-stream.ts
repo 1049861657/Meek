@@ -34,6 +34,7 @@ import { createSessionStore, type ChatSessionStore } from '@/lib/chat/session-st
 import type { HistoryEntry, PermissionMode } from '@/lib/chat/storage-contract';
 import { feedTurnCollectorFromPayload } from '@/lib/chat/sync-turn-collector';
 import { formatMessageTimeWithElapsed } from '@/lib/chat/time';
+import type { QuickBubbleMode } from '@/lib/chat/quick-messages-storage';
 import { useAuth } from '@/providers/auth-provider';
 
 export type ChatStreamStatus = 'idle' | 'loading' | 'streaming' | 'error';
@@ -90,6 +91,7 @@ export interface UseChatStreamResult {
   activeModal: ChatModalId | null;
   openModal: (id: ChatModalId) => void;
   closeModal: () => void;
+  quickBubbleMode: QuickBubbleMode | null;
   internals: ChatStreamInternals;
 }
 
@@ -165,6 +167,7 @@ export function useChatStream(): UseChatStreamResult {
   const [planningItems, setPlanningItems] = useState<PlanningItemState[]>([]);
   const [mcpEnabledCount, setMcpEnabledCount] = useState(0);
   const [activeModal, setActiveModal] = useState<ChatModalId | null>(null);
+  const [quickBubbleMode, setQuickBubbleMode] = useState<QuickBubbleMode | null>(null);
 
   const guestDataRef = useRef<ChatSessionData | null>(null);
   const sessionStoreRef = useRef<ChatSessionStore | null>(null);
@@ -176,6 +179,24 @@ export function useChatStream(): UseChatStreamResult {
   const pendingUserTextRef = useRef<string | null>(null);
   const lastFailedTextRef = useRef<string | null>(null);
   const initOnceRef = useRef(false);
+  const quickBubbleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearQuickBubbleTimer = useCallback((): void => {
+    if (quickBubbleTimerRef.current) {
+      clearTimeout(quickBubbleTimerRef.current);
+      quickBubbleTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleQuickBubbles = useCallback(
+    (mode: QuickBubbleMode, delayMs = 100): void => {
+      clearQuickBubbleTimer();
+      quickBubbleTimerRef.current = setTimeout(() => {
+        setQuickBubbleMode(mode);
+      }, delayMs);
+    },
+    [clearQuickBubbleTimer]
+  );
 
   const syncSessionDisplay = useCallback((sessionId: string): void => {
     const store = sessionStoreRef.current;
@@ -206,7 +227,12 @@ export function useChatStream(): UseChatStreamResult {
     if (todoItems?.length) {
       setPlanningItems(todoItems as PlanningItemState[]);
     }
-  }, []);
+    if (entries.length > 0) {
+      scheduleQuickBubbles('appended', 300);
+    } else {
+      scheduleQuickBubbles('random', 100);
+    }
+  }, [scheduleQuickBubbles]);
 
   const setContextCompactedState = useCallback((value: boolean): void => {
     setContextCompacted(value);
@@ -319,11 +345,11 @@ export function useChatStream(): UseChatStreamResult {
         syncMcpCounter();
 
         if (!sessionStore.isAuthed()) {
-          if (guestData.db.isReady) {
-            await guestData.loadLatestProviderSession().catch(() => guestData.createNewSession());
-          } else {
-            guestData.createNewSession();
-          }
+          await guestData.whenIdbReady();
+          await guestData.loadLatestProviderSession().catch(() => guestData.createNewSession());
+        } else if (sessionStore.isAuthedSessionsGated()) {
+          sessionStore.newSession();
+          scheduleQuickBubbles('random', 100);
         } else {
           await sessionStore.loadLatest().catch(() => sessionStore.newSession());
         }
@@ -336,7 +362,13 @@ export function useChatStream(): UseChatStreamResult {
         showToast(message, 'error');
       }
     })();
-  }, [loadHistoryToUi, syncMcpCounter, syncSessionDisplay]);
+  }, [loadHistoryToUi, scheduleQuickBubbles, syncMcpCounter, syncSessionDisplay]);
+
+  useEffect(() => {
+    return () => {
+      clearQuickBubbleTimer();
+    };
+  }, [clearQuickBubbleTimer]);
 
   const updateAssistantById = useCallback(
     (assistantId: string, updater: (prev: AssistantMessage) => AssistantMessage): void => {
@@ -434,6 +466,8 @@ export function useChatStream(): UseChatStreamResult {
       lastFailedTextRef.current = null;
       streamRuntimeRef.current.userAborted = false;
       pendingUserTextRef.current = trimmed;
+      setQuickBubbleMode(null);
+      clearQuickBubbleTimer();
 
       const userId = crypto.randomUUID();
       const assistantId = crypto.randomUUID();
@@ -540,6 +574,7 @@ export function useChatStream(): UseChatStreamResult {
             setPlanningItems(todoItems as PlanningItemState[]);
           }
           setContextCompacted(Boolean(orchestrator.state.compactedBaseline));
+          scheduleQuickBubbles('appended', 300);
         }
         setStatus('idle');
       } catch (err: unknown) {
@@ -561,7 +596,7 @@ export function useChatStream(): UseChatStreamResult {
         pendingUserTextRef.current = null;
       }
     },
-    [status, updateAssistantById]
+    [status, updateAssistantById, clearQuickBubbleTimer, scheduleQuickBubbles]
   );
 
   const retryLast = useCallback((): void => {
@@ -594,13 +629,15 @@ export function useChatStream(): UseChatStreamResult {
     setMessages([]);
     setPlanningItems([]);
     setContextCompacted(false);
+    setQuickBubbleMode(null);
     const orchestrator = orchestratorRef.current;
     if (orchestrator) {
       orchestrator.state.messageHistory = [];
       orchestrator.resetContextCompressionState();
     }
+    scheduleQuickBubbles('random', 100);
     showToast('对话已清除', 'info');
-  }, [messages.length]);
+  }, [messages.length, scheduleQuickBubbles]);
 
   const newSession = useCallback((): void => {
     const sessionStore = sessionStoreRef.current;
@@ -619,9 +656,11 @@ export function useChatStream(): UseChatStreamResult {
     setMessages([]);
     setPlanningItems([]);
     setContextCompacted(false);
+    setQuickBubbleMode(null);
     syncSessionDisplay(sessionId);
+    scheduleQuickBubbles('random', 100);
     showToast('已创建新会话', 'info');
-  }, [status, syncSessionDisplay]);
+  }, [status, syncSessionDisplay, scheduleQuickBubbles]);
 
   const internals: ChatStreamInternals = {
     orchestratorRef,
@@ -656,6 +695,7 @@ export function useChatStream(): UseChatStreamResult {
     activeModal,
     openModal,
     closeModal,
+    quickBubbleMode,
     internals,
   };
 }

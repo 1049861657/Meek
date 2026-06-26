@@ -78,11 +78,19 @@ export function ContextModal({ open, onClose, internals }: ChatModalProps): Reac
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
-      const data = (await response.json().catch(() => ({}))) as {
-        preview?: ContextPreviewPayload;
-        error?: string;
-      };
+      let data: { preview?: ContextPreviewPayload; error?: string } = {};
+      try {
+        data = (await response.json()) as { preview?: ContextPreviewPayload; error?: string };
+      } catch {
+        if (response.status === 413) {
+          throw new Error('上下文过大，无法加载预览。您仍可尝试生成摘要。');
+        }
+        throw new Error(`HTTP ${response.status}`);
+      }
       if (!response.ok) {
+        if (response.status === 413) {
+          throw new Error(data.error || '上下文过大，无法加载预览。您仍可尝试生成摘要。');
+        }
         throw new Error(data.error || `HTTP ${response.status}`);
       }
       setPreview(data.preview ?? null);

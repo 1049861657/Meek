@@ -38,9 +38,31 @@ export class ChatSessionIdb {
     isReady: false,
   };
 
+  private readyPromise: Promise<void> | null = null;
+  private resolveReady: (() => void) | null = null;
+
+  whenReady(): Promise<void> {
+    if (this.db.isReady || typeof indexedDB === 'undefined') {
+      return Promise.resolve();
+    }
+    if (!this.readyPromise) {
+      this.readyPromise = new Promise<void>((resolve) => {
+        this.resolveReady = resolve;
+      });
+    }
+    return this.readyPromise;
+  }
+
+  private markReady(): void {
+    this.resolveReady?.();
+    this.resolveReady = null;
+    this.readyPromise = null;
+  }
+
   initDatabase(onReady?: () => void): void {
     if (typeof indexedDB === 'undefined') {
       this.db.isReady = false;
+      this.markReady();
       return;
     }
 
@@ -49,11 +71,13 @@ export class ChatSessionIdb {
     request.onerror = () => {
       console.error('打开IndexedDB失败:', request.error);
       this.db.isReady = false;
+      this.markReady();
     };
 
     request.onsuccess = () => {
       this.db.instance = request.result;
       this.db.isReady = true;
+      this.markReady();
       onReady?.();
     };
 

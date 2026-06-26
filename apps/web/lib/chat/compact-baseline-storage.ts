@@ -45,6 +45,13 @@ export function saveCompactedBaselineToStorage(
   }
 }
 
+export function clearCompactedBaselineFromStorage(sessionId: string): void {
+  if (typeof window === 'undefined' || !sessionId) {
+    return;
+  }
+  localStorage.removeItem(compactBaselineStorageKey(sessionId));
+}
+
 export function loadCompactedBaselineFromStorage(
   sessionId: string,
   deps: CompactStorageDeps

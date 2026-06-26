@@ -8,6 +8,7 @@ import { OverlayModal } from '@/components/ui/overlay-modal';
 import { confirmModal } from '@/components/ui/confirm-dialog';
 import { showToast } from '@/components/ui/toast';
 import { CHAT_SESSION_ID_PREFIX } from '@/lib/chat/storage-contract';
+import { AUTHED_SESSIONS_GATE_MESSAGE } from '@/lib/chat/authed-sessions-gate';
 import type { HistoryEntry } from '@/lib/chat/storage-contract';
 import type { SessionListItem } from '@/lib/chat/session-data';
 
@@ -26,10 +27,16 @@ export function HistoryModal({ open, onClose, internals }: ChatModalProps): Reac
   const sessionStore = internals.sessionStoreRef.current;
   const orchestrator = internals.orchestratorRef.current;
   const isAuthed = sessionStore?.isAuthed() ?? false;
+  const isAuthedSessionsGated = sessionStore?.isAuthedSessionsGated() ?? false;
   const provider = orchestrator?.state.vendor ?? '';
 
   const loadSessions = useCallback(async (): Promise<void> => {
     if (!sessionStore) {
+      return;
+    }
+    if (isAuthedSessionsGated) {
+      setSessions([]);
+      setLoading(false);
       return;
     }
     setLoading(true);
@@ -61,7 +68,7 @@ export function HistoryModal({ open, onClose, internals }: ChatModalProps): Reac
     } finally {
       setLoading(false);
     }
-  }, [isAuthed, provider, sessionStore]);
+  }, [isAuthed, isAuthedSessionsGated, provider, sessionStore]);
 
   useEffect(() => {
     if (!open) {
@@ -222,6 +229,11 @@ export function HistoryModal({ open, onClose, internals }: ChatModalProps): Reac
         </button>
       </div>
       <div className="history-modal-body">
+        {isAuthedSessionsGated ? (
+          <div className="history-gate-banner" role="alert">
+            {AUTHED_SESSIONS_GATE_MESSAGE}
+          </div>
+        ) : null}
         <aside className="history-sidebar">
           <div className="history-sidebar-head">
             <p className="history-sidebar-label">

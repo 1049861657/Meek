@@ -213,17 +213,17 @@ apps/web/
 
 - [x] **M3-03-39** `aiChatSettings` 读写（**M3-03-C 提前完成**：`chat-settings-storage.ts` + Settings 关闭时持久化）
 - [x] **M3-03-40** `aiQuickMessages` + 服务端种子（**M3-03-C 提前完成**：`quick-messages-storage.ts`）
-- [ ] **M3-03-41** `aiCompactBaseline:{sessionId}`
-- [ ] **M3-03-42** Guest IDB 持久化 + 旧数据兼容
-- [ ] **M3-03-43** Authed `/api/sessions`（**门控 M4-05**：壳 + 提示）
-- [ ] **M3-03-44** guest/authed init-once；登录 reload
-- [ ] **M3-03-45** QuickMessage 随机/追加气泡
-- [ ] **M3-03-46** ContextModal ↔ `POST /api/chat/context-preview`
+- [x] **M3-03-41** `aiCompactBaseline:{sessionId}`
+- [x] **M3-03-42** Guest IDB 持久化 + 旧数据兼容
+- [x] **M3-03-43** Authed `/api/sessions`（**门控 M4-05**：壳 + 提示）
+- [x] **M3-03-44** guest/authed init-once；登录 reload
+- [x] **M3-03-45** QuickMessage 随机/追加气泡
+- [x] **M3-03-46** ContextModal ↔ `POST /api/chat/context-preview`
 
 ### M3-03-E 样式（03-47～03-48）
 
-- [ ] **M3-03-47** 迁移 `chat/style.css`、`chat-ui.css` → `app/ai/chat.css`
-- [ ] **M3-03-48** 分包验证 + `scrollToBottom` 行为
+- [x] **M3-03-47** 迁移 `chat/style.css`、`chat-ui.css` → `app/ai/chat.css`
+- [x] **M3-03-48** 分包验证 + `scrollToBottom` 行为
 
 ---
 

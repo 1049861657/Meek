@@ -1,15 +1,21 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import type { ChatMessage } from '@/lib/chat/chat-ui-types';
+import type { QuickBubbleMode } from '@/lib/chat/quick-messages-storage';
+import { useChatAutoScroll } from '@/hooks/use-chat-auto-scroll';
 
 import { AssistantMessageView } from './assistant-message';
 import { ContextCompactNotice } from './context-compact-notice';
+import { QuickMessageBubbles } from './quick-message-bubbles';
 
 interface MessageListProps {
   messages: ChatMessage[];
   contextCompacted?: boolean;
+  isStreaming?: boolean;
+  quickBubbleMode?: QuickBubbleMode | null;
+  onQuickBubbleSelect?: (text: string) => void;
   onResolvePermission?: (
     toolCallId: string,
     decision: 'approve' | 'deny',
@@ -26,22 +32,36 @@ interface MessageListProps {
 export function MessageList({
   messages,
   contextCompacted = false,
+  isStreaming = false,
+  quickBubbleMode = null,
+  onQuickBubbleSelect,
   onResolvePermission,
   onOpenPlanning,
 }: MessageListProps): React.ReactElement {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (el) {
-      el.scrollTop = el.scrollHeight;
-    }
-  }, [messages]);
+  useChatAutoScroll(containerRef, {
+    messageCount: messages.length,
+    isStreaming,
+    quickBubbleMode,
+  });
+
+  const showRandomBubbles =
+    quickBubbleMode === 'random' && messages.length === 0 && Boolean(onQuickBubbleSelect);
+  const showAppendedBubbles =
+    quickBubbleMode === 'appended' && messages.length > 0 && Boolean(onQuickBubbleSelect);
 
   return (
     <div ref={containerRef} className="chat-messages" aria-live="polite">
-      {messages.length === 0 ? (
+      {messages.length === 0 && quickBubbleMode !== 'random' ? (
         <p className="chat-messages__empty">发送消息开始对话</p>
+      ) : null}
+      {showRandomBubbles ? (
+        <QuickMessageBubbles
+          mode="random"
+          visible
+          onSelect={(text) => onQuickBubbleSelect?.(text)}
+        />
       ) : null}
       {messages.map((message) =>
         message.role === 'user' ? (
@@ -58,6 +78,13 @@ export function MessageList({
         )
       )}
       {contextCompacted ? <ContextCompactNotice /> : null}
+      {showAppendedBubbles ? (
+        <QuickMessageBubbles
+          mode="appended"
+          visible
+          onSelect={(text) => onQuickBubbleSelect?.(text)}
+        />
+      ) : null}
     </div>
   );
 }

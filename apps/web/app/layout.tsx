@@ -15,8 +15,8 @@ export default function RootLayout({
   children: ReactNode;
 }): React.ReactElement {
   return (
-    <html lang="zh-CN">
-      <body className="has-navbar">
+    <html lang="zh-CN" suppressHydrationWarning>
+      <body className="has-navbar" suppressHydrationWarning>
         <AuthProvider>
           <Navbar />
           {children}

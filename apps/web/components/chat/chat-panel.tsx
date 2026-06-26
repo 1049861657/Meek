@@ -31,6 +31,7 @@ export function ChatPanel(): React.ReactElement {
     activeModal,
     openModal,
     closeModal,
+    quickBubbleMode,
     internals,
   } = chat;
 
@@ -76,6 +77,11 @@ export function ChatPanel(): React.ReactElement {
         <MessageList
           messages={messages}
           contextCompacted={contextCompacted}
+          isStreaming={isStreaming}
+          quickBubbleMode={quickBubbleMode}
+          onQuickBubbleSelect={(text) => {
+            void sendMessage(text);
+          }}
           onResolvePermission={resolvePermission}
           onOpenPlanning={handleOpenPlanning}
         />

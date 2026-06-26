@@ -4,6 +4,10 @@
 
 import { getSession } from '@/lib/auth/session';
 
+import {
+  AuthedSessionsGateError,
+  isAuthedSessionsApiReady,
+} from './authed-sessions-gate';
 import { buildConversationReplay } from './session-conversation';
 import type { ChatSessionData, SessionListItem } from './session-data';
 import { CHAT_SESSION_ID_PREFIX, type HistoryEntry, type StoredToolCall } from './storage-contract';
@@ -136,6 +140,16 @@ export class ChatSessionStore {
     return this.mode === SESSION_MODE.AUTHED;
   }
 
+  isAuthedSessionsGated(): boolean {
+    return this.isAuthed() && !isAuthedSessionsApiReady();
+  }
+
+  private assertAuthedSessionsApi(): void {
+    if (this.isAuthedSessionsGated()) {
+      throw new AuthedSessionsGateError();
+    }
+  }
+
   isValidActiveSessionId(sessionId: string): boolean {
     if (!sessionId) {
       return false;
@@ -174,7 +188,7 @@ export class ChatSessionStore {
     if (!this.isAuthed()) {
       return this.guestData.getAllChatSessions(provider);
     }
-
+    this.assertAuthedSessionsApi();
     const data = await this.authedFetch('/api/sessions');
     const sessions = Array.isArray(data.sessions) ? data.sessions : [];
     return sessions.map((session) => {
@@ -196,7 +210,7 @@ export class ChatSessionStore {
     if (!this.isAuthed()) {
       return this.guestData.idb.getSessionMessages(sessionId);
     }
-
+    this.assertAuthedSessionsApi();
     const data = await this.authedFetch(
       `/api/sessions/${encodeURIComponent(sessionId)}/messages?limit=${AUTHED_PAGE_LIMIT}`
     );
@@ -209,7 +223,7 @@ export class ChatSessionStore {
       await this.guestData.deleteSessionMessages(sessionId);
       return;
     }
-
+    this.assertAuthedSessionsApi();
     await this.authedFetch(`/api/sessions/${encodeURIComponent(sessionId)}`, {
       method: 'DELETE',
     });
@@ -221,6 +235,9 @@ export class ChatSessionStore {
   async loadLatest(): Promise<string> {
     if (!this.isAuthed()) {
       return this.guestData.loadLatestProviderSession();
+    }
+    if (this.isAuthedSessionsGated()) {
+      return this.newSession();
     }
 
     const data = await this.authedFetch('/api/sessions');
@@ -234,9 +251,10 @@ export class ChatSessionStore {
 
   async loadSession(sessionId: string): Promise<string> {
     if (!this.isAuthed()) {
+      this.callbacks.onResetContext?.();
       return this.guestData.loadSession(sessionId);
     }
-
+    this.assertAuthedSessionsApi();
     this.guestData.isLoading = true;
     this.callbacks.onResetContext?.();
     try {
@@ -269,7 +287,7 @@ export class ChatSessionStore {
   }
 
   async ensureActiveSession(): Promise<void> {
-    if (!this.isAuthed() || this.activeSessionPersisted) {
+    if (!this.isAuthed() || this.activeSessionPersisted || this.isAuthedSessionsGated()) {
       return;
     }
 

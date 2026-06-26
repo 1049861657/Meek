@@ -15,6 +15,8 @@ export interface QuickMessagesData {
   categories: string[];
 }
 
+export type QuickBubbleMode = 'random' | 'appended';
+
 function parseQuickMessagesResponse(data: unknown): QuickMessagesData {
   if (!data || typeof data !== 'object') {
     throw new Error('响应格式无效');

@@ -2,7 +2,7 @@
  * Guest 会话数据管理 — 对齐 session-data.js
  */
 
-import { loadCompactedBaselineFromStorage } from './compact-baseline-storage';
+import { clearCompactedBaselineFromStorage, loadCompactedBaselineFromStorage } from './compact-baseline-storage';
 import {
   CHAT_DB_INDEX_PROVIDER,
   CHAT_DB_INDEX_TIMESTAMP,
@@ -61,6 +61,10 @@ export class ChatSessionData {
       }
       void this.loadMessageHistory();
     });
+  }
+
+  whenIdbReady(): Promise<void> {
+    return this.idb.whenReady();
   }
 
   async getAllChatSessions(provider: string | null = null): Promise<SessionListItem[]> {
@@ -358,6 +362,7 @@ export class ChatSessionData {
   }
 
   deleteSessionMessages(sessionId: string): Promise<void> {
+    clearCompactedBaselineFromStorage(sessionId);
     return this.idb.deleteSessionMessages(sessionId);
   }
 }
