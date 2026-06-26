@@ -1,162 +1,61 @@
 # 迁移交付
 
-## 交付流程（顺序固定）
+> 流程见 [SKILL.md](./SKILL.md)。门禁 subagent · proposals 裁决 · 交付模板。
 
-```
-编码完成 → pnpm build → 勾选 todos → 整理本批变更清单 → 启动交付门禁 subagent → PASS 后主 AI 裁决优化建议 → 交付正文
-```
+## 硬规则
 
-**禁止**用 Bugbot / `bugbot` subagent 代替本门禁。  
-**禁止**门禁 BLOCK 时仍向用户宣称批次完成。  
-**禁止**因「优化建议」本身 BLOCK；建议与门禁分离。
+- 门禁：`generalPurpose` + `readonly`，**禁 Bugbot**
+- Findings → BLOCK；proposals **不** BLOCK
+- 审阅范围 =「本批变更清单」路径，**禁**工作区全量 diff
+- **勾选任务书 ≠ 交付**；PASS 后须裁决 proposals（含「无」）方能对用户说完成
 
----
+## 交付前自检
 
-## 交付门禁 subagent（必过）
+build · 本批 `M*.md` 勾选 · `README` 进度 · 门禁 PASS · proposals 已裁决（无则注明）· `写入 todos` 已 `Grep` `Mx-yy-Dnn` · 回复含裁决表
 
-编码与 `pnpm build` 通过后、写交付正文前，**必须**启动 **1 个** readonly subagent。
-
-| 项 | 值 |
-|----|-----|
-| `subagent_type` | `generalPurpose`（**不是** `bugbot`） |
-| `readonly` | `true` |
-| `run_in_background` | `false` |
-| `description` | `Migrate delivery gate` |
-
-此时 subagent 同时掌握 **本批变更清单 + 参考源码 + 任务书**，信息最全——除硬性门禁外，**应主动提出优化建议**（见下），供主 AI 裁决；subagent **不得**自行改代码或 todos。
-
-**范围以主 AI 填写的「本批变更清单」为准**，勿用 `git diff` / `uncommitted changes` 作为门禁范围（多任务并行时会把历史未提交改动算进来）。subagent 只审清单内文件；可对清单内路径做定点 `Read` / `git diff HEAD -- <path>` 核对内容，勿因无 commit 拒审。
-
-### 主 AI：本批变更清单（启动门禁前必填）
-
-编码过程中**边做边记**；启动门禁前整理为下表。清单须与 `todos/M*.md` 本批范围一致。
+## 变更清单（启门禁前，边编码边记）
 
 ```markdown
-## 本批变更清单
-Batch: <Mx / Mx-yy>
-
-### 新增
+Batch: M3-04 | 新增/修改/删除/不属于本批/超任务书（无则写无）
 | 路径 | 摘要 |
-|------|------|
-
-### 修改
-| 路径 | 摘要 |
-|------|------|
-
-### 删除
-| 路径 | 摘要 |
-|------|------|
-
-### 明确不属于本批（工作区另有未提交，门禁勿审）
-| 路径 | 归属 |
-|------|------|
-
-### 超任务书说明（若有）
-- ...
 ```
 
-- 无项写「无」；删除/排除同理。
-- 若本批**已单独 commit**，仍优先用清单界定范围；可附 `git show` / `branch changes` 作交叉核对，**不可替代清单**。
-- 禁止用「整份工作区未提交 diff」代替清单；若漏记，主 AI 须根据本会话实现**回溯补全**，而非把无关文件一并交给门禁。
+## 门禁 subagent
 
-### 传给 subagent 的 prompt 模板
+`generalPurpose` · `readonly` · `run_in_background: false` · `Migrate delivery gate`
+
+**Prompt**（填实参路径）：
 
 ```text
-Full Repository Path: D:\gitProject\Meek
-Reference Repository Path: D:\gitProject\MCP-Client
-Batch: <Mx / Mx-yy 节，如 M3-00>
+Meek: … | 参考: … | Batch: …
+本批变更清单: <上表>
+Read: delivery.md, optimize.md
 
-本批变更清单:
-<paste 上节表格；含「不属于本批」排除项>
+任务 A — 仅清单内文件，对照参考 + routes.ts + storage-contract + README 禁止项 + 任务书；超任务书已落地无说明 → BLOCK。
+核对：①参考映射 ②无禁项新能力 ③API/存储键 ④清单=实现 ⑤build ⑥todo 勾选一致 ⑦未授权 optimize。
 
-Read:
-- Meek/.cursor/skills/migrate/delivery.md（门禁 + 优化建议）
-- Meek/.cursor/skills/migrate/optimize.md（禁止项）
+任务 B — 不 BLOCK：| # | 类型 | 建议 | 理由 | 影响 | 建议处置 |（本批采纳|写入 todos|拒绝）
 
-任务 A — 硬性门禁（只读）：**仅对照「本批变更清单」内文件**与参考，逐条判定；不过则 Verdict=BLOCK。勿将「明确不属于本批」或清单外未提交文件纳入 Findings。
-
-门禁清单：
-1. 清单内每条改动能指向现查得到的 MCP-Client/ 参考路径（或任务书已声明的 Meek 独有落点）
-2. 无参考代码不存在的新功能（对照 todos/README.md 禁止项）
-3. API 路径/方法与 routes.ts 一致；storage 键与 storage-contract.js 一致（migrate 未擅自改名）
-4. 改动范围在本批次 todos/M*.md 内，无无关文件；清单与实现一致、无遗漏或多报
-5. 本批涉及 web/packages 时，pnpm build 应有通过依据（父 agent 可提供结论）
-6. 本批次 Meek todos 子项与实现一致
-7. 若清单含**已落地**的超任务书改动：交付须备差异说明；未说明且非用户授权的 optimize → BLOCK
-
-任务 B — 优化建议（不阻塞 PASS）：在通过门禁的前提下，基于**本批变更清单**+参考+任务书，列出**可选**改进。
-- 类型：parity 缺口 / 结构简化 / 性能 / 可维护性 / 任务书补项
-- 遵守 optimize.md 禁止项；触及禁止项的只能标为「需用户授权」
-- 每条须说明：现状、建议、理由、影响面、是否建议写入 todos
-
-输出格式（严格遵守）：
-## Verdict
-PASS | BLOCK
-
-## Findings
-（BLOCK：| # | 门禁项 | 位置 | 说明 |；PASS：无）
-
-## Optimization proposals
-（无建议写「无」；有则表格 | # | 类型 | 建议 | 理由 | 影响 | 建议处置 |）
-建议处置枚举：本批采纳 | 写入 todos | 拒绝
-
-## Notes
-（参考路径摘要、M4/M6 门控补验提示）
+输出：## Verdict ## Findings ## Optimization proposals（无则写无）## Notes
 ```
-
-### 主 AI 处理 Verdict
 
 | Verdict | 动作 |
 |---------|------|
-| **PASS** | 进入「优化建议裁决」（下节），再写交付正文 |
-| **BLOCK** | 只修 Findings → 重跑 build → 重跑门禁（同批最多 **2** 次） |
+| BLOCK | 修 Findings → build → 重跑（≤2 次） |
+| PASS | 裁决 proposals → 交付 |
 
-### 主 AI 处理 Optimization proposals（PASS 后必做）
+## Proposals 裁决
 
-| 建议处置 | 主 AI 动作 |
-|----------|------------|
-| **本批采纳** | 用户未禁止则实现 → 视为 optimize → 交付写「优化差异」→ 必要时更新 todos |
-| **写入 todos** | 在对应 `M*.md` 增子项；交付「待办优化」列出 |
-| **拒绝** | 不实现；交付一句话理由（可写在 Notes） |
+子 agent「建议处置」≠ 终裁。`无` / `已跳过` 也须在裁决表占一行。
 
-**默认**：未触及禁止项、改动小 → 主 AI 可自行「本批采纳」或「写入 todos」；触及 API/存储键/BullMQ 等 → **必须**问用户或标「需用户授权」。
-
-用户说「就按任务书、不要优化」→ 忽略 proposals，交付写「优化建议：已跳过（用户仅 migrate）」。
-
----
-
-## 交付正文（门禁 PASS + 建议裁决后）
-
-```markdown
-## 做了什么
-（本批次，对应 Mx-yy）
-
-## 本批变更
-| 路径 | 操作 | 摘要 |
-（与门禁清单一致）
-
-## 参考源码
-- MCP-Client/...
-
-## 优化差异
-（本批已采纳的超任务书改动；无则「无，纯 parity migrate」）
-
-## 优化建议（门禁）
-| # | 建议 | 裁决 |
-（无则「门禁未提出」或「已跳过」）
-
-## 门禁
-Migrate delivery gate: PASS
-```
-
----
-
-## 与 optimize 模式的关系
-
-| 概念 | 含义 |
+| 终裁 | 动作 |
 |------|------|
-| **migrate（默认）** | 只实现任务书；门禁仍可**提议**优化，但不自动做 |
-| **optimize（用户明确说）** | 允许超任务书实现；交付必须有「优化差异」 |
-| **门禁 Optimization proposals** | 每批 PASS 后的**建议池**；做不做由**主 AI + 用户**定 |
+| 本批采纳 | 改代码 →「优化差异」 |
+| 写入 todos | `todos/M*.md` 该节末：`### 门禁待办（deferred）— Mx-yy` + `- [ ] **Mx-yy-D01** （门禁 #n）简述` → Grep 确认 |
+| 拒绝 | 表内写理由 |
 
-禁止：用 MCP-Client todos 证明完成度；未 PASS 不得写「门禁: PASS」。
+触 optimize 禁止项 / API·存储键 / BullMQ → 禁「本批采纳」。子 agent「写入 todos」→ 禁跳过。用户「仅 migrate」→ 全拒绝或 deferred，**仍填表**。
+
+## 用户回复（PASS 后）
+
+做了什么 · 本批变更表 · 参考路径 · 优化差异（无则 parity migrate）· **优化建议（门禁）**`| # | 建议 | 裁决 | 落点 |` · `门禁 PASS · deferred: … / 无`

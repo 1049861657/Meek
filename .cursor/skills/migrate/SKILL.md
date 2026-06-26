@@ -3,8 +3,9 @@ name: meek-migrate
 description: >-
   Migrate MCP-Client landed source into Meek (Next.js 16 + Worker) with behavior
   parity. Use when the user says 迁移, Meek, M0-M6, 复刻, MCP-Client 参考, or asks to
-  implement a migration task with optional 优化/改进/重构. Delivery requires a readonly
-  generalPurpose gate subagent (not Bugbot); see delivery.md.
+  implement a migration task with optional 优化/改进/重构. After each batch: readonly
+  generalPurpose gate (not Bugbot), adjudicate all proposals, deferred todos as Mx-yy-Dnn;
+  see delivery.md.
 paths:
   - "todos/**"
   - "apps/**"
@@ -12,71 +13,54 @@ paths:
   - "prisma/**"
   - "docs/**"
 metadata:
-  version: "2"
+  version: "4.1"
   modes: migrate, optimize
 ---
 
 # Meek Migrate
 
-**任务书** [`todos/README.md`](../../todos/README.md) + [`todos/M*.md`](../../todos/)  
-**参考源码** `../MCP-Client/src/`、`../MCP-Client/frontend/src/`、`../MCP-Client/prisma/`  
-**运行时** [`docs/adr-006-agent-runtime-hybrid.md`](../../docs/adr-006-agent-runtime-hybrid.md)  
-**禁止** 以 `../MCP-Client/todos/` 界定范围。
+**任务书** `todos/README.md` + `todos/M*.md` · **参考** `MCP-Client/{src,frontend/src,prisma}/` · **禁** `MCP-Client/todos/` 定范围 · **运行时** `docs/adr-006-agent-runtime-hybrid.md`
 
-## 现查锚点（每批次编码前）
+## 现查锚点（编码前）
 
-| 锚点 | 路径 |
-|------|------|
-| API | `src/api/routes.ts` |
-| 存储键 | `frontend/src/chat/storage-contract.js` |
-| 数据模型 | `prisma/schema.prisma` |
-| 本批目录 | 见 `todos/M*.md` 头部「现查」 |
-| 禁止项 | `todos/README.md` |
+`routes.ts` · `storage-contract.js` · `schema.prisma` · 本批 `M*.md`「现查」Glob · `todos/README.md` 禁止项
 
-## 双模式
+## 模式
 
 | 模式 | 触发 | 目标 |
 |------|------|------|
-| **migrate**（默认） | 做 Mx-yy、复刻 | 按任务书 + 参考源码对齐 |
-| **optimize** | 用户明确说优化/重构等 | 超出任务书的改进；见 [optimize.md](./optimize.md) |
+| migrate（默认） | Mx-yy、复刻 | 任务书 + 参考 parity |
+| optimize | 用户明确优化/重构 | 见 [optimize.md](./optimize.md) |
 
 ## 执行清单
 
 ```
-[ ] 0  解析批次：M3 / M3-03 / M3-03-04
-[ ] 1  Read todos/M*.md 对应节
-[ ] 2  现查 MCP-Client（锚点 + Glob 本批目录）
-[ ] 3  参考映射表（见 review.md）→ 用户确认（未说跳过评审时）
-[ ] 4  编码：iron-rules + main-rule（边做边记本批变更路径）
-[ ] 5  验证：routes.ts / storage-contract / pnpm build
-[ ] 6  勾选任务 + 更新 todos/README.md 进度
-[ ] 7  整理本批变更清单 → 交付门禁：readonly generalPurpose subagent（硬性 PASS/BLOCK + Optimization proposals）
-[ ] 8  主 AI 裁决 proposals（采纳 / 写 todos / 拒绝）→ 门禁 PASS 后交付正文
+0  解析批次
+1  Read 本批 todos/M*.md
+2  现查 MCP-Client（锚点 + Glob）
+3  映射表（review.md）→ 用户确认（未说跳过评审）
+4  编码（iron-rules；边做边记变更路径）
+5  验证 routes / storage-contract / pnpm build
+6  勾选 M*.md + 更新 README 进度
+7  变更清单 → 门禁 subagent（delivery.md）
+8  裁决全部 proposals（采纳|写入 todos Mx-yy-Dnn|拒绝）+ Grep deferred
+9  交付正文（含裁决表）→ 方可对用户说「本批完成」
 ```
 
-## 硬约束（ADR-006）
+## ADR-006 硬约束
 
-- Harness 移植 + `openai` + `@modelcontextprotocol/sdk`；**不装** `ai` / `@ai-sdk/*`
-- Web `chatStream`：**registerSink → publishInbound → worker**；禁止直连 Agent
-- SSE 对齐 `web-channel.adapter.ts`；前端移植 `stream-handler.js`
+Harness + `openai` + `@modelcontextprotocol/sdk`（禁 `ai`/`@ai-sdk/*`）· chatStream：`registerSink → publishInbound → worker` · SSE 对齐 `web-channel.adapter.ts`
 
-## Meek 落点
+## 路由
 
-见 [reference-map.md](./reference-map.md)。
-
-## 阶段路由
-
-| 阶段 | 读 |
-|------|-----|
+| 阶段 | 文档 |
+|------|------|
 | 评审 | [review.md](./review.md) |
 | 编码 | [iron-rules.md](./iron-rules.md) |
-| optimize | [optimize.md](./optimize.md) |
-| 交付 | [delivery.md](./delivery.md)（**门禁 subagent 必过，禁 Bugbot**） |
+| 优化 | [optimize.md](./optimize.md) |
+| 交付 | [delivery.md](./delivery.md) |
+| 落点 | [reference-map.md](./reference-map.md) |
 
 ## 禁止
 
-- MCP-Client `todos/` 定范围  
-- 未读参考源码就写 API/UI  
-- 改 API 路径或存储键（migrate 模式）  
-- 迁移批次新建 `apps/web/docs/` 或平行 README（约定写任务书 + 代码）  
-- `npm` / `yarn`
+未读参考就写 · 改 API 路径/存储键（migrate）· 拷 JS 进 Meek · 建 `apps/web/docs/` · `npm`/`yarn`

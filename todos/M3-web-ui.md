@@ -233,20 +233,20 @@ apps/web/
 
 参考：`frontend/src/info/*` · **依赖 M2 API**
 
-- [ ] **M3-04-01** Loading shell → app shell
-- [ ] **M3-04-02** 服务器侧边栏 + 搜索 + 刷新
-- [ ] **M3-04-03** MCP 新增/编辑/删除（stdio/HTTP、headers）
-- [ ] **M3-04-04** 连接 / 断开 / 切换 + pending UI
-- [ ] **M3-04-05** OAuth authorize + `?oauth=` 回跳
-- [ ] **M3-04-06** `POST /api/server/reload-config`
-- [ ] **M3-04-07** 详情栏 StatusChip + 连接/授权按钮
-- [ ] **M3-04-08** Tools 面板 + StatusDot + 单工具开关
-- [ ] **M3-04-09** 工具 bulk 全选/全不选 + preferences
-- [ ] **M3-04-10** Resources / Prompts（`rp-panel.js`）
-- [ ] **M3-04-11** Tool 测试 Drawer
-- [ ] **M3-04-12** URL intent 深链
-- [ ] **M3-04-13** Guest 写操作 AuthShell 拦截
-- [ ] **M3-04-14** Info 样式（`info/style.css`）
+- [x] **M3-04-01** Loading shell → app shell
+- [x] **M3-04-02** 服务器侧边栏 + 搜索 + 刷新
+- [x] **M3-04-03** MCP 新增/编辑/删除（stdio/HTTP、headers）
+- [x] **M3-04-04** 连接 / 断开 / 切换 + pending UI
+- [x] **M3-04-05** OAuth authorize + `?oauth=` 回跳
+- [x] **M3-04-06** `POST /api/server/reload-config`
+- [x] **M3-04-07** 详情栏 StatusChip + 连接/授权按钮
+- [x] **M3-04-08** Tools 面板 + StatusDot + 单工具开关
+- [x] **M3-04-09** 工具 bulk 全选/全不选 + preferences
+- [x] **M3-04-10** Resources / Prompts（`rp-panel.js`）
+- [x] **M3-04-11** Tool 测试 Drawer
+- [x] **M3-04-12** URL intent 深链
+- [x] **M3-04-13** Guest 写操作 AuthShell 拦截
+- [x] **M3-04-14** Info 样式（`info/style.css`）
 
 ---
 
@@ -256,15 +256,15 @@ apps/web/
 
 参考：`frontend/src/settings/*` · **写操作门控 M4-04**
 
-- [ ] **M3-05-01** 布局 sidebar + main + 保存栏
-- [ ] **M3-05-02** Provider CRUD + 侧边栏切换
-- [ ] **M3-05-03** Provider 内模型增删改
-- [ ] **M3-05-04** 默认 Provider + 保存
-- [ ] **M3-05-05** 保存 + `providers/reload`（M4 联调）
-- [ ] **M3-05-06** 剪贴板导入/导出（`provider-clipboard.js`）
-- [ ] **M3-05-07** API Key 显隐
-- [ ] **M3-05-08** Guest 只读 + `data-requires-auth`
-- [ ] **M3-05-09** Settings 样式（`settings/style.css`）
+- [x] **M3-05-01** 布局 sidebar + main + 保存栏
+- [x] **M3-05-02** Provider CRUD + 侧边栏切换
+- [x] **M3-05-03** Provider 内模型增删改
+- [x] **M3-05-04** 默认 Provider + 保存
+- [x] **M3-05-05** 保存 + `providers/reload`（M4 联调）
+- [x] **M3-05-06** 剪贴板导入/导出（`provider-clipboard.js`）
+- [x] **M3-05-07** API Key 显隐
+- [x] **M3-05-08** Guest 只读 + `data-requires-auth`
+- [x] **M3-05-09** Settings 样式（`settings/style.css`）
 
 ---
 
