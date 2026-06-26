@@ -48,9 +48,11 @@
 
 - [ ] **M6-02-01** Read `storage-contract.js` → 全部存储键对齐
 
-- [ ] **M6-02-02** Glob `frontend/src/**` → 5 页 + 共享 UI + 6 Modal 行为对齐
+- [ ] **M6-02-02** Glob `frontend/src/**` → 5 页 + 共享 UI + 9 Modal 行为对齐
 
 - [ ] **M6-02-03** SSE / tool 卡片 / guest-authed 双模式与参考一致
+
+- [ ] **M6-02-04** **M4 门控补验**（M3-08-09 登记）：`M3-03-37` MemoryDebug（M4-06，`memory-debug-modal` + API）、`M3-03-43` Authed 会话（M4-05，`authed-sessions-gate.ts`）、`M3-05-05` Settings 保存/reload（M4-04，`settings-api-gate.ts`）、`M3-07` Admin 写操作（M4-02/03，`admin-api-gate.ts`）
 
 
 

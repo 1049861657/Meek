@@ -1,6 +1,6 @@
 # M3 — Web 前端全页面
 
-> **状态**：未开始  
+> **状态**：已完成（MS3）  
 > **周期**：6 ~ 8 人周（2 人）  
 > **前置（硬）**：M1 SSE 契约稳定（MS1）；M2 Info / MCP API 就绪（MS2）  
 > **前置（软 / 可 UI 壳先行）**：M4 Settings / Sessions / Admin / Memory API — 见 **联调门控**  
@@ -270,8 +270,8 @@ apps/web/
 
 ## M3-06 Landing `/`
 
-- [ ] **M3-06-01** 产品介绍 + CTA（**RSC**，`landing/main.js`）
-- [ ] **M3-06-02** Landing 样式
+- [x] **M3-06-01** 产品介绍 + CTA（**RSC**，`landing/main.js`）
+- [x] **M3-06-02** Landing 样式
 
 ---
 
@@ -281,31 +281,69 @@ apps/web/
 
 参考：`frontend/src/admin/*` · **写操作门控 M4-02/03**
 
-- [ ] **M3-07-01** 三态门禁（未登录 / forbidden / workspace）
-- [ ] **M3-07-02** Tab：用户管理 | 渠道管理
-- [ ] **M3-07-03** Seed 面板（guest 默认归属账号）
-- [ ] **M3-07-04** 用户表 + 角色 + 重置密码
-- [ ] **M3-07-05** `POST /api/admin/seed` 初始化
-- [ ] **M3-07-06** 渠道 rail + status 轮询
-- [ ] **M3-07-07** Channel Binding（RouteRule `boundUserId`）
-- [ ] **M3-07-08** Channel Config 面板（`channel-config-panel.js` 全量）
-- [ ] **M3-07-09** 保存 + MCP probe 失败 flash
-- [ ] **M3-07-10** Admin 样式 + `admin/icons.js`
+- [x] **M3-07-01** 三态门禁（未登录 / forbidden / workspace）
+- [x] **M3-07-02** Tab：用户管理 | 渠道管理
+- [x] **M3-07-03** Seed 面板（guest 默认归属账号）
+- [x] **M3-07-04** 用户表 + 角色 + 重置密码
+- [x] **M3-07-05** `POST /api/admin/seed` 初始化
+- [x] **M3-07-06** 渠道 rail + status 轮询
+- [x] **M3-07-07** Channel Binding（RouteRule `boundUserId`）
+  - [x] **M3-07-D01** 绑定切换 / 保存后自动 `applyAccountDefaultsToForm`（参考 `app.js` `applyAccountDefaults: true`）
+- [x] **M3-07-08** Channel Config 面板（`channel-config-panel.js` 全量）
+- [x] **M3-07-09** 保存 + MCP probe 失败 flash
+- [x] **M3-07-10** Admin 样式 + `admin/icons.js`
 
 ---
 
 ## M3-08 跨页验收
 
-- [ ] **M3-08-01** Glob：`frontend/src/chat/*.js` 均有映射或合并说明
-- [ ] **M3-08-02** 9 Modal DOM id 与参考一致
-- [ ] **M3-08-03** Settings 页无 MCP CRUD / Tool Prompt
-- [ ] **M3-08-04** `storage-contract` 键名逐字一致
-- [ ] **M3-08-05** guest/authed：init-once + reload，无 silent 丢数据
-- [ ] **M3-08-06** SSE：多 tool 并行 + permission + stop
-- [ ] **M3-08-07** Info：OAuth + reload-config + tool test
-- [ ] **M3-08-08** Markdown + Modal lazy；build analyze 首屏可接受
-- [ ] **M3-08-09** M4 门控项（03-37、03-43、05-05、07 写操作）登记 M6 补验
-- [ ] **M3-08-10** **MS3 签收**：M3-00～M3-07 任务全勾选 + 5 页可访问
+### chat/*.js 映射（M3-08-01）
+
+| 参考 `frontend/src/chat/` | Meek 落点 | 说明 |
+|---------------------------|-----------|------|
+| `storage-contract.js` | `lib/chat/storage-contract.ts` | 键名契约 |
+| `session-idb.js` | `lib/chat/session-idb.ts` | |
+| `session-store.js` | `lib/chat/session-store.ts` | guest/authed |
+| `session-data.js` | `lib/chat/session-data.ts` | |
+| `session-conversation.js` | `lib/chat/session-conversation.ts` | |
+| `compact-baseline-storage.js` | `lib/chat/compact-baseline-storage.ts` | |
+| `chat-settings-storage`（经 settings-modal） | `lib/chat/chat-settings-storage.ts` | |
+| `quickmessage-store.js` | `lib/chat/quick-messages-storage.ts` | |
+| `config-fetch.js` | `lib/chat/config-fetch.ts` | |
+| `chat-request-body.js` | `lib/chat/chat-request-body.ts` | |
+| `chat-api.js` / `stream-handler.js` | `hooks/use-chat-stream.ts` + `lib/chat/process-sse-stream.ts` | |
+| `sse-parse.js` | `lib/chat/sse-parse.ts` | |
+| `turn-collector.js` | `lib/chat/turn-collector.ts` + `sync-turn-collector.ts` | |
+| `message-history-builder.js` | `lib/chat/message-history-builder.ts` | |
+| `context-messages.js` | `lib/chat/context-messages.ts` | |
+| `mcp-selection.js` | `lib/chat/mcp-selection.ts` | |
+| `usage-telemetry.js` | `lib/chat/usage-telemetry.ts` | |
+| `time.js` | `lib/chat/time.ts` | |
+| `renderers.js` | `lib/chat/tool-renderers.ts` | |
+| `prompt-editor.js` | `components/chat/modals/prompts-modal.tsx` | |
+| `todo-card-view.js` | `components/chat/todo-tool-card.tsx` | |
+| `ui/*-modal.js`（×7） | `components/chat/modals/*.tsx` | 见 M3-03-C 表 |
+| `ui/chat-modals-host.js` | `components/chat/modals/chat-modals-host.tsx` | `dynamic()` lazy |
+| `ui/chat-shell-ui.js` | `components/chat/chat-panel.tsx` 等 | |
+| `ui/planning-panel.js` | `components/chat/planning-panel.tsx` | |
+| `ui/tool-cards.js` | `components/chat/tool-call-card.tsx` | |
+| `ui/quickmessage.js` | `quick-messages-modal` + `edit-message-modal` | |
+| `icons.js` | `components/chat/chat-icons.tsx` | |
+| `markdown-stack.js` | `components/chat/chat-markdown.tsx` + inner | `dynamic()` lazy |
+| `markdown-stack.bundle.js` | — | 不拷贝 bundle；Next 分包 |
+| `main.js` / `app-core.js` / `app-lifecycle.js` | `app/ai/` + `chat-panel` + `use-chat-stream` | 入口合并 |
+| `utils.js` | `lib/utils/*` + 内联 | 无独立 chat/utils |
+
+- [x] **M3-08-01** Glob：`frontend/src/chat/*.js` 均有映射或合并说明
+- [x] **M3-08-02** 9 Modal DOM id 与参考一致（`OverlayModal` `modalId`：`history-modal` … `prompts-modal`）
+- [x] **M3-08-03** Settings 页无 MCP CRUD / Tool Prompt（仅 Provider CRUD）
+- [x] **M3-08-04** `storage-contract` 键名逐字一致（`aiChatSettings`、`aiQuickMessages`、`aiCompactBaseline:*`、`AIChatDatabase`）
+- [x] **M3-08-05** guest/authed：`auth-provider` / `use-chat-stream` `initOnceRef`；`reloadAfterAuth` 全页刷新
+- [x] **M3-08-06** SSE：`process-sse-stream` 多 tool 卡片；`permission-resolve-client`；`stop()` + `AbortSignal`
+- [x] **M3-08-07** Info：OAuth `info-api` authorize；`reload-config`；`ToolTestDrawer`
+- [x] **M3-08-08** `chat-markdown` + 9 Modal `dynamic()` lazy；`pnpm build` 通过
+- [x] **M3-08-09** M4 门控项登记 → `M6-02-04`
+- [x] **M3-08-10** **MS3 签收**：M3-00～M3-07 全勾选；`/` `/ai` `/info` `/settings` `/admin` 可访问
 
 ---
 

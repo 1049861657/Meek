@@ -1,6 +1,16 @@
 # 参考代码 → Meek 落点
 
-边界与现查规则见 [`todos/README.md`](../../todos/README.md)。
+> **读者 = 编码 agent（步骤 4）**。本表是**默认落点索引**；编码前仍须 review 现查验证文件存在。边界规则见 `todos/README.md`。
+
+## 使用方式
+
+```
+1. 从评审映射表拿到参考路径
+2. 在本文件 Grep 参考侧路径
+3. 找到 → 写到表内 Meek 落点
+4. 未找到 → 停，问用户（禁猜目录）
+5. 落点后 Glob Meek 侧是否已有同类模块 → 优先扩展
+```
 
 ## 进程
 
@@ -9,7 +19,7 @@
 | `src/app.ts` | `apps/web` 启动 + `apps/worker/src/main.ts` |
 | `startMessageBus` / `startChannels` | worker only |
 
-## API（`src/api/routes.ts`）
+## API（对照 `src/api/routes.ts`）
 
 | 控制器 | Meek |
 |--------|------|
@@ -34,12 +44,12 @@
 | `frontend/info.html` | `apps/web/app/info/` |
 | `frontend/admin.html` | `apps/web/app/admin/` |
 
-## 聊天页模块（`frontend/src/chat/`）
+## 聊天页（`frontend/src/chat/`）
 
-| 参考 | Meek 建议 |
-|------|-----------|
+| 参考 | Meek |
+|------|------|
 | `storage-contract.js` | `apps/web/lib/chat/storage-contract.ts` |
-| `stream-handler.js` / `sse-parse.js` | React hooks，保留参考 SSE 事件格式 |
+| `stream-handler.js` / `sse-parse.js` | React hooks；**保留参考 SSE 事件格式** |
 | `ui/*-modal.js` | `components/chat/modals/*` |
 | `session-idb.js` | `lib/chat/session-idb.ts` |
 
@@ -49,15 +59,23 @@
 |------------|------|
 | `src/core/agent-harness/*` | `packages/agent-core/` |
 | `src/core/mcp/*` | `packages/mcp-runtime/` |
-| `src/mcp-servers/*` | `apps/worker/mcp-servers/` → `dist/mcp-servers/`（worker 内嵌打包） |
+| `src/mcp-servers/*` | `apps/worker/mcp-servers/` → `dist/mcp-servers/` |
 | `src/core/memory/*` | `packages/agent-core/memory/` |
 | `src/config-plane/*` | `packages/config-plane/` |
 | `src/message-bus/*` | `apps/worker/message-bus/` |
 | `src/channels/*` | `apps/worker/channels/` |
-| `src/services/*` | 按职责进 `packages/*` 或 worker |
+| `src/services/*` | 按职责 → `packages/*` 或 worker |
 
 ## 数据
 
 | MCP-Client | Meek |
 |------------|------|
 | `prisma/schema.prisma` | 同结构；`packages/db` |
+
+## 落点冲突时
+
+| 情况 | 动作 |
+|------|------|
+| 表内落点已有实现 | 扩展该模块，禁平行新建 |
+| 表内落点不存在但邻近模块可承载 | 评审表标注「扩展现有」并等确认 |
+| 表无条目 | 不编码；回 review 补映射 |
