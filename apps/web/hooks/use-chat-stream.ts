@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 
 import { showToast } from '@/components/ui/toast';
 import {
@@ -9,24 +9,60 @@ import {
 } from '@/lib/chat/chat-orchestrator';
 import { historyEntriesToChatMessages } from '@/lib/chat/chat-message-mapper';
 import {
+  buildChatSettingsFromState,
+  loadChatSettings,
+  saveChatSettings,
+} from '@/lib/chat/chat-settings-storage';
+import {
   createAssistantMessage,
   createUserMessage,
   type AssistantMessage,
   type ChatMessage,
   type PlanningItemState,
 } from '@/lib/chat/chat-ui-types';
-import { fetchChatFeatureConfig, fetchChatProviderConfig } from '@/lib/chat/config-fetch';
+import {
+  fetchChatFeatureConfig,
+  fetchChatProviderConfig,
+  type FeatureConfigResult,
+  type ProviderConfigResult,
+} from '@/lib/chat/config-fetch';
 import { countKnownEnabledMcpServers, fetchMcpServers } from '@/lib/chat/mcp-selection';
 import { resolveChatToolPermission } from '@/lib/chat/permission-resolve-client';
 import { consumeSseStream, type StreamRuntime } from '@/lib/chat/process-sse-stream';
 import { ChatSessionData } from '@/lib/chat/session-data';
 import { createSessionStore, type ChatSessionStore } from '@/lib/chat/session-store';
-import type { HistoryEntry } from '@/lib/chat/storage-contract';
+import type { HistoryEntry, PermissionMode } from '@/lib/chat/storage-contract';
 import { feedTurnCollectorFromPayload } from '@/lib/chat/sync-turn-collector';
 import { formatMessageTimeWithElapsed } from '@/lib/chat/time';
 import { useAuth } from '@/providers/auth-provider';
 
 export type ChatStreamStatus = 'idle' | 'loading' | 'streaming' | 'error';
+
+export type ChatModalId =
+  | 'history'
+  | 'settings'
+  | 'context'
+  | 'system-tools'
+  | 'mcp'
+  | 'quick-messages'
+  | 'edit-message'
+  | 'memory-debug'
+  | 'prompts';
+
+export interface ChatStreamInternals {
+  orchestratorRef: React.RefObject<ChatOrchestrator | null>;
+  sessionStoreRef: React.RefObject<ChatSessionStore | null>;
+  guestDataRef: React.RefObject<ChatSessionData | null>;
+  featureConfigRef: React.RefObject<FeatureConfigResult | null>;
+  providerConfigRef: React.RefObject<ProviderConfigResult | null>;
+  syncMcpCounter: () => void;
+  syncSessionDisplay: (sessionId: string) => void;
+  loadHistoryToUi: (entries: HistoryEntry[]) => void;
+  setContextCompactedState: (value: boolean) => void;
+  setPlanningItems: Dispatch<SetStateAction<PlanningItemState[]>>;
+  composerInsertRef: React.RefObject<((text: string) => void) | null>;
+  persistSettings: () => void;
+}
 
 export interface UseChatStreamResult {
   messages: ChatMessage[];
@@ -51,6 +87,71 @@ export interface UseChatStreamResult {
       permissionSessionKey: string;
     }
   ) => Promise<void>;
+  activeModal: ChatModalId | null;
+  openModal: (id: ChatModalId) => void;
+  closeModal: () => void;
+  internals: ChatStreamInternals;
+}
+
+const VALID_PERMISSION_MODES: PermissionMode[] = ['open', 'interactive', 'locked'];
+
+function applyStoredSettings(
+  orchestrator: ChatOrchestrator,
+  feature: FeatureConfigResult,
+  stored: ReturnType<typeof loadChatSettings>
+): void {
+  const { state } = orchestrator;
+  if (stored.model) {
+    state.model = stored.model;
+  }
+  if (stored.compactModel) {
+    state.compactModel = stored.compactModel;
+  }
+  if (typeof stored.skipMemory === 'boolean') {
+    state.skipMemory = stored.skipMemory;
+  }
+  if (typeof stored.enableAutoCompact === 'boolean') {
+    state.enableAutoCompact = stored.enableAutoCompact;
+  }
+  if (typeof stored.temperature === 'number') {
+    state.temperature = stored.temperature;
+  }
+  if (typeof stored.maxTokens === 'number') {
+    state.maxTokens = stored.maxTokens;
+  }
+  if (typeof stored.enableMCPTools === 'boolean') {
+    state.enableMCPTools = stored.enableMCPTools;
+  }
+  if (typeof stored.enablePrompts === 'boolean') {
+    state.enablePrompts = stored.enablePrompts;
+  }
+  if (typeof stored.enableMessageHistory === 'boolean') {
+    state.enableMessageHistory = stored.enableMessageHistory;
+  }
+  if (typeof stored.messageHistoryCount === 'number') {
+    state.messageHistoryCount = stored.messageHistoryCount;
+  }
+  if (typeof stored.maxToolCallRounds === 'number') {
+    state.maxToolCallRounds = stored.maxToolCallRounds;
+  }
+  if (
+    stored.permissionMode &&
+    VALID_PERMISSION_MODES.includes(stored.permissionMode)
+  ) {
+    state.permissionMode = stored.permissionMode;
+  }
+  if (Array.isArray(stored.enabledServerIds)) {
+    state.enabledServerIds = stored.enabledServerIds.filter(
+      (id): id is string => typeof id === 'string'
+    );
+  }
+  if (Array.isArray(stored.enabledSystemToolNames)) {
+    state.enabledSystemToolNames = stored.enabledSystemToolNames.filter(
+      (name): name is string => typeof name === 'string'
+    );
+  } else {
+    state.enabledSystemToolNames = feature.enabledSystemToolNames;
+  }
 }
 
 export function useChatStream(): UseChatStreamResult {
@@ -63,10 +164,14 @@ export function useChatStream(): UseChatStreamResult {
   const [contextCompacted, setContextCompacted] = useState(false);
   const [planningItems, setPlanningItems] = useState<PlanningItemState[]>([]);
   const [mcpEnabledCount, setMcpEnabledCount] = useState(0);
+  const [activeModal, setActiveModal] = useState<ChatModalId | null>(null);
 
   const guestDataRef = useRef<ChatSessionData | null>(null);
   const sessionStoreRef = useRef<ChatSessionStore | null>(null);
   const orchestratorRef = useRef<ChatOrchestrator | null>(null);
+  const featureConfigRef = useRef<FeatureConfigResult | null>(null);
+  const providerConfigRef = useRef<ProviderConfigResult | null>(null);
+  const composerInsertRef = useRef<((text: string) => void) | null>(null);
   const streamRuntimeRef = useRef<StreamRuntime>({ reader: null, userAborted: false });
   const pendingUserTextRef = useRef<string | null>(null);
   const lastFailedTextRef = useRef<string | null>(null);
@@ -101,6 +206,26 @@ export function useChatStream(): UseChatStreamResult {
     if (todoItems?.length) {
       setPlanningItems(todoItems as PlanningItemState[]);
     }
+  }, []);
+
+  const setContextCompactedState = useCallback((value: boolean): void => {
+    setContextCompacted(value);
+  }, []);
+
+  const persistSettings = useCallback((): void => {
+    const orchestrator = orchestratorRef.current;
+    if (!orchestrator) {
+      return;
+    }
+    saveChatSettings(buildChatSettingsFromState(orchestrator.state));
+  }, []);
+
+  const openModal = useCallback((id: ChatModalId): void => {
+    setActiveModal(id);
+  }, []);
+
+  const closeModal = useCallback((): void => {
+    setActiveModal(null);
   }, []);
 
   useEffect(() => {
@@ -166,6 +291,9 @@ export function useChatStream(): UseChatStreamResult {
           fetchMcpServers(),
         ]);
 
+        featureConfigRef.current = feature;
+        providerConfigRef.current = providerConfig;
+
         orchestrator.state.isConfigLoaded = true;
         orchestrator.state.enableMCPTools = feature.enableMCPTools;
         orchestrator.state.enablePrompts = feature.enablePrompts;
@@ -185,6 +313,8 @@ export function useChatStream(): UseChatStreamResult {
           orchestrator.state.model = models[0]?.value ?? '';
           orchestrator.state.compactModel = models[0]?.value ?? '';
         }
+
+        applyStoredSettings(orchestrator, feature, loadChatSettings());
 
         syncMcpCounter();
 
@@ -493,6 +623,21 @@ export function useChatStream(): UseChatStreamResult {
     showToast('已创建新会话', 'info');
   }, [status, syncSessionDisplay]);
 
+  const internals: ChatStreamInternals = {
+    orchestratorRef,
+    sessionStoreRef,
+    guestDataRef,
+    featureConfigRef,
+    providerConfigRef,
+    syncMcpCounter,
+    syncSessionDisplay,
+    loadHistoryToUi,
+    setContextCompactedState,
+    setPlanningItems,
+    composerInsertRef,
+    persistSettings,
+  };
+
   return {
     messages,
     status,
@@ -508,6 +653,10 @@ export function useChatStream(): UseChatStreamResult {
     clearChat,
     newSession,
     resolvePermission,
+    activeModal,
+    openModal,
+    closeModal,
+    internals,
   };
 }
 

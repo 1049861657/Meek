@@ -25,10 +25,6 @@ interface ChatToolbarProps {
   onToolbarAction?: (action: ChatToolbarAction) => void;
 }
 
-function stubModal(action: string): void {
-  showToast(`${action} 将在 Modal 批次（M3-03-C）开放`, 'info');
-}
-
 /** 会话栏 + 工具栏 — 对齐 ai.html session-info / session-buttons */
 export function ChatToolbar({
   sessionDisplayId,
@@ -38,12 +34,12 @@ export function ChatToolbar({
   onToolbarAction,
 }: ChatToolbarProps): React.ReactElement {
   const handleAction = (action: ChatToolbarAction): void => {
-    if (onToolbarAction) {
-      onToolbarAction(action);
-      return;
-    }
     if (action === 'clear') {
       onClearChat();
+      return;
+    }
+    if (onToolbarAction) {
+      onToolbarAction(action);
       return;
     }
     const labels: Record<Exclude<ChatToolbarAction, 'clear'>, string> = {
@@ -52,7 +48,7 @@ export function ChatToolbar({
       compact: '上下文',
       settings: '聊天设置',
     };
-    stubModal(labels[action]);
+    showToast(`${labels[action]} 未连接`, 'info');
   };
 
   return (

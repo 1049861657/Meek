@@ -1,8 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-
-import { showToast } from '@/components/ui/toast';
+import { useCallback, useEffect, useState } from 'react';
 
 import { IconNewSession, IconQuick, IconSend, IconStop } from './chat-icons';
 
@@ -10,10 +8,12 @@ interface ChatComposerProps {
   disabled: boolean;
   isStreaming: boolean;
   hasError: boolean;
+  composerInsertRef: React.RefObject<((text: string) => void) | null>;
   onSend: (text: string) => void;
   onStop: () => void;
   onRetry: () => void;
   onNewSession: () => void;
+  onOpenQuickMessages: () => void;
 }
 
 /** 输入区：发送/停止/Enter/新建会话 — 对齐 ai.html message-input-container */
@@ -21,12 +21,23 @@ export function ChatComposer({
   disabled,
   isStreaming,
   hasError,
+  composerInsertRef,
   onSend,
   onStop,
   onRetry,
   onNewSession,
+  onOpenQuickMessages,
 }: ChatComposerProps): React.ReactElement {
   const [text, setText] = useState('');
+
+  useEffect(() => {
+    composerInsertRef.current = (value: string): void => {
+      setText(value);
+    };
+    return () => {
+      composerInsertRef.current = null;
+    };
+  }, [composerInsertRef]);
 
   const handleSubmit = useCallback(
     (event?: React.FormEvent): void => {
@@ -75,7 +86,7 @@ export function ChatComposer({
             title="快捷消息"
             aria-label="快捷消息"
             disabled={isStreaming}
-            onClick={() => showToast('快捷消息将在 Modal 批次开放', 'info')}
+            onClick={onOpenQuickMessages}
           >
             <IconQuick />
           </button>

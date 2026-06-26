@@ -199,20 +199,20 @@ apps/web/
 | `memory-debug-modal` | `memory-debug-modal.js` | 03-37 |
 | `prompts-modal` | `prompt-editor.js` | 03-38 |
 
-- [ ] **M3-03-30** HistoryModal — 搜索、批量删、加载会话
-- [ ] **M3-03-31** SettingsModal — 模型/权限/MCP 开关/恢复默认（Toggle 用受控 `ToggleSwitch`，不移植 `bindToggle`）
-- [ ] **M3-03-32** ContextModal — 预览/生成/应用/清除摘要
-- [ ] **M3-03-33** SystemToolsModal
-- [ ] **M3-03-34** McpModal — probe 后保存、顶栏计数
-- [ ] **M3-03-35** QuickMessagesModal — 分类 CRUD
-- [ ] **M3-03-36** EditMessageModal
-- [ ] **M3-03-37** MemoryDebugModal（**门控 M4-06**：未就绪仅壳）
-- [ ] **M3-03-38** PromptsModal — Tool Prompt + System Sections（**非 Settings 页**）
+- [x] **M3-03-30** HistoryModal — 搜索、批量删、加载会话
+- [x] **M3-03-31** SettingsModal — 模型/权限/MCP 开关/恢复默认（Toggle 用受控 `ToggleSwitch`，不移植 `bindToggle`）
+- [x] **M3-03-32** ContextModal — 预览/生成/应用/清除摘要
+- [x] **M3-03-33** SystemToolsModal
+- [x] **M3-03-34** McpModal — probe 后保存、顶栏计数
+- [x] **M3-03-35** QuickMessagesModal — 分类 CRUD
+- [x] **M3-03-36** EditMessageModal
+- [x] **M3-03-37** MemoryDebugModal（**门控 M4-06**：未就绪仅壳）
+- [x] **M3-03-38** PromptsModal — Tool Prompt + System Sections（**非 Settings 页**）
 
 ### M3-03-D 存储与契约（03-39～03-46）
 
-- [ ] **M3-03-39** `aiChatSettings` 读写
-- [ ] **M3-03-40** `aiQuickMessages` + 服务端种子
+- [x] **M3-03-39** `aiChatSettings` 读写（**M3-03-C 提前完成**：`chat-settings-storage.ts` + Settings 关闭时持久化）
+- [x] **M3-03-40** `aiQuickMessages` + 服务端种子（**M3-03-C 提前完成**：`quick-messages-storage.ts`）
 - [ ] **M3-03-41** `aiCompactBaseline:{sessionId}`
 - [ ] **M3-03-42** Guest IDB 持久化 + 旧数据兼容
 - [ ] **M3-03-43** Authed `/api/sessions`（**门控 M4-05**：壳 + 提示）

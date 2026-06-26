@@ -9,7 +9,10 @@ export const MCP_CHECKBOX_PREFIX = 'mcp-server-';
 export interface McpServerSummary {
   id: string;
   name?: string;
+  description?: string;
+  isConnected?: boolean;
   toolsEnabled?: number;
+  toolsTotal?: number;
 }
 
 export interface McpProbeResult {

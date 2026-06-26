@@ -3,7 +3,7 @@
 ## 交付流程（顺序固定）
 
 ```
-编码完成 → pnpm build → 勾选 todos → 启动交付门禁 subagent → PASS 后主 AI 裁决优化建议 → 交付正文
+编码完成 → pnpm build → 勾选 todos → 整理本批变更清单 → 启动交付门禁 subagent → PASS 后主 AI 裁决优化建议 → 交付正文
 ```
 
 **禁止**用 Bugbot / `bugbot` subagent 代替本门禁。  
@@ -23,7 +23,41 @@
 | `run_in_background` | `false` |
 | `description` | `Migrate delivery gate` |
 
-此时 subagent 同时掌握 **Diff + 参考源码 + 任务书**，信息最全——除硬性门禁外，**应主动提出优化建议**（见下），供主 AI 裁决；subagent **不得**自行改代码或 todos。门禁默认对照工作区未提交变更（`Diff: uncommitted changes`），勿因无 commit 拒审。
+此时 subagent 同时掌握 **本批变更清单 + 参考源码 + 任务书**，信息最全——除硬性门禁外，**应主动提出优化建议**（见下），供主 AI 裁决；subagent **不得**自行改代码或 todos。
+
+**范围以主 AI 填写的「本批变更清单」为准**，勿用 `git diff` / `uncommitted changes` 作为门禁范围（多任务并行时会把历史未提交改动算进来）。subagent 只审清单内文件；可对清单内路径做定点 `Read` / `git diff HEAD -- <path>` 核对内容，勿因无 commit 拒审。
+
+### 主 AI：本批变更清单（启动门禁前必填）
+
+编码过程中**边做边记**；启动门禁前整理为下表。清单须与 `todos/M*.md` 本批范围一致。
+
+```markdown
+## 本批变更清单
+Batch: <Mx / Mx-yy>
+
+### 新增
+| 路径 | 摘要 |
+|------|------|
+
+### 修改
+| 路径 | 摘要 |
+|------|------|
+
+### 删除
+| 路径 | 摘要 |
+|------|------|
+
+### 明确不属于本批（工作区另有未提交，门禁勿审）
+| 路径 | 归属 |
+|------|------|
+
+### 超任务书说明（若有）
+- ...
+```
+
+- 无项写「无」；删除/排除同理。
+- 若本批**已单独 commit**，仍优先用清单界定范围；可附 `git show` / `branch changes` 作交叉核对，**不可替代清单**。
+- 禁止用「整份工作区未提交 diff」代替清单；若漏记，主 AI 须根据本会话实现**回溯补全**，而非把无关文件一并交给门禁。
 
 ### 传给 subagent 的 prompt 模板
 
@@ -31,25 +65,26 @@
 Full Repository Path: D:\gitProject\Meek
 Reference Repository Path: D:\gitProject\MCP-Client
 Batch: <Mx / Mx-yy 节，如 M3-00>
-Diff: uncommitted changes
-（若本批已 commit 未 push，可改为 branch changes）
+
+本批变更清单:
+<paste 上节表格；含「不属于本批」排除项>
 
 Read:
 - Meek/.cursor/skills/migrate/delivery.md（门禁 + 优化建议）
 - Meek/.cursor/skills/migrate/optimize.md（禁止项）
 
-任务 A — 硬性门禁（只读）：对照 Diff 与参考，逐条判定；不过则 Verdict=BLOCK。
+任务 A — 硬性门禁（只读）：**仅对照「本批变更清单」内文件**与参考，逐条判定；不过则 Verdict=BLOCK。勿将「明确不属于本批」或清单外未提交文件纳入 Findings。
 
 门禁清单：
-1. 每条改动能指向现查得到的 MCP-Client/ 参考路径（或任务书已声明的 Meek 独有落点）
+1. 清单内每条改动能指向现查得到的 MCP-Client/ 参考路径（或任务书已声明的 Meek 独有落点）
 2. 无参考代码不存在的新功能（对照 todos/README.md 禁止项）
 3. API 路径/方法与 routes.ts 一致；storage 键与 storage-contract.js 一致（migrate 未擅自改名）
-4. 改动范围在本批次 todos/M*.md 内，无无关文件
+4. 改动范围在本批次 todos/M*.md 内，无无关文件；清单与实现一致、无遗漏或多报
 5. 本批涉及 web/packages 时，pnpm build 应有通过依据（父 agent 可提供结论）
 6. 本批次 Meek todos 子项与实现一致
-7. 若 Diff 含**已落地**的超任务书改动：交付须备差异说明；未说明且非用户授权的 optimize → BLOCK
+7. 若清单含**已落地**的超任务书改动：交付须备差异说明；未说明且非用户授权的 optimize → BLOCK
 
-任务 B — 优化建议（不阻塞 PASS）：在通过门禁的前提下，基于当前 Diff+参考+任务书，列出**可选**改进。
+任务 B — 优化建议（不阻塞 PASS）：在通过门禁的前提下，基于**本批变更清单**+参考+任务书，列出**可选**改进。
 - 类型：parity 缺口 / 结构简化 / 性能 / 可维护性 / 任务书补项
 - 遵守 optimize.md 禁止项；触及禁止项的只能标为「需用户授权」
 - 每条须说明：现状、建议、理由、影响面、是否建议写入 todos
@@ -95,6 +130,10 @@ PASS | BLOCK
 ```markdown
 ## 做了什么
 （本批次，对应 Mx-yy）
+
+## 本批变更
+| 路径 | 操作 | 摘要 |
+（与门禁清单一致）
 
 ## 参考源码
 - MCP-Client/...

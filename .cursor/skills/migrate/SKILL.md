@@ -47,10 +47,10 @@ metadata:
 [ ] 1  Read todos/M*.md 对应节
 [ ] 2  现查 MCP-Client（锚点 + Glob 本批目录）
 [ ] 3  参考映射表（见 review.md）→ 用户确认（未说跳过评审时）
-[ ] 4  编码：iron-rules + main-rule
+[ ] 4  编码：iron-rules + main-rule（边做边记本批变更路径）
 [ ] 5  验证：routes.ts / storage-contract / pnpm build
 [ ] 6  勾选任务 + 更新 todos/README.md 进度
-[ ] 7  交付门禁：readonly generalPurpose subagent（硬性 PASS/BLOCK + Optimization proposals）
+[ ] 7  整理本批变更清单 → 交付门禁：readonly generalPurpose subagent（硬性 PASS/BLOCK + Optimization proposals）
 [ ] 8  主 AI 裁决 proposals（采纳 / 写 todos / 拒绝）→ 门禁 PASS 后交付正文
 ```
 

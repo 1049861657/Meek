@@ -7,6 +7,7 @@ import { fetchJson } from '@/lib/api/fetch-json';
 export interface SystemToolCatalogEntry {
   codeName: string;
   label?: string;
+  summary?: string;
 }
 
 export interface ProviderModelOption {

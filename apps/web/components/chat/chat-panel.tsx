@@ -5,12 +5,14 @@ import { useCallback, useState } from 'react';
 import { useChatStream } from '@/hooks/use-chat-stream';
 
 import { ChatComposer } from './chat-composer';
-import { ChatToolbar } from './chat-toolbar';
+import { ChatModalsHost } from './modals/chat-modals-host';
+import { ChatToolbar, type ChatToolbarAction } from './chat-toolbar';
 import { MessageList } from './message-list';
 import { PlanningPanel } from './planning-panel';
 
 /** 聊天页 Client 岛 — 对齐 chat-shell + ai.html 布局 */
 export function ChatPanel(): React.ReactElement {
+  const chat = useChatStream();
   const {
     messages,
     status,
@@ -26,7 +28,11 @@ export function ChatPanel(): React.ReactElement {
     clearChat,
     newSession,
     resolvePermission,
-  } = useChatStream();
+    activeModal,
+    openModal,
+    closeModal,
+    internals,
+  } = chat;
 
   const [planningForced, setPlanningForced] = useState(false);
 
@@ -36,6 +42,21 @@ export function ChatPanel(): React.ReactElement {
   const handleOpenPlanning = useCallback((): void => {
     setPlanningForced(true);
   }, []);
+
+  const handleToolbarAction = useCallback(
+    (action: ChatToolbarAction): void => {
+      const map: Record<Exclude<ChatToolbarAction, 'clear'>, Parameters<typeof openModal>[0]> = {
+        mcp: 'mcp',
+        history: 'history',
+        compact: 'context',
+        settings: 'settings',
+      };
+      if (action !== 'clear') {
+        openModal(map[action]);
+      }
+    },
+    [openModal]
+  );
 
   return (
     <div className="chat-shell">
@@ -69,20 +90,30 @@ export function ChatPanel(): React.ReactElement {
             mcpEnabledCount={mcpEnabledCount}
             isStreaming={isStreaming}
             onClearChat={clearChat}
+            onToolbarAction={handleToolbarAction}
           />
           <ChatComposer
             disabled={disabled}
             isStreaming={isStreaming}
             hasError={status === 'error'}
+            composerInsertRef={internals.composerInsertRef}
             onSend={(text) => {
               void sendMessage(text);
             }}
             onStop={stop}
             onRetry={retryLast}
             onNewSession={newSession}
+            onOpenQuickMessages={() => openModal('quick-messages')}
           />
         </div>
       </div>
+
+      <ChatModalsHost
+        activeModal={activeModal}
+        onClose={closeModal}
+        onOpenModal={openModal}
+        internals={internals}
+      />
     </div>
   );
 }
