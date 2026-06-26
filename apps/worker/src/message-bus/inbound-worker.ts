@@ -1,4 +1,5 @@
 import type { ChunkResponse } from '@meek/agent-core';
+import { resolveProfile } from '@meek/config-plane';
 import type { AgentMessageEnvelopeSerialized, WebAgentMessageEnvelopeSerialized } from '@meek/message-bus';
 import {
   envelopeToHarnessInput,
@@ -6,12 +7,11 @@ import {
   logInboundDequeue,
   publishOutboundEvent,
   resolvePermissionSessionKey,
-  resolveWebProfile,
   subscribeAbortSignal,
   type AgentOutboundEnvelope,
 } from '@meek/message-bus';
 
-import { getHarnessProvider, resolveDefaultModel } from '../lib/runtime-bootstrap.js';
+import { getHarnessProvider } from '../lib/runtime-bootstrap.js';
 import { McpConnectionService } from '../lib/mcp-connection-bridge.js';
 
 const INBOUND_AI_UNAVAILABLE_MESSAGE =
@@ -65,11 +65,9 @@ async function runHarnessForEnvelope(
   requestId: string,
   signal?: AbortSignal
 ): Promise<void> {
-  const poolUserId = envelope.channelMeta.userId ?? null;
-  const vendor = envelope.channelMeta.vendor;
-  const defaultModel = await resolveDefaultModel(poolUserId);
-  const resolved = resolveWebProfile(envelope, defaultModel);
-  const { messages } = envelopeToHarnessInput(envelope);
+  const resolved = await resolveProfile(envelope);
+  const vendor = resolved.vendor ?? envelope.channelMeta.vendor;
+  const configUserId = resolved.configUserId ?? null;
 
   logInboundDequeue(envelope, {
     profileId: resolved.profileId,
@@ -78,14 +76,14 @@ async function runHarnessForEnvelope(
     permissionMode: resolved.permissionMode,
   });
 
-  const service = await getHarnessProvider(poolUserId, vendor);
+  const service = await getHarnessProvider(configUserId, vendor);
   if (!service) {
     console.warn(`[BUS] Inbound Worker 跳过：无可用 AI 服务 requestId=${requestId}`);
     await routeInboundError(envelope, requestId, INBOUND_AI_UNAVAILABLE_MESSAGE);
     return;
   }
 
-  const configUserId = resolved.configUserId ?? null;
+  const { messages } = envelopeToHarnessInput(envelope);
   const wallStarted = Date.now();
   McpConnectionService.beginChatScope(configUserId, requestId);
 

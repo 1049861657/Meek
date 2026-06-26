@@ -33,6 +33,9 @@ function serializeWebInbound(envelope: WebAgentMessageEnvelope): AgentMessageEnv
 export function serializeInboundEnvelope(
   envelope: AgentMessageEnvelope
 ): AgentMessageEnvelopeSerialized {
+  if (envelope.channel !== 'web') {
+    throw new Error(`serializeInboundEnvelope: 暂不支持 channel=${envelope.channel}`);
+  }
   return serializeWebInbound(envelope);
 }
 

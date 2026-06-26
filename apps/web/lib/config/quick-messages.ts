@@ -1,43 +1,12 @@
-import { prisma } from '@meek/db';
+import { ConfigService } from '@meek/config-plane';
 import type { QuickMessage, QuickMessagesPayload } from '@meek/shared';
 
-const QUICK_MESSAGE_CATEGORIES_KEY = 'quickMessageCategories';
-
-async function readStoredCategories(): Promise<string[]> {
-  const row = await prisma.setting.findFirst({
-    where: { userId: null, key: QUICK_MESSAGE_CATEGORIES_KEY },
-  });
-  if (!row?.value || !Array.isArray(row.value)) {
-    return [];
-  }
-  return row.value.filter(
-    (item): item is string => typeof item === 'string' && item.trim().length > 0
-  );
-}
-
 export async function getQuickMessageCategories(messages: QuickMessage[]): Promise<string[]> {
-  const stored = await readStoredCategories();
-  const fromMessages = messages
-    .map((msg) => msg.category)
-    .filter((category): category is string => typeof category === 'string' && category.trim().length > 0);
-  const merged = [...stored];
-  for (const category of fromMessages) {
-    if (!merged.includes(category)) {
-      merged.push(category);
-    }
-  }
-  return merged;
+  return ConfigService.getQuickMessageCategories(messages);
 }
 
 export async function getQuickMessagesConfig(): Promise<QuickMessage[]> {
-  const messages = await prisma.quickMessage.findMany({ orderBy: { sortId: 'asc' } });
-  return messages.map((msg) => ({
-    id: msg.id,
-    sortId: msg.sortId,
-    content: msg.content,
-    result: msg.result,
-    category: msg.category,
-  }));
+  return ConfigService.getQuickMessagesConfig();
 }
 
 export interface QuickMessagesHttpResult {

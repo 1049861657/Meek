@@ -12,6 +12,7 @@
   "dependencies": {
     "@better-auth/prisma-adapter": "^1.6.19",
     "@meek/agent-core": "workspace:*",
+    "@meek/config-plane": "workspace:*",
     "@meek/db": "workspace:*",
     "@meek/mcp-runtime": "workspace:*",
     "@meek/message-bus": "workspace:*",

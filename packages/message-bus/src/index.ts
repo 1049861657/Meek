@@ -7,8 +7,14 @@ export type {
   AgentTrace,
   ChatOptions,
   ContextCompactedPayload,
+  DingtalkAgentMessageEnvelope,
+  DingtalkAgentMessageEnvelopeSerialized,
+  DingtalkChannelMetaSerialized,
   DoneOutboundPayload,
   ErrorOutboundPayload,
+  FeishuAgentMessageEnvelope,
+  FeishuAgentMessageEnvelopeSerialized,
+  FeishuChannelMetaSerialized,
   UsageOutboundPayload,
   WebAgentMessageEnvelope,
   WebAgentMessageEnvelopeSerialized,
@@ -16,7 +22,11 @@ export type {
   WebChannelMeta,
   WebChannelMetaSerialized,
 } from './channel.types.js';
-export { isWebInboundEnvelope } from './channel.types.js';
+export {
+  isDingtalkInboundEnvelope,
+  isFeishuInboundEnvelope,
+  isWebInboundEnvelope,
+} from './channel.types.js';
 
 export {
   parseAgentMessageEnvelopeSerialized,
@@ -46,7 +56,6 @@ export {
   subscribeAbortSignal,
 } from './outbound-bridge.js';
 
-export { resolveWebProfile } from './web-profile-resolver.js';
 export { logInboundDequeue } from './inbound-log.js';
 
 export {

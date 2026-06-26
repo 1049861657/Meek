@@ -1,8 +1,8 @@
 # M4 — 配置平面、Admin API 与认证会话
 
-> **状态**：未开始  
+> **状态**：已定稿 · 可开工（37 项，无需再改任务书结构）  
 > **周期**：3 ~ 4 人周（2 人）  
-> **前置**：M0 Auth + 完整 Prisma；M1 完成后与 M2 并行  
+> **前置**：M0–M3 已完成；M2 已完成  
 > **参考代码**：`MCP-Client/src/config-plane/`、`src/api/admin.controller.ts`、`settings.controller.ts`、`sessions.controller.ts`、`users.controller.ts`、`src/core/memory/`  
 > **现查**：`src/config-plane/`、`*controller.ts`（admin/settings/sessions/users/memory-debug）、`src/core/memory/`
 
@@ -16,22 +16,22 @@
 
 ## M4-01 packages/config-plane
 
-- [ ] **M4-01-01** `AgentProfile`、`RouteRule`、`Setting`、`AIProvider`、`QuickMessage` 等读写
-- [ ] **M4-01-02** `resolveProfile(channel, matchKey, userId)`
-- [ ] **M4-01-03** 配置快照 reload（`config-snapshot.ts`）
-- [ ] **M4-01-04** Web：localStorage 全局 + body 覆盖；IM：仅 Profile
-- [ ] **M4-01-05** seed 默认 Profile/Route/Provider/MCP
-- [ ] **M4-01-06** `seed-follow.service`（种子跟随账号）
-- [ ] **M4-01-07** Config **运行时单入口**（聚合 `feature-config` + DB `Setting` 解析，对齐参考调用行为）
+- [x] **M4-01-01** `AgentProfile`、`RouteRule`、`Setting`、`AIProvider`、`QuickMessage` 等读写
+- [x] **M4-01-02** `resolveProfile(channel, matchKey, userId)`
+- [x] **M4-01-03** 配置快照 reload（`config-snapshot.ts`）
+- [x] **M4-01-04** Web：localStorage 全局 + body 覆盖；IM：仅 Profile
+- [x] **M4-01-05** seed 默认 Profile/Route/Provider/MCP
+- [x] **M4-01-06** `seed-follow.service`（种子跟随账号）
+- [x] **M4-01-07** Config **运行时单入口**（聚合 `feature-config` + DB `Setting` 解析，对齐参考调用行为）
 
 ## M4-02 Admin API（SUPERADMIN）
 
-- [ ] **M4-02-01** `requireSuperAdmin` 中间件
-- [ ] **M4-02-02** `POST /api/admin/seed`
-- [ ] **M4-02-03** Profile CRUD + reset
-- [ ] **M4-02-04** Route CRUD
-- [ ] **M4-02-05** `GET/PUT /api/admin/channel-config`
-- [ ] **M4-02-06** `GET /api/admin/channel-status`
+- [x] **M4-02-01** `requireSuperAdmin` 中间件
+- [x] **M4-02-02** `POST /api/admin/seed`
+- [x] **M4-02-03** Profile CRUD + reset
+- [x] **M4-02-04** Route CRUD
+- [x] **M4-02-05** `GET/PUT /api/admin/channel-config`
+- [x] **M4-02-06** `GET /api/admin/channel-status`
 
 ## M4-03 用户管理 API
 
@@ -69,8 +69,8 @@
 
 ## M4-07 渠道绑定
 
-- [ ] **M4-07-01** `channel-binding.service`（IM boundUserId）
-- [ ] **M4-07-02** `channel-config.service` 读写与校验
+- [x] **M4-07-01** `channel-binding.service`（IM boundUserId）
+- [x] **M4-07-02** `channel-config.service` 读写与校验
 
 ---
 

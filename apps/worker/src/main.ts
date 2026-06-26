@@ -1,5 +1,6 @@
 import { createServer, type Server } from 'node:http';
 import { cleanupExpiredAgentOutputs } from '@meek/agent-core/context';
+import { ensureSeedFollowDefault, initConfigPlane } from '@meek/config-plane';
 import { getRedisUrl } from '@meek/shared';
 import { startChannels } from './channels/bootstrap.js';
 import { bootstrapMcpConfig } from './lib/mcp-config-bootstrap.js';
@@ -13,6 +14,8 @@ async function main(): Promise<void> {
 
   await cleanupExpiredAgentOutputs();
   await bootstrapMcpConfig();
+  await initConfigPlane();
+  await ensureSeedFollowDefault();
 
   const messageBus = startMessageBus();
   startChannels();

@@ -1,2 +1,6 @@
 export { prisma, PrismaClient } from './prisma.js';
-export { ConnectionType } from './generated/prisma/client.js';
+export {
+  ConfigChannelId,
+  ConnectionType,
+  ProviderType,
+} from './generated/prisma/client.js';

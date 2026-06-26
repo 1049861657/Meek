@@ -1,27 +1,29 @@
 {
-  "name": "@meek/worker",
+  "name": "@meek/config-plane",
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "dev": "node --env-file=../../.env --import tsx/esm --watch src/main.ts",
-    "build": "tsc && tsc -p tsconfig.mcp-servers.json",
-    "start": "node dist/main.js",
+    "build": "tsc",
     "lint": "eslint src"
   },
   "dependencies": {
     "@meek/agent-core": "workspace:*",
-    "@meek/config-plane": "workspace:*",
     "@meek/db": "workspace:*",
     "@meek/mcp-runtime": "workspace:*",
     "@meek/message-bus": "workspace:*",
     "@meek/shared": "workspace:*",
-    "@modelcontextprotocol/sdk": "^1.29.0",
-    "zod": "^4.4.3"
+    "lru-cache": "^11.5.1"
   },
   "devDependencies": {
     "@types/node": "^25.9.3",
-    "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }
 }
