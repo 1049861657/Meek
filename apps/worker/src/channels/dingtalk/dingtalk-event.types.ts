@@ -1,22 +1,10 @@
-/** Stream 回调 `/v1.0/im/bot/messages/get` 下行帧（M5-05 接入 dingtalk-stream 后对齐 SDK 类型） */
-export interface DingtalkBotMessageDownstream {
-  data: string;
-}
+import type { DWClientDownStream, RobotTextMessage } from 'dingtalk-stream';
 
-/** 机器人文本消息体（data JSON 解析后） */
-export interface DingtalkBotTextMessage {
-  msgtype: string;
-  msgId?: string;
-  senderId?: string;
-  chatbotUserId?: string;
-  conversationId: string;
-  conversationType?: string;
-  sessionWebhook?: string;
-  sessionWebhookExpiredTime?: number;
-  robotCode?: string;
+/** Stream 回调 `/v1.0/im/bot/messages/get` 下行帧 */
+export type DingtalkBotMessageDownstream = DWClientDownStream;
+
+/** 机器人文本消息体（data JSON 解析后；SDK 类型未含 isInAtList） */
+export interface DingtalkBotTextMessage extends RobotTextMessage {
   isInAtList?: boolean;
   conversationTitle?: string;
-  text?: {
-    content?: string;
-  };
 }

@@ -1,5 +1,8 @@
 import type { ChannelId, ChatAgentOptions, MemoryIdentityScope, PermissionMode } from '@meek/shared';
 
+/** IM 渠道 Profile permissionMode（无 interactive） */
+export type ImPermissionMode = 'open' | 'locked';
+
 /** @deprecated 历史 seed 残留；Resolver 已改为按渠道默认方案解析 */
 export const CONFIG_PROFILE_GLOBAL_DEFAULT = 'global-default';
 export const CONFIG_PROFILE_WEB_DEFAULT = 'web-default';

@@ -5,6 +5,7 @@ import type { MCPServer } from '@meek/mcp-runtime';
 import { handleMcpOAuthAuthorize, handleMcpOAuthFinish } from '../lib/mcp-oauth-handlers.js';
 import {
   handleMcpListServers,
+  handleMcpPartitionForPersistence,
   handleMcpProbeServers,
   type McpAgentHandlerResult,
 } from '../lib/mcp-agent-handlers.js';
@@ -315,6 +316,19 @@ export async function handleInternalApi(
       forwardAgentHandlerResult(
         res,
         await handleMcpProbeServers(parseConfigUserId(body.configUserId), body.serverIds)
+      );
+      return true;
+    }
+
+    if (pathname === '/internal/mcp/reachability/partition') {
+      const enableTools = body.enableTools === true;
+      forwardAgentHandlerResult(
+        res,
+        await handleMcpPartitionForPersistence(
+          parseConfigUserId(body.configUserId),
+          body.serverIds,
+          enableTools
+        )
       );
       return true;
     }

@@ -1,14 +1,15 @@
 import { ContextConfig } from '@meek/agent-core';
 import { parseImPermissionMode } from '@meek/agent-core/permission';
 import { prisma } from '@meek/db';
-import { McpReachabilityService } from '@meek/mcp-runtime';
 
 import { ConfigService } from './config.service.js';
 import { resolveChannelBindingContext } from './channel-binding.service.js';
 import {
   CHANNEL_DEFAULT_PROFILE_BY_CHANNEL,
   type EditableImChannelProfileId,
+  type ImPermissionMode,
 } from './config-plane.types.js';
+import { partitionMcpServerIdsForPersistence } from './mcp-reachability-port.js';
 
 export interface ChannelConfigProviderOption {
   name: string;
@@ -30,7 +31,7 @@ export interface ChannelConfigProfileValues {
   enableTools: boolean;
   enablePrompts: boolean;
   maxToolCallRounds: number;
-  permissionMode: 'open' | 'locked';
+  permissionMode: ImPermissionMode;
   enableAutoCompact: boolean;
   compactModel: string | null;
   mcpServerIds: string[];
@@ -67,7 +68,7 @@ export interface ChannelConfigSaveInput {
   enableTools?: boolean;
   enablePrompts?: boolean;
   maxToolCallRounds?: number;
-  permissionMode?: 'open' | 'locked';
+  permissionMode?: ImPermissionMode;
   enableAutoCompact?: boolean;
   compactModel?: string | null;
   mcpServerIds?: string[];
@@ -311,7 +312,7 @@ export async function saveChannelConfig(options: {
     const enableTools =
       typeof input.enableTools === 'boolean' ? input.enableTools : existing.enableTools;
 
-    const partition = await McpReachabilityService.partitionForPersistence(
+    const partition = await partitionMcpServerIdsForPersistence(
       uniqueIds,
       binding.configUserId,
       enableTools

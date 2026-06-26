@@ -2,8 +2,8 @@ import { ConfigService } from '@meek/config-plane';
 import {
   getProviderForUser,
   initializeProviders,
-  invalidateProviderCache,
   installMemoryPort,
+  invalidateProviderCache,
   setAiProvidersConfig,
   setChatStore,
   setMcpClientResolver,
@@ -11,7 +11,8 @@ import {
   type AIProvidersConfigType,
 } from '@meek/agent-core';
 import { chatStorePort } from '@meek/chat-store';
-import { getMcpClientForUser as getRuntimeMcpClient } from '@meek/mcp-runtime';
+import { setMcpReachabilityPartitioner } from '@meek/config-plane';
+import { getMcpClientForUser as getRuntimeMcpClient, McpReachabilityService } from '@meek/mcp-runtime';
 
 import { bootstrapMcpConfig, loadMcpConfig } from './mcp-config-bootstrap.js';
 import { createMcpClientPort } from './mcp-adapter.js';
@@ -44,6 +45,9 @@ export async function ensureWorkerRuntime(configUserId: string | null = null): P
   installMemoryPort();
   await bootstrapMcpConfig();
   setMcpClientResolver((userId) => createMcpClientPort(getRuntimeMcpClient(userId)));
+  setMcpReachabilityPartitioner((serverIds, configUserId, enableTools) =>
+    McpReachabilityService.partitionForPersistence(serverIds, configUserId, enableTools)
+  );
   wireMcpConnectionService();
   await loadAiProvidersConfig(configUserId);
   await initializeProviders();

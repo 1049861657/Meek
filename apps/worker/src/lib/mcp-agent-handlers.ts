@@ -3,6 +3,7 @@ import {
   getMcpClientForUser,
   McpConfigService,
   McpConnectionService,
+  McpReachabilityService,
   ToolPreferencesService,
   type ToolInfo,
 } from '@meek/mcp-runtime';
@@ -130,6 +131,35 @@ export async function handleMcpProbeServers(
     );
     const result = await McpConnectionService.probeForSelection(poolEnabledIds, configUserId);
     return ok({ success: true, ...result });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return fail(500, message);
+  }
+}
+
+export async function handleMcpPartitionForPersistence(
+  configUserId: string | null,
+  serverIdsRaw: unknown,
+  enableTools: boolean
+): Promise<
+  McpAgentHandlerResult<{
+    success: true;
+    persistIds: string[];
+    skipped: Array<{ id: string; name: string }>;
+  }>
+> {
+  try {
+    if (!Array.isArray(serverIdsRaw)) {
+      return fail(400, 'serverIds 必须为数组');
+    }
+    const serverIds = serverIdsRaw.filter((id): id is string => typeof id === 'string');
+    await ensureWorkerRuntimeForUser(configUserId);
+    const partition = await McpReachabilityService.partitionForPersistence(
+      serverIds,
+      configUserId,
+      enableTools
+    );
+    return ok({ success: true, ...partition });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     return fail(500, message);

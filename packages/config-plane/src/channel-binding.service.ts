@@ -1,7 +1,8 @@
+import { prisma } from '@meek/db';
 import type { ChannelId } from '@meek/shared';
 
 import type { ConfigPlaneSnapshot } from './config-snapshot.js';
-import { resolveChannelSnapshot } from './config-snapshot.js';
+import { invalidateChannelSnapshot, resolveChannelSnapshot } from './config-snapshot.js';
 import type { AgentProfileRecord, RouteRuleRecord } from './config-plane.types.js';
 import {
   CHANNEL_DEFAULT_PROFILE_BY_CHANNEL,
@@ -58,4 +59,29 @@ export async function resolveChannelBindingContext(options: {
     boundUserId,
     configUserId,
   };
+}
+
+/** 保存 IM 渠道通配路由 boundUserId（Admin「保存绑定」） */
+export async function saveWildcardChannelBinding(options: {
+  channel: 'dingtalk' | 'feishu';
+  boundUserId: string;
+}): Promise<ChannelBindingContext> {
+  const boundUserId = options.boundUserId.trim();
+  if (!boundUserId) {
+    throw new Error('boundUserId 不能为空');
+  }
+
+  const snapshot = await resolveChannelSnapshot();
+  const wildcardRoute = getWildcardRouteRule(snapshot, options.channel);
+  if (!wildcardRoute) {
+    throw new Error(`渠道 ${options.channel} 无通配路由，请先执行 seed`);
+  }
+
+  await prisma.routeRule.update({
+    where: { id: wildcardRoute.id },
+    data: { boundUserId },
+  });
+  invalidateChannelSnapshot();
+
+  return resolveChannelBindingContext({ channel: options.channel });
 }

@@ -1,4 +1,9 @@
 import { registerChannelAdapter } from './registry.js';
+import { getDingtalkChannelAdapter } from './dingtalk/dingtalk-channel.adapter.js';
+import {
+  getDingtalkLinkStatus,
+  startDingtalkStreamListener,
+} from './dingtalk/dingtalk-stream-listener.js';
 import { getFeishuChannelAdapter } from './feishu/feishu-channel.adapter.js';
 import { getFeishuLinkStatus, startFeishuEventListener } from './feishu/feishu-event-listener.js';
 
@@ -12,12 +17,14 @@ export interface ImChannelStatusMap {
 /** 注册 IM Adapter 并启动长连接（Web 出站仍在 BFF，不经此注册表） */
 export function startChannels(): void {
   registerChannelAdapter(getFeishuChannelAdapter());
+  registerChannelAdapter(getDingtalkChannelAdapter());
   startFeishuEventListener();
+  startDingtalkStreamListener();
 }
 
 export function getImChannelLinkStatusMap(): ImChannelStatusMap {
   return {
     feishu: getFeishuLinkStatus(),
-    dingtalk: 'skipped',
+    dingtalk: getDingtalkLinkStatus(),
   };
 }

@@ -3,7 +3,7 @@ import { cleanupExpiredAgentOutputs } from '@meek/agent-core/context';
 import { ensureSeedFollowDefault, initConfigPlane } from '@meek/config-plane';
 import { getRedisUrl } from '@meek/shared';
 import { startChannels } from './channels/bootstrap.js';
-import { bootstrapMcpConfig } from './lib/mcp-config-bootstrap.js';
+import { ensureWorkerRuntime } from './lib/runtime-bootstrap.js';
 import { handleChannelStatusGet } from './http/channel-status-api.js';
 import { handleInternalApi } from './http/internal-api.js';
 import { startMessageBus } from './message-bus/bootstrap.js';
@@ -14,9 +14,9 @@ async function main(): Promise<void> {
   getRedisUrl();
 
   await cleanupExpiredAgentOutputs();
-  await bootstrapMcpConfig();
   await initConfigPlane();
   await ensureSeedFollowDefault();
+  await ensureWorkerRuntime();
 
   const messageBus = startMessageBus();
   startChannels();

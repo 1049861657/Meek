@@ -1,5 +1,11 @@
 export { ConfigService } from './config.service.js';
 export {
+  setMcpReachabilityPartitioner,
+  partitionMcpServerIdsForPersistence,
+  type McpPersistencePartition,
+  type McpReachabilityPartitioner,
+} from './mcp-reachability-port.js';
+export {
   getChannelConfigEditorState,
   saveChannelConfig,
   type ChannelConfigEditorState,
@@ -9,6 +15,7 @@ export {
 export {
   getWildcardRouteRule,
   resolveChannelBindingContext,
+  saveWildcardChannelBinding,
   type ChannelBindingContext,
 } from './channel-binding.service.js';
 export {
@@ -53,6 +60,7 @@ export {
   type ChannelDefaultProfileId,
   type ConfigPlaneSeedResult,
   type EditableImChannelProfileId,
+  type ImPermissionMode,
   type ProfileResolveContext,
   type RouteRuleRecord,
 } from './config-plane.types.js';

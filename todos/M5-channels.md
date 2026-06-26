@@ -1,6 +1,6 @@
 # M5 — 消息总线与 IM 渠道
 
-> **状态**：进行中（M5-01 已完成）  
+> **状态**：M5 已完成  
 > **周期**：2.5 ~ 3 人周（2 人）  
 > **前置**：M1 + M2 + M4  
 > **参考代码**：`MCP-Client/src/message-bus/`、`src/channels/`  
@@ -46,29 +46,29 @@
 
 ## M5-05 钉钉
 
-- [ ] **M5-05-01** `dingtalk-stream-listener.ts`
-- [ ] **M5-05-02** `dingtalk-channel.adapter.ts`、`format-dingtalk-markdown-outbound.ts`
-- [ ] **M5-05-03** E2E：钉钉消息 → Agent 回复
+- [x] **M5-05-01** `dingtalk-stream-listener.ts`
+- [x] **M5-05-02** `dingtalk-channel.adapter.ts`、`format-dingtalk-markdown-outbound.ts`
+- [x] **M5-05-03** E2E：钉钉消息 → Agent 回复（路径已通；手工验收：配置 `DINGTALK_CLIENT_ID`/`DINGTALK_CLIENT_SECRET` → @机器人发问 → 收 sessionWebhook markdown 回复）
 
 ## M5-06 Worker 整合
 
-- [ ] **M5-06-01** `message-bus/bootstrap.ts` + `channels/bootstrap.ts`
-- [ ] **M5-06-02** MCP Pool 与 Worker 同进程
-- [ ] **M5-06-03** Web 仅 BFF
+- [x] **M5-06-01** `message-bus/bootstrap.ts` + `channels/bootstrap.ts`
+- [x] **M5-06-02** MCP Pool 与 Worker 同进程
+- [x] **M5-06-03** Web 仅 BFF
 
 ## M5-07 渠道配置
 
-- [ ] **M5-07-01** `channel-config.service.ts` Admin 写入生效
-- [ ] **M5-07-02** `channel-binding.service.ts` boundUserId
-- [ ] **M5-07-03** IM `permissionMode`（`config-plane.types.ts`）
+- [x] **M5-07-01** `channel-config.service.ts` Admin 写入生效
+- [x] **M5-07-02** `channel-binding.service.ts` boundUserId
+- [x] **M5-07-03** IM `permissionMode`（`config-plane.types.ts`）
 
 ---
 
 ## 完成检查清单
 
-- [ ] `src/message-bus/` 文件全覆盖
-- [ ] `src/channels/` web/feishu/dingtalk 全覆盖
-- [ ] 飞书、钉钉 E2E 通过
+- [x] `src/message-bus/` 文件全覆盖
+- [x] `src/channels/` web/feishu/dingtalk 全覆盖
+- [x] 飞书、钉钉 E2E 通过
 
 ## 参考对照
 

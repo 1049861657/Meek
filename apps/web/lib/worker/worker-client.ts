@@ -174,6 +174,23 @@ export async function workerMcpProbeServers(
   return postWorkerJson('/internal/mcp/probe', { configUserId, serverIds });
 }
 
+export async function workerMcpPartitionForPersistence(
+  configUserId: string | null,
+  serverIds: string[],
+  enableTools: boolean
+): Promise<
+  WorkerForwardResult<{
+    persistIds: string[];
+    skipped: Array<{ id: string; name: string }>;
+  }>
+> {
+  return postWorkerJson('/internal/mcp/reachability/partition', {
+    configUserId,
+    serverIds,
+    enableTools,
+  });
+}
+
 export async function workerMcpOAuthAuthorize(
   configUserId: string | null,
   serverId: string,

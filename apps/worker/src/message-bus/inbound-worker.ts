@@ -4,11 +4,13 @@ import type {
   AgentMessageEnvelopeSerialized,
   AgentOutboundEnvelope,
   AgentOutboundKind,
+  DingtalkAgentMessageEnvelopeSerialized,
   FeishuAgentMessageEnvelopeSerialized,
   WebAgentMessageEnvelopeSerialized,
 } from '@meek/message-bus';
 import {
   envelopeToHarnessInput,
+  isDingtalkInboundEnvelope,
   isFeishuInboundEnvelope,
   isWebInboundEnvelope,
   logInboundDequeue,
@@ -16,6 +18,7 @@ import {
   subscribeAbortSignal,
 } from '@meek/message-bus';
 
+import { getDingtalkChannelAdapter } from '../channels/dingtalk/dingtalk-channel.adapter.js';
 import { getFeishuChannelAdapter } from '../channels/feishu/feishu-channel.adapter.js';
 import { getHarnessProvider } from '../lib/runtime-bootstrap.js';
 import { McpConnectionService } from '../lib/mcp-connection-bridge.js';
@@ -202,6 +205,24 @@ async function processFeishuInboundJob(
   }
 }
 
+async function processDingtalkInboundJob(
+  envelope: DingtalkAgentMessageEnvelopeSerialized
+): Promise<void> {
+  const { requestId, ...meta } = envelope.channelMeta;
+  const dingtalkAdapter = getDingtalkChannelAdapter();
+  dingtalkAdapter.beginReply(requestId, { requestId, ...meta });
+
+  try {
+    await runHarnessForEnvelope(envelope, requestId);
+  } catch (error: unknown) {
+    const errMessage = error instanceof Error ? error.message : String(error);
+    console.error(`[BUS] Inbound Worker 钉钉处理失败 requestId=${requestId}:`, error);
+    await routeInboundError(envelope, requestId, errMessage);
+  } finally {
+    dingtalkAdapter.endReply(requestId);
+  }
+}
+
 /** Inbound Worker：按 channel 分发 */
 export async function processInboundJob(
   envelope: AgentMessageEnvelopeSerialized
@@ -212,6 +233,10 @@ export async function processInboundJob(
   }
   if (isFeishuInboundEnvelope(envelope)) {
     await processFeishuInboundJob(envelope);
+    return;
+  }
+  if (isDingtalkInboundEnvelope(envelope)) {
+    await processDingtalkInboundJob(envelope);
     return;
   }
   console.warn(

@@ -5,13 +5,15 @@ import {
   getChannelConfigEditorState,
   reloadConfigPlaneSnapshot,
   resolveChannelBindingContext,
+  ROUTE_MATCH_ALL,
   runConfigPlaneSeed,
   saveChannelConfig,
+  saveWildcardChannelBinding,
+  partitionMcpServerIdsForPersistence,
   type AgentProfileRecord,
 } from '@meek/config-plane';
 import { parseImPermissionMode } from '@meek/agent-core/permission';
 import { ConfigChannelId, prisma } from '@meek/db';
-import { McpReachabilityService } from '@meek/mcp-runtime';
 import type { ChannelId } from '@meek/shared';
 
 import { getChannelLinkStatusMap } from './channel-link-status';
@@ -215,13 +217,18 @@ export async function handleUpdateProfile(
         const binding = await resolveChannelBindingContext({ channel: imChannel });
         reachabilityConfigUserId = binding.configUserId;
       }
-      const partition = await McpReachabilityService.partitionForPersistence(
+      const partition = await partitionMcpServerIdsForPersistence(
         mcpServerIds,
         reachabilityConfigUserId,
         enableTools
       );
       data.mcpServerIds = partition.persistIds;
       skippedMcpServers = partition.skipped;
+      if (skippedMcpServers.length > 0) {
+        console.warn(
+          `[ADMIN] Profile ${profileId} 跳过不可达 MCP: ${skippedMcpServers.map((s) => s.name).join('、')}`
+        );
+      }
     }
     if (typeof body.toolPrompt === 'string') {
       data.toolPrompt = body.toolPrompt;
@@ -327,6 +334,28 @@ export async function handleUpdateRoute(routeId: string, body: unknown): Promise
     if (typeof body.enabled === 'boolean') {
       data.enabled = body.enabled;
     }
+
+    const isImWildcardBindingOnly =
+      existing.matchKey === ROUTE_MATCH_ALL &&
+      (existing.channel === 'dingtalk' || existing.channel === 'feishu') &&
+      typeof body.boundUserId === 'string' &&
+      body.boundUserId.trim().length > 0 &&
+      body.channel === undefined &&
+      body.matchKey === undefined &&
+      body.profileId === undefined &&
+      body.priority === undefined &&
+      body.enabled === undefined;
+
+    if (isImWildcardBindingOnly) {
+      const boundUserId = (body.boundUserId as string).trim();
+      await saveWildcardChannelBinding({
+        channel: existing.channel as 'dingtalk' | 'feishu',
+        boundUserId,
+      });
+      console.info(`[ADMIN] 更新 Route ${routeId} boundUserId=${boundUserId}`);
+      return reloadSuccess();
+    }
+
     if (typeof body.boundUserId === 'string') {
       data.boundUserId = body.boundUserId.trim() || null;
     }
@@ -448,6 +477,9 @@ export async function handleSaveChannelConfig(body: unknown): Promise<Response> 
     const payload: Record<string, unknown> = { profile: result.profile };
     if (result.skippedMcpServers.length > 0) {
       payload.skippedMcpServers = result.skippedMcpServers;
+      console.warn(
+        `[ADMIN] 渠道 ${channel} 跳过不可达 MCP: ${result.skippedMcpServers.map((s) => s.name).join('、')}`
+      );
     }
     reloadConfigPlaneSnapshot();
     return Response.json({ success: true, ...payload });

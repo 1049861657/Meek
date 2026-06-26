@@ -19,6 +19,13 @@ export {
   DingtalkInboundSkipError,
   normalizeDingtalkInbound,
 } from './dingtalk/normalize-dingtalk-inbound.js';
+export { getDingtalkChannelAdapter } from './dingtalk/dingtalk-channel.adapter.js';
+export {
+  getDingtalkLinkStatus,
+  startDingtalkStreamListener,
+  type DingtalkLinkStatus,
+} from './dingtalk/dingtalk-stream-listener.js';
+export { formatDingtalkMarkdownOutbound } from './dingtalk/format-dingtalk-markdown-outbound.js';
 
 export {
   publishFeishuInboundFromEvent,
