@@ -208,6 +208,26 @@ export {
 } from './ports/memory-port.js';
 export type { MemoryPort } from './ports/memory-port.js';
 export {
+  createHindsightMemoryPort,
+  installMemoryPort,
+} from './memory/install-memory-port.js';
+export {
+  debugPrompt,
+  debugRecall,
+  debugReflect,
+  formatMemoryDebugError,
+  getMemoryDebugMeta,
+  MemoryDebugUnavailableError,
+} from './memory/memory-debug.js';
+export type {
+  MemoryDebugMetaPayload,
+  MemoryDebugPromptPayload,
+  MemoryDebugRecallItem,
+  MemoryDebugRecallPayload,
+  MemoryDebugReflectPayload,
+  MemoryDebugReflectReference,
+} from './types/memory-debug.types.js';
+export {
   getSetting,
   getMCPConfig,
   setMcpConfig,

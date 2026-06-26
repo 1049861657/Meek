@@ -27,13 +27,26 @@ export interface FeishuChannelMetaSerialized {
   vendor?: string;
 }
 
+/** 飞书入站 channelMeta（进程内 runtime） */
+export interface FeishuChannelMeta extends FeishuChannelMetaSerialized {
+  abortSignal?: AbortSignal;
+}
+
 /** 钉钉入站 channelMeta（序列化 JSON） */
 export interface DingtalkChannelMetaSerialized {
   requestId: string;
   msgId: string;
   conversationId: string;
+  sessionWebhook: string;
+  sessionWebhookExpiredTime: number;
   robotCode?: string;
+  conversationType?: string;
   vendor?: string;
+}
+
+/** 钉钉入站 channelMeta（进程内 runtime） */
+export interface DingtalkChannelMeta extends DingtalkChannelMetaSerialized {
+  abortSignal?: AbortSignal;
 }
 
 /** Web 入站 channelMeta（进程内 runtime，含 AbortSignal） */
@@ -73,7 +86,7 @@ export interface FeishuAgentMessageEnvelope extends AgentEnvelopeCore {
   type: 'agent.message.inbound';
   channel: 'feishu';
   sessionKey: string;
-  channelMeta: FeishuChannelMetaSerialized;
+  channelMeta: FeishuChannelMeta;
   payload: AgentInboundPayload;
   trace: AgentTrace;
 }
@@ -84,7 +97,7 @@ export interface DingtalkAgentMessageEnvelope extends AgentEnvelopeCore {
   type: 'agent.message.inbound';
   channel: 'dingtalk';
   sessionKey: string;
-  channelMeta: DingtalkChannelMetaSerialized;
+  channelMeta: DingtalkChannelMeta;
   payload: AgentInboundPayload;
   trace: AgentTrace;
 }
@@ -173,8 +186,21 @@ export interface WebAgentOutboundEnvelope extends AgentOutboundEnvelopeBase {
   channel: 'web';
 }
 
-/** 出站 Envelope 联合（M1 仅 web） */
-export type AgentOutboundEnvelope = WebAgentOutboundEnvelope;
+/** 飞书出站 Envelope（→ im.v1.message.reply） */
+export interface FeishuAgentOutboundEnvelope extends AgentOutboundEnvelopeBase {
+  channel: 'feishu';
+}
+
+/** 钉钉出站 Envelope（→ sessionWebhook POST） */
+export interface DingtalkAgentOutboundEnvelope extends AgentOutboundEnvelopeBase {
+  channel: 'dingtalk';
+}
+
+/** 出站 Envelope 联合 */
+export type AgentOutboundEnvelope =
+  | WebAgentOutboundEnvelope
+  | FeishuAgentOutboundEnvelope
+  | DingtalkAgentOutboundEnvelope;
 
 export function isWebInboundEnvelope(
   envelope: AgentMessageEnvelopeSerialized

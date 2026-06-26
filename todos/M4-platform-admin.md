@@ -61,11 +61,11 @@
 
 ## M4-06 Memory（参考 `src/core/memory/`、`memory-debug.controller.ts`）
 
-- [ ] **M4-06-01** Hindsight memory provider（recall/retain）
-- [ ] **M4-06-02** `memory-pipeline-context` 注入 Prompt
-- [ ] **M4-06-03** `GET /api/memory/debug/meta`
-- [ ] **M4-06-04** `POST /api/memory/debug/recall|reflect|prompt`
-- [ ] **M4-06-05** MemoryDebugModal 数据全对接（M3 UI）
+- [x] **M4-06-01** Hindsight memory provider（recall/retain）
+- [x] **M4-06-02** `memory-pipeline-context` 注入 Prompt
+- [x] **M4-06-03** `GET /api/memory/debug/meta`
+- [x] **M4-06-04** `POST /api/memory/debug/recall|reflect|prompt`
+- [x] **M4-06-05** MemoryDebugModal 数据全对接（M3 UI）
 
 ## M4-07 渠道绑定
 

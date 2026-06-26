@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@meek/shared": "workspace:*",
+    "@vectorize-io/hindsight-client": "^0.8.3",
     "lru-cache": "^11.5.1",
     "openai": "^6.44.0"
   },

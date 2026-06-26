@@ -3,8 +3,8 @@ import {
   resolveMaxToolCallRounds,
   type InternalMessage,
 } from '@meek/agent-core';
+import { buildWebInboundEnvelope, buildWebSessionKey } from '@meek/message-bus';
 import type { WebAgentMessageEnvelope } from '@meek/message-bus';
-import { buildWebSessionKey } from '@meek/message-bus';
 
 import { assembleContextMessages } from '@/lib/chat/chat-store-stub';
 
@@ -45,7 +45,7 @@ function buildChatOptionsFromBody(
   const options: NonNullable<WebAgentMessageEnvelope['payload']['chatOptions']> = {};
   let hasOption = false;
 
-  const assignBoolean = (key: 'enableTools' | 'enablePrompts' | 'enableAutoCompact' | 'skipMemory'): void => {
+  const assignBoolean = (key: 'enableTools' | 'enablePrompts' | 'skipMemory'): void => {
     const value = body[key];
     if (typeof value === 'boolean') {
       options[key] = value;
@@ -55,8 +55,12 @@ function buildChatOptionsFromBody(
 
   assignBoolean('enableTools');
   assignBoolean('enablePrompts');
-  assignBoolean('enableAutoCompact');
   assignBoolean('skipMemory');
+
+  if (typeof body.enableAutoCompact === 'boolean') {
+    options.enableAutoCompact = resolveEnableAutoCompact(body.enableAutoCompact);
+    hasOption = true;
+  }
 
   if (typeof body.maxToolCallRounds === 'number') {
     options.maxToolCallRounds = resolveMaxToolCallRounds(body.maxToolCallRounds);
@@ -137,27 +141,15 @@ export async function normalizeWebInbound(
 
   const chatOptions = buildChatOptionsFromBody(body);
 
-  return {
-    id: requestId,
-    source: 'web:api',
-    type: 'agent.message.inbound',
-    time: new Date().toISOString(),
-    channel: 'web',
+  return buildWebInboundEnvelope({
+    requestId,
     sessionKey: buildWebSessionKey(requestId),
-    channelMeta: {
-      requestId,
-      webChatSessionId,
-      ...(vendor !== undefined ? { vendor } : {}),
-      ...(userId !== undefined ? { userId } : {}),
-      ...(abortSignal !== undefined ? { abortSignal } : {}),
-    },
-    payload: {
-      messages,
-      ...(chatOptions !== undefined ? { chatOptions } : {}),
-    },
-    trace: {
-      traceId: requestId,
-      idempotencyKey: requestId,
-    },
-  };
+    webChatSessionId,
+    messages,
+    chatOptions,
+    idempotencyKey: requestId,
+    ...(vendor !== undefined ? { vendor } : {}),
+    ...(userId !== undefined ? { userId } : {}),
+    ...(abortSignal !== undefined ? { abortSignal } : {}),
+  });
 }

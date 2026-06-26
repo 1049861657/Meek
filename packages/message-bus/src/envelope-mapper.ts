@@ -1,4 +1,4 @@
-import type { ChatOptions } from './channel.types.js';
+import type { AgentMessageEnvelopeSerialized, ChatOptions } from './channel.types.js';
 import type { InternalMessage } from '@meek/agent-core';
 
 export function pickDefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
@@ -18,7 +18,7 @@ export interface EnvelopeHarnessInput {
 }
 
 export function envelopeToHarnessInput(
-  envelope: { payload: { messages: InternalMessage[]; chatOptions?: ChatOptions } }
+  envelope: AgentMessageEnvelopeSerialized
 ): EnvelopeHarnessInput {
   return {
     messages: envelope.payload.messages,

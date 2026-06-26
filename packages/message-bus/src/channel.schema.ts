@@ -36,6 +36,24 @@ const webChannelMetaSerializedSchema = z.object({
   userId: z.string().optional(),
 });
 
+const feishuChannelMetaSerializedSchema = z.object({
+  requestId: z.string().min(1),
+  messageId: z.string().min(1),
+  chatId: z.string().min(1),
+  vendor: z.string().optional(),
+});
+
+const dingtalkChannelMetaSerializedSchema = z.object({
+  requestId: z.string().min(1),
+  msgId: z.string().min(1),
+  conversationId: z.string().min(1),
+  sessionWebhook: z.string().url(),
+  sessionWebhookExpiredTime: z.number(),
+  robotCode: z.string().optional(),
+  conversationType: z.string().optional(),
+  vendor: z.string().optional(),
+});
+
 const agentTraceSchema = z.object({
   traceId: z.string().min(1),
   idempotencyKey: z.string().min(1),
@@ -53,7 +71,35 @@ const webAgentMessageEnvelopeSerializedSchema = z.object({
   trace: agentTraceSchema,
 });
 
-export const agentMessageEnvelopeSerializedSchema = webAgentMessageEnvelopeSerializedSchema;
+const feishuAgentMessageEnvelopeSerializedSchema = z.object({
+  id: z.string().min(1),
+  source: z.literal('feishu:im'),
+  type: z.literal('agent.message.inbound'),
+  time: z.string().min(1),
+  channel: z.literal('feishu'),
+  sessionKey: z.string().min(1),
+  channelMeta: feishuChannelMetaSerializedSchema,
+  payload: agentInboundPayloadSchema,
+  trace: agentTraceSchema,
+});
+
+const dingtalkAgentMessageEnvelopeSerializedSchema = z.object({
+  id: z.string().min(1),
+  source: z.literal('dingtalk:im'),
+  type: z.literal('agent.message.inbound'),
+  time: z.string().min(1),
+  channel: z.literal('dingtalk'),
+  sessionKey: z.string().min(1),
+  channelMeta: dingtalkChannelMetaSerializedSchema,
+  payload: agentInboundPayloadSchema,
+  trace: agentTraceSchema,
+});
+
+export const agentMessageEnvelopeSerializedSchema = z.discriminatedUnion('channel', [
+  webAgentMessageEnvelopeSerializedSchema,
+  feishuAgentMessageEnvelopeSerializedSchema,
+  dingtalkAgentMessageEnvelopeSerializedSchema,
+]);
 
 const chunkPayloadSchema = z.record(z.string(), z.unknown());
 
@@ -114,6 +160,66 @@ const agentOutboundEnvelopeSchema = z.discriminatedUnion('kind', [
   z.object({
     ...outboundEnvelopeBaseSchema,
     channel: z.literal('web'),
+    kind: z.literal('error'),
+    payload: errorOutboundPayloadSchema,
+  }),
+  z.object({
+    ...outboundEnvelopeBaseSchema,
+    channel: z.literal('feishu'),
+    kind: z.literal('chunk'),
+    payload: chunkPayloadSchema,
+  }),
+  z.object({
+    ...outboundEnvelopeBaseSchema,
+    channel: z.literal('feishu'),
+    kind: z.literal('context_compacted'),
+    payload: contextCompactedPayloadSchema,
+  }),
+  z.object({
+    ...outboundEnvelopeBaseSchema,
+    channel: z.literal('feishu'),
+    kind: z.literal('usage'),
+    payload: usageOutboundPayloadSchema,
+  }),
+  z.object({
+    ...outboundEnvelopeBaseSchema,
+    channel: z.literal('feishu'),
+    kind: z.literal('done'),
+    payload: doneOutboundPayloadSchema,
+  }),
+  z.object({
+    ...outboundEnvelopeBaseSchema,
+    channel: z.literal('feishu'),
+    kind: z.literal('error'),
+    payload: errorOutboundPayloadSchema,
+  }),
+  z.object({
+    ...outboundEnvelopeBaseSchema,
+    channel: z.literal('dingtalk'),
+    kind: z.literal('chunk'),
+    payload: chunkPayloadSchema,
+  }),
+  z.object({
+    ...outboundEnvelopeBaseSchema,
+    channel: z.literal('dingtalk'),
+    kind: z.literal('context_compacted'),
+    payload: contextCompactedPayloadSchema,
+  }),
+  z.object({
+    ...outboundEnvelopeBaseSchema,
+    channel: z.literal('dingtalk'),
+    kind: z.literal('usage'),
+    payload: usageOutboundPayloadSchema,
+  }),
+  z.object({
+    ...outboundEnvelopeBaseSchema,
+    channel: z.literal('dingtalk'),
+    kind: z.literal('done'),
+    payload: doneOutboundPayloadSchema,
+  }),
+  z.object({
+    ...outboundEnvelopeBaseSchema,
+    channel: z.literal('dingtalk'),
     kind: z.literal('error'),
     payload: errorOutboundPayloadSchema,
   }),

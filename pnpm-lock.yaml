@@ -154,6 +154,9 @@ importers:
       '@meek/shared':
         specifier: workspace:*
         version: link:../shared
+      '@vectorize-io/hindsight-client':
+        specifier: ^0.8.3
+        version: 0.8.3
       lru-cache:
         specifier: ^11.5.1
         version: 11.5.1
@@ -1354,6 +1357,9 @@ packages:
 
   '@ungap/structured-clone@1.3.2':
     resolution: {integrity: sha512-5jsZFwgR5rTdKwidH9Qmat75RKwqfpKlWWB1frDkljN127mwqBu8K0PYo7/hFpF03IEJpfVPpCQDY/eDx3iHvA==}
+
+  '@vectorize-io/hindsight-client@0.8.3':
+    resolution: {integrity: sha512-I2pBWOzvj8SB3rBoQIzk2pFQ3C6e9veoNr54dvXuCT1HWkCIPFDoLcmmpAlWbcXxukKUnMI/f6/ib4M21D36JA==}
 
   accepts@2.0.0:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
@@ -3827,6 +3833,8 @@ snapshots:
       eslint-visitor-keys: 5.0.1
 
   '@ungap/structured-clone@1.3.2': {}
+
+  '@vectorize-io/hindsight-client@0.8.3': {}
 
   accepts@2.0.0:
     dependencies:

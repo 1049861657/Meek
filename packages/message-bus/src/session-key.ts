@@ -12,12 +12,20 @@ export function buildWebChatPermissionSessionKey(chatSessionId: string): string 
 export function resolvePermissionSessionKey(
   envelope: AgentMessageEnvelopeSerialized
 ): string {
-  if (!isWebInboundEnvelope(envelope)) {
-    throw new Error(`resolvePermissionSessionKey: 仅支持 Web 渠道，收到 ${envelope.channel}`);
+  if (isWebInboundEnvelope(envelope)) {
+    const chatSessionId = envelope.channelMeta.webChatSessionId?.trim() ?? '';
+    if (!chatSessionId) {
+      throw new Error('Web 入站缺少 channelMeta.webChatSessionId（body.sessionId）');
+    }
+    return buildWebChatPermissionSessionKey(chatSessionId);
   }
-  const chatSessionId = envelope.channelMeta.webChatSessionId.trim();
-  if (!chatSessionId) {
-    throw new Error('Web 入站缺少 channelMeta.webChatSessionId（body.sessionId）');
-  }
-  return buildWebChatPermissionSessionKey(chatSessionId);
+  return envelope.sessionKey;
+}
+
+export function buildFeishuSessionKey(chatId: string): string {
+  return `feishu:${chatId}`;
+}
+
+export function buildDingtalkSessionKey(conversationId: string): string {
+  return `dingtalk:${conversationId}`;
 }

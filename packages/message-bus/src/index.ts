@@ -9,11 +9,15 @@ export type {
   ContextCompactedPayload,
   DingtalkAgentMessageEnvelope,
   DingtalkAgentMessageEnvelopeSerialized,
+  DingtalkAgentOutboundEnvelope,
+  DingtalkChannelMeta,
   DingtalkChannelMetaSerialized,
   DoneOutboundPayload,
   ErrorOutboundPayload,
   FeishuAgentMessageEnvelope,
   FeishuAgentMessageEnvelopeSerialized,
+  FeishuAgentOutboundEnvelope,
+  FeishuChannelMeta,
   FeishuChannelMetaSerialized,
   UsageOutboundPayload,
   WebAgentMessageEnvelope,
@@ -41,11 +45,19 @@ export {
 } from './inbound-queue.js';
 
 export { prepareSerializedInbound, serializeInboundEnvelope } from './inbound-envelope.js';
+export {
+  buildDingtalkInboundEnvelope,
+  buildFeishuInboundEnvelope,
+  buildWebInboundEnvelope,
+} from './build-inbound-envelope.js';
 export { envelopeToHarnessInput, pickDefined } from './envelope-mapper.js';
+export { generateRequestId } from './request-id.js';
 
 export {
   buildWebSessionKey,
   buildWebChatPermissionSessionKey,
+  buildFeishuSessionKey,
+  buildDingtalkSessionKey,
   resolvePermissionSessionKey,
 } from './session-key.js';
 
@@ -57,6 +69,8 @@ export {
 } from './outbound-bridge.js';
 
 export { logInboundDequeue } from './inbound-log.js';
+
+export { tryAcquireIdempotency, releaseIdempotency } from './idempotency.js';
 
 export {
   REDIS_KEY_PREFIX,

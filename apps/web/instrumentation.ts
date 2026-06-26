@@ -4,8 +4,9 @@ export async function register(): Promise<void> {
     await bootstrapUsers();
     const { installWebMcpClientResolver } = await import('./lib/mcp/web-mcp-port');
     installWebMcpClientResolver();
-    const { setChatStore } = await import('@meek/agent-core');
+    const { setChatStore, installMemoryPort } = await import('@meek/agent-core');
     const { chatStorePort } = await import('@meek/chat-store');
     setChatStore(chatStorePort);
+    installMemoryPort();
   }
 }

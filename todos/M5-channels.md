@@ -1,6 +1,6 @@
 # M5 — 消息总线与 IM 渠道
 
-> **状态**：未开始  
+> **状态**：进行中（M5-01 已完成）  
 > **周期**：2.5 ~ 3 人周（2 人）  
 > **前置**：M1 + M2 + M4  
 > **参考代码**：`MCP-Client/src/message-bus/`、`src/channels/`  
@@ -16,14 +16,14 @@
 
 ## M5-01 Envelope
 
-- [ ] **M5-01-01** `inbound-envelope.ts` 类型与校验
-- [ ] **M5-01-02** `session-key.ts`
-- [ ] **M5-01-03** `idempotency.ts`（Redis `mcp-client:*` 前缀 → Meek 等价键）
-- [ ] **M5-01-04** `normalize-web-inbound.ts`
-- [ ] **M5-01-05** `normalize-feishu-inbound.ts`
-- [ ] **M5-01-06** `normalize-dingtalk-inbound.ts`
-- [ ] **M5-01-07** `envelope-mapper.ts`
-- [ ] **M5-01-08** 三渠道 normalize **公共 Envelope 构建器**（web/飞书/钉钉只填差异字段）
+- [x] **M5-01-01** `inbound-envelope.ts` 类型与校验
+- [x] **M5-01-02** `session-key.ts`
+- [x] **M5-01-03** `idempotency.ts`（Redis `mcp-client:*` 前缀 → Meek 等价键）
+- [x] **M5-01-04** `normalize-web-inbound.ts`
+- [x] **M5-01-05** `normalize-feishu-inbound.ts`
+- [x] **M5-01-06** `normalize-dingtalk-inbound.ts`
+- [x] **M5-01-07** `envelope-mapper.ts`
+- [x] **M5-01-08** 三渠道 normalize **公共 Envelope 构建器**（web/飞书/钉钉只填差异字段）
 
 ## M5-02 Message Bus
 

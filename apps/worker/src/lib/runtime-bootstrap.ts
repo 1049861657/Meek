@@ -3,6 +3,7 @@ import {
   getProviderForUser,
   initializeProviders,
   invalidateProviderCache,
+  installMemoryPort,
   setAiProvidersConfig,
   setChatStore,
   setMcpClientResolver,
@@ -40,6 +41,7 @@ export async function ensureWorkerRuntime(configUserId: string | null = null): P
     return;
   }
   setChatStore(chatStorePort);
+  installMemoryPort();
   await bootstrapMcpConfig();
   setMcpClientResolver((userId) => createMcpClientPort(getRuntimeMcpClient(userId)));
   wireMcpConnectionService();
