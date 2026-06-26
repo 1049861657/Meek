@@ -4,6 +4,7 @@ import { ensureSeedFollowDefault, initConfigPlane } from '@meek/config-plane';
 import { getRedisUrl } from '@meek/shared';
 import { startChannels } from './channels/bootstrap.js';
 import { bootstrapMcpConfig } from './lib/mcp-config-bootstrap.js';
+import { handleChannelStatusGet } from './http/channel-status-api.js';
 import { handleInternalApi } from './http/internal-api.js';
 import { startMessageBus } from './message-bus/bootstrap.js';
 
@@ -24,6 +25,11 @@ async function main(): Promise<void> {
     void (async () => {
       const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
       const pathname = url.pathname;
+
+      if (req.method === 'GET' && pathname === '/internal/channels/status') {
+        handleChannelStatusGet(res);
+        return;
+      }
 
       if (await handleInternalApi(req, res, pathname)) {
         return;

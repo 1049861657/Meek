@@ -7,12 +7,18 @@ import { parseAgentMessageEnvelopeSerialized } from './channel.schema.js';
 import { tryAcquireIdempotency } from './idempotency.js';
 import { prepareSerializedInbound } from './inbound-envelope.js';
 import {
+  logInboundDeadLetter,
+  logInboundJobFailed,
+  logInboundPublished,
+  logInboundSkippedDuplicate,
+} from './inbound-log.js';
+import {
   INBOUND_ATTEMPTS,
   INBOUND_BACKOFF_DELAY_MS,
   INBOUND_JOB_NAME,
   INBOUND_QUEUE_NAME,
   REDIS_KEY_PREFIX,
-} from './queue-constants.js';
+} from './queue-names.js';
 
 export type InboundJobHandler = (envelope: AgentMessageEnvelopeSerialized) => Promise<void>;
 
@@ -36,13 +42,45 @@ function getOrCreateInboundQueue(): Queue {
   return inboundQueue;
 }
 
+function resolveMaxAttempts(job: Job<AgentMessageEnvelopeSerialized>): number {
+  return job.opts.attempts ?? INBOUND_ATTEMPTS;
+}
+
+function handleInboundJobFailed(
+  job: Job<AgentMessageEnvelopeSerialized> | undefined,
+  error: Error
+): void {
+  if (!job) {
+    console.error(`[BUS] inbound job failed jobId=unknown: ${error.message}`);
+    return;
+  }
+
+  const maxAttempts = resolveMaxAttempts(job);
+  const jobId = job.id ?? 'unknown';
+
+  if (job.attemptsMade >= maxAttempts) {
+    let envelope: AgentMessageEnvelopeSerialized | undefined;
+    try {
+      envelope = parseAgentMessageEnvelopeSerialized(job.data);
+    } catch {
+      envelope = undefined;
+    }
+    logInboundDeadLetter(jobId, envelope, error, job.attemptsMade);
+    return;
+  }
+
+  logInboundJobFailed(jobId, job.attemptsMade, maxAttempts, error);
+}
+
+/**
+ * 入站 Envelope 入队。
+ * 幂等：Redis SET NX + BullMQ jobId 双保险；重复请求静默跳过。
+ */
 export async function publishInbound(envelope: AgentMessageEnvelope): Promise<void> {
   const idempotencyKey = envelope.trace.idempotencyKey;
   const acquired = await tryAcquireIdempotency(idempotencyKey);
   if (!acquired) {
-    console.info(
-      `[BUS] inbound skipped duplicate idempotencyKey=${idempotencyKey} requestId=${envelope.channelMeta.requestId}`
-    );
+    logInboundSkippedDuplicate(idempotencyKey, envelope.channelMeta.requestId);
     return;
   }
 
@@ -51,11 +89,13 @@ export async function publishInbound(envelope: AgentMessageEnvelope): Promise<vo
   await queue.add(INBOUND_JOB_NAME, serialized, {
     jobId: idempotencyKey,
   });
-  console.info(
-    `[BUS] publishInbound requestId=${envelope.channelMeta.requestId} traceId=${envelope.trace.traceId}`
-  );
+  logInboundPublished(envelope);
 }
 
+/**
+ * 启动 Inbound Worker 订阅队列。
+ * @returns Worker 实例（进程生命周期内保持）
+ */
 export function startInboundWorker(
   handler: InboundJobHandler,
   concurrency: number
@@ -78,15 +118,14 @@ export function startInboundWorker(
   );
 
   inboundWorker.on('failed', (job, error) => {
-    console.error(
-      `[BUS] inbound job failed jobId=${job?.id ?? 'unknown'}: ${error.message}`
-    );
+    handleInboundJobFailed(job, error);
   });
 
   console.info(`[BUS] Inbound Worker started concurrency=${concurrency}`);
   return inboundWorker;
 }
 
+/** 测试 / 优雅关闭 */
 export async function closeInboundMessageBus(): Promise<void> {
   if (inboundWorker) {
     await inboundWorker.close();

@@ -30,6 +30,10 @@ export function unregisterOutboundSink(requestId: string): void {
 }
 
 export function sendOutboundToSink(envelope: AgentOutboundEnvelope): void {
+  if (envelope.channel !== 'web') {
+    return;
+  }
+
   const sink = getOutboundSink(envelope.requestId);
   if (!sink || sink.isEnded()) {
     return;

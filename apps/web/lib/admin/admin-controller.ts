@@ -359,8 +359,8 @@ export async function handleDeleteRoute(routeId: string): Promise<Response> {
   }
 }
 
-export function handleGetChannelStatus(): Response {
-  return Response.json(getChannelLinkStatusMap());
+export async function handleGetChannelStatus(): Promise<Response> {
+  return Response.json(await getChannelLinkStatusMap());
 }
 
 export async function handleGetChannelConfig(

@@ -68,14 +68,29 @@ export {
   subscribeAbortSignal,
 } from './outbound-bridge.js';
 
-export { logInboundDequeue } from './inbound-log.js';
+export {
+  logInboundDequeue,
+  logInboundSkippedDuplicate,
+  logInboundPublished,
+  logInboundDeadLetter,
+  formatInboundLogFields,
+} from './inbound-log.js';
 
 export { tryAcquireIdempotency, releaseIdempotency } from './idempotency.js';
 
 export {
   REDIS_KEY_PREFIX,
+  REFERENCE_REDIS_KEY_PREFIX,
   INBOUND_QUEUE_NAME,
+  INBOUND_JOB_NAME,
+  INBOUND_ATTEMPTS,
+  INBOUND_BACKOFF_DELAY_MS,
+  IDEMPOTENCY_TTL_SECONDS,
+  DEFAULT_INBOUND_WORKER_CONCURRENCY,
   resolveInboundWorkerConcurrency,
-} from './queue-constants.js';
+  buildIdempotencyRedisKey,
+  buildOutboundRedisChannel,
+  buildAbortRedisChannel,
+} from './queue-names.js';
 
 export { closeMessageBusRedisConnections } from './redis-bridge.js';

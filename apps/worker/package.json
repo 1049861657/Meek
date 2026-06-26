@@ -10,6 +10,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "@larksuiteoapi/node-sdk": "^1.68.0",
     "@meek/agent-core": "workspace:*",
     "@meek/chat-store": "workspace:*",
     "@meek/config-plane": "workspace:*",

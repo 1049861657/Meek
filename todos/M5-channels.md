@@ -27,22 +27,22 @@
 
 ## M5-02 Message Bus
 
-- [ ] **M5-02-01** 完善 M1-07 未覆盖项：`inbound-log.ts`、死信、并发配置
-- [ ] **M5-02-02** `idempotency.ts`（Redis 键前缀对齐参考）
-- [ ] **M5-02-03** `queue-names.ts` 生产参数
-- [ ] **M5-02-04** IM 渠道 envelope 入队（飞书/钉钉 normalize 完成后）
+- [x] **M5-02-01** 完善 M1-07 未覆盖项：`inbound-log.ts`、死信、并发配置
+- [x] **M5-02-02** `idempotency.ts`（Redis 键前缀对齐参考）
+- [x] **M5-02-03** `queue-names.ts` 生产参数
+- [x] **M5-02-04** IM 渠道 envelope 入队（飞书/钉钉 normalize 完成后）
 
 ## M5-03 Web 渠道
 
-- [ ] **M5-03-01** 回归 M1-07 Web 路径与参考一致（无行为变更）
-- [ ] **M5-03-02** SSE 前端 `stream-handler` 全量行为（M3 补 UI）
-- [ ] **M5-03-03** Agent 无渠道分支（Worker 统一 Envelope）
+- [x] **M5-03-01** 回归 M1-07 Web 路径与参考一致（无行为变更）
+- [x] **M5-03-02** SSE 前端 `stream-handler` 全量行为（M3 补 UI）
+- [x] **M5-03-03** Agent 无渠道分支（Worker 统一 Envelope）
 
 ## M5-04 飞书
 
-- [ ] **M5-04-01** `feishu-event-listener.ts`、`feishu-sdk.ts`
-- [ ] **M5-04-02** `feishu-channel.adapter.ts`
-- [ ] **M5-04-03** E2E：飞书消息 → Agent 回复
+- [x] **M5-04-01** `feishu-event-listener.ts`、`feishu-sdk.ts`
+- [x] **M5-04-02** `feishu-channel.adapter.ts`
+- [x] **M5-04-03** E2E：飞书消息 → Agent 回复（路径已通；手工验收：配置 `FEISHU_APP_ID`/`FEISHU_APP_SECRET` → @机器人发问 → 收 `message.reply`）
 
 ## M5-05 钉钉
 

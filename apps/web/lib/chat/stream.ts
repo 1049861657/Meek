@@ -91,7 +91,9 @@ export async function handleChatStream(
         const toolMessageCount = messages.filter((message) => message.role === 'tool').length;
         console.info(
           `[API] 收到流式聊天请求 requestId=${requestId} messages=${messages.length} ` +
-            `tool=${toolMessageCount} vendor=${vendor ?? '默认'} tools=${chatOptions.enableTools ?? ToolsConfig.enableMCPTools}`
+            `tool=${toolMessageCount} vendor=${vendor ?? '默认'} tools=${chatOptions.enableTools ?? ToolsConfig.enableMCPTools} ` +
+            `prompts=${chatOptions.enablePrompts} maxToolRounds=${chatOptions.maxToolCallRounds} ` +
+            `autoCompact=${chatOptions.enableAutoCompact} skipMemory=${chatOptions.skipMemory === true}`
         );
 
         webAdapter.registerSink(requestId, {

@@ -28,11 +28,10 @@ import {
 } from '@/lib/chat/config-fetch';
 import { countKnownEnabledMcpServers, fetchMcpServers } from '@/lib/chat/mcp-selection';
 import { resolveChatToolPermission } from '@/lib/chat/permission-resolve-client';
-import { consumeSseStream, type StreamRuntime } from '@/lib/chat/process-sse-stream';
+import { consumeSseStream, feedTurnCollectorFromPayload, type StreamRuntime } from '@/lib/chat/stream-handler';
 import { ChatSessionData } from '@/lib/chat/session-data';
 import { createSessionStore, type ChatSessionStore } from '@/lib/chat/session-store';
 import type { HistoryEntry, PermissionMode } from '@/lib/chat/storage-contract';
-import { feedTurnCollectorFromPayload } from '@/lib/chat/sync-turn-collector';
 import { formatMessageTimeWithElapsed } from '@/lib/chat/time';
 import type { QuickBubbleMode } from '@/lib/chat/quick-messages-storage';
 import { useAuth } from '@/providers/auth-provider';
