@@ -41,6 +41,9 @@ importers:
       '@meek/agent-core':
         specifier: workspace:*
         version: link:../../packages/agent-core
+      '@meek/chat-store':
+        specifier: workspace:*
+        version: link:../../packages/chat-store
       '@meek/config-plane':
         specifier: workspace:*
         version: link:../../packages/config-plane
@@ -111,6 +114,9 @@ importers:
       '@meek/agent-core':
         specifier: workspace:*
         version: link:../../packages/agent-core
+      '@meek/chat-store':
+        specifier: workspace:*
+        version: link:../../packages/chat-store
       '@meek/config-plane':
         specifier: workspace:*
         version: link:../../packages/config-plane
@@ -154,6 +160,22 @@ importers:
       openai:
         specifier: ^6.44.0
         version: 6.44.0(zod@4.4.3)
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.3
+        version: 25.9.3
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/chat-store:
+    dependencies:
+      '@meek/agent-core':
+        specifier: workspace:*
+        version: link:../agent-core
+      '@meek/db':
+        specifier: workspace:*
+        version: link:../db
     devDependencies:
       '@types/node':
         specifier: ^25.9.3

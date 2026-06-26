@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@meek/agent-core": "workspace:*",
+    "@meek/chat-store": "workspace:*",
     "@meek/config-plane": "workspace:*",
     "@meek/db": "workspace:*",
     "@meek/mcp-runtime": "workspace:*",

@@ -4,10 +4,12 @@ import {
   initializeProviders,
   invalidateProviderCache,
   setAiProvidersConfig,
+  setChatStore,
   setMcpClientResolver,
   type AIProvider,
   type AIProvidersConfigType,
 } from '@meek/agent-core';
+import { chatStorePort } from '@meek/chat-store';
 import { getMcpClientForUser as getRuntimeMcpClient } from '@meek/mcp-runtime';
 
 import { bootstrapMcpConfig, loadMcpConfig } from './mcp-config-bootstrap.js';
@@ -37,6 +39,7 @@ export async function ensureWorkerRuntime(configUserId: string | null = null): P
   if (workerRuntimeInitialized) {
     return;
   }
+  setChatStore(chatStorePort);
   await bootstrapMcpConfig();
   setMcpClientResolver((userId) => createMcpClientPort(getRuntimeMcpClient(userId)));
   wireMcpConnectionService();

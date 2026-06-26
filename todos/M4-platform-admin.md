@@ -35,29 +35,29 @@
 
 ## M4-03 用户管理 API
 
-- [ ] **M4-03-01** `GET /api/users`
-- [ ] **M4-03-02** `POST /api/users/:id/role`
-- [ ] **M4-03-03** `POST /api/users/:id/reset-password`
-- [ ] **M4-03-04** Seed follow GET/PUT
-- [ ] **M4-03-05** `bootstrap-users` 首启超级管理员
+- [x] **M4-03-01** `GET /api/users`
+- [x] **M4-03-02** `POST /api/users/:id/role`
+- [x] **M4-03-03** `POST /api/users/:id/reset-password`
+- [x] **M4-03-04** Seed follow GET/PUT
+- [x] **M4-03-05** `bootstrap-users` 首启超级管理员
 
 ## M4-04 Settings API（全路由）
 
-- [ ] **M4-04-01** Provider CRUD + reload + reset
-- [ ] **M4-04-02** `GET /api/settings/provider-types`
-- [ ] **M4-04-03** Tool prompt get/save/reset
-- [ ] **M4-04-04** MCP servers reset
-- [ ] **M4-04-05** `GET /api/settings/system-prompt-sections`
-- [ ] **M4-04-06** 写操作 `requireAuth`；读接口匿名策略对齐参考
+- [x] **M4-04-01** Provider CRUD + reload + reset
+- [x] **M4-04-02** `GET /api/settings/provider-types`
+- [x] **M4-04-03** Tool prompt get/save/reset
+- [x] **M4-04-04** MCP servers reset
+- [x] **M4-04-05** `GET /api/settings/system-prompt-sections`
+- [x] **M4-04-06** 写操作 `requireAuth`；读接口匿名策略对齐参考
 
 ## M4-05 聊天会话（参考 `chat-store.service.ts`、`sessions.controller.ts`）
 
-- [ ] **M4-05-01** `ChatSession`、`ChatMessage` 读写
-- [ ] **M4-05-02** `GET/POST/DELETE /api/sessions`
-- [ ] **M4-05-03** `GET /api/sessions/:id/messages`
-- [ ] **M4-05-04** append-only 消息；级联删除
-- [ ] **M4-05-05** Authed 聊天写回 DB；Guest 仍 IDB
-- [ ] **M4-05-06** `compactBaselineJson` 字段读写
+- [x] **M4-05-01** `ChatSession`、`ChatMessage` 读写
+- [x] **M4-05-02** `GET/POST/DELETE /api/sessions`
+- [x] **M4-05-03** `GET /api/sessions/:id/messages`
+- [x] **M4-05-04** append-only 消息；级联删除
+- [x] **M4-05-05** Authed 聊天写回 DB；Guest 仍 IDB
+- [x] **M4-05-06** `compactBaselineJson` 字段读写
 
 ## M4-06 Memory（参考 `src/core/memory/`、`memory-debug.controller.ts`）
 

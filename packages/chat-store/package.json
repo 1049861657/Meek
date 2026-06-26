@@ -1,0 +1,25 @@
+{
+  "name": "@meek/chat-store",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@meek/agent-core": "workspace:*",
+    "@meek/db": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "typescript": "^6.0.3"
+  }
+}
