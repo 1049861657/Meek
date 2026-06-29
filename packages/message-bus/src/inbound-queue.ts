@@ -1,6 +1,7 @@
 import { Queue, Worker, type Job } from 'bullmq';
 
 import { getQueueConnectionOptions, getWorkerConnectionOptions } from '@meek/shared';
+import { Logger } from '@meek/shared/logger';
 
 import type { AgentMessageEnvelope, AgentMessageEnvelopeSerialized } from './channel.types.js';
 import { parseAgentMessageEnvelopeSerialized } from './channel.schema.js';
@@ -121,7 +122,7 @@ export function startInboundWorker(
     handleInboundJobFailed(job, error);
   });
 
-  console.info(`[BUS] Inbound Worker started concurrency=${concurrency}`);
+  Logger.info('BUS', `Inbound Worker started concurrency=${concurrency}`);
   return inboundWorker;
 }
 

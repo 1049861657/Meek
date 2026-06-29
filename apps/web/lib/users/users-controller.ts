@@ -3,6 +3,7 @@ import {
   setSeedFollowUserId,
 } from '@meek/config-plane';
 import { prisma } from '@meek/db';
+import { Logger } from '@meek/agent-core';
 
 import { SUPERADMIN_ROLE, USER_ROLE } from '@/lib/auth/constants';
 import { hashPassword } from '@/lib/password-hasher';
@@ -56,7 +57,7 @@ export async function handleSetRole(
       }
     }
     await prisma.user.update({ where: { id: userId }, data: { role } });
-    console.info(`[USERS] 用户 ${userId} 角色改为 ${role}`);
+    Logger.info('USERS', `用户 ${userId} 角色改为 ${role}`);
     return Response.json({ success: true });
   } catch (error: unknown) {
     return usersError(500, '修改角色失败', getErrorMessage(error));
@@ -106,7 +107,7 @@ export async function handleResetPassword(userId: string, body: unknown): Promis
       prisma.account.update({ where: { id: account.id }, data: { password: hashed } }),
       prisma.session.deleteMany({ where: { userId } }),
     ]);
-    console.info(`[USERS] 重置用户 ${userId} 密码并吊销其会话`);
+    Logger.info('USERS', `重置用户 ${userId} 密码并吊销其会话`);
     return Response.json({ success: true });
   } catch (error: unknown) {
     return usersError(500, '重置密码失败', getErrorMessage(error));

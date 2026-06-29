@@ -1,3 +1,5 @@
+import { Logger } from '@meek/agent-core';
+
 import type { RequestPrincipal } from '@/lib/chat/resolve-principal';
 import type { WorkerForwardResult } from '@/lib/worker/worker-client';
 
@@ -23,6 +25,6 @@ export function workerResultToResponse<T>(result: WorkerForwardResult<T>): Respo
 
 export async function handleWorkerError(error: unknown, label: string): Promise<Response> {
   const message = error instanceof Error ? error.message : String(error);
-  console.error(`[API] ${label}:`, message);
+  Logger.error('API', `${label}: ${message}`);
   return Response.json({ error: label, details: message }, { status: 500 });
 }

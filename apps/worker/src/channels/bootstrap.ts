@@ -3,9 +3,14 @@ import { getDingtalkChannelAdapter } from './dingtalk/dingtalk-channel.adapter.j
 import {
   getDingtalkLinkStatus,
   startDingtalkStreamListener,
+  stopDingtalkStreamListener,
 } from './dingtalk/dingtalk-stream-listener.js';
 import { getFeishuChannelAdapter } from './feishu/feishu-channel.adapter.js';
-import { getFeishuLinkStatus, startFeishuEventListener } from './feishu/feishu-event-listener.js';
+import {
+  getFeishuLinkStatus,
+  startFeishuEventListener,
+  stopFeishuEventListener,
+} from './feishu/feishu-event-listener.js';
 
 export type ImChannelLinkStatus = 'connected' | 'connecting' | 'disconnected' | 'skipped';
 
@@ -20,6 +25,11 @@ export function startChannels(): void {
   registerChannelAdapter(getDingtalkChannelAdapter());
   startFeishuEventListener();
   startDingtalkStreamListener();
+}
+
+export function stopChannels(): void {
+  stopFeishuEventListener();
+  stopDingtalkStreamListener();
 }
 
 export function getImChannelLinkStatusMap(): ImChannelStatusMap {

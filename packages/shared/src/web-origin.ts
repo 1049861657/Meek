@@ -4,7 +4,7 @@ export const MCP_OAUTH_CALLBACK_PATH = '/api/mcp/oauth/callback';
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 3000;
 
-/** 进程默认 Web 端口（`PORT` 环境变量，否则 3000） */
+/** Next.js Web 端口（`PORT` 环境变量，否则 3000） */
 export function resolveDefaultWebPort(): number {
   const raw = process.env.PORT?.trim();
   if (!raw) {

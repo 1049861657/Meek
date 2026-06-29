@@ -15,6 +15,9 @@ export const auth = betterAuth({
     allowedHosts: ['localhost:*', '127.0.0.1:*', '*.vercel.app'],
     fallback: resolveDefaultWebOrigin(),
   },
+  advanced: {
+    cookiePrefix: 'meek',
+  },
   database: prismaAdapter(prisma, { provider: 'sqlite' }),
   emailAndPassword: {
     enabled: true,

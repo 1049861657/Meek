@@ -16,12 +16,14 @@
     "dev": {
       "dependsOn": ["^build", "^db:generate"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": ["PORT", "WORKER_PORT", "LOG_LEVEL", "LOG_FILE", "LOG_TO_FILE"]
     },
     "start": {
       "dependsOn": ["build", "^build"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": ["PORT", "WORKER_PORT", "LOG_LEVEL", "LOG_FILE", "LOG_TO_FILE"]
     },
     "lint": {
       "dependsOn": ["^lint"]

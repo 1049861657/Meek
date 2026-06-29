@@ -39,6 +39,10 @@ export interface DropdownSelectProps {
   name?: string;
 }
 
+const MENU_GAP = 6;
+const VIEWPORT_PADDING = 8;
+const MENU_MIN_HEIGHT = 120;
+
 function ChevronIcon(): React.ReactElement {
   return (
     <svg
@@ -83,6 +87,7 @@ export function DropdownSelect({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const [opensUpward, setOpensUpward] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
 
   const allOptions = flattenOptions(options, groups);
@@ -95,11 +100,47 @@ export function DropdownSelect({
     if (!trigger || !menu) {
       return;
     }
+
     const rect = trigger.getBoundingClientRect();
+    const menuHeight = menu.offsetHeight || menu.scrollHeight;
+    const spaceBelow = window.innerHeight - rect.bottom - VIEWPORT_PADDING;
+    const spaceAbove = rect.top - VIEWPORT_PADDING;
+    const estimatedHeight = menuHeight || MENU_MIN_HEIGHT;
+    const shouldOpenUp =
+      spaceBelow < estimatedHeight + MENU_GAP && spaceAbove >= spaceBelow;
+
+    setOpensUpward(shouldOpenUp);
+
     menu.style.position = 'fixed';
-    menu.style.top = `${rect.bottom + 6}px`;
     menu.style.left = `${rect.left}px`;
     menu.style.minWidth = `${rect.width}px`;
+    menu.style.bottom = 'auto';
+
+    const availableSpace = shouldOpenUp
+      ? spaceAbove - MENU_GAP
+      : spaceBelow - MENU_GAP;
+
+    if (availableSpace > 0) {
+      menu.style.maxHeight = `${Math.max(MENU_MIN_HEIGHT, availableSpace)}px`;
+      menu.style.overflowY = 'auto';
+    } else {
+      menu.style.maxHeight = '';
+      menu.style.overflowY = '';
+    }
+
+    if (shouldOpenUp) {
+      const top = rect.top - MENU_GAP - (menu.offsetHeight || menuHeight);
+      menu.style.top = `${Math.max(VIEWPORT_PADDING, top)}px`;
+    } else {
+      menu.style.top = `${rect.bottom + MENU_GAP}px`;
+    }
+
+    const menuWidth = Math.max(rect.width, menu.offsetWidth);
+    let left = rect.left;
+    if (left + menuWidth > window.innerWidth - VIEWPORT_PADDING) {
+      left = window.innerWidth - VIEWPORT_PADDING - menuWidth;
+    }
+    menu.style.left = `${Math.max(VIEWPORT_PADDING, left)}px`;
   }, []);
 
   const close = useCallback(() => {
@@ -125,6 +166,14 @@ export function DropdownSelect({
     },
     [close, onChange, value],
   );
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const frame = requestAnimationFrame(() => positionMenu());
+    return () => cancelAnimationFrame(frame);
+  }, [open, positionMenu, allOptions.length]);
 
   useEffect(() => {
     if (!open) {
@@ -215,7 +264,13 @@ export function DropdownSelect({
   return (
     <div
       ref={rootRef}
-      className={cn('fb-select', open && 'is-open', disabled && 'fb-select--disabled', className)}
+      className={cn(
+        'fb-select',
+        open && 'is-open',
+        open && opensUpward && 'is-open-up',
+        disabled && 'fb-select--disabled',
+        className,
+      )}
       data-fb-select="1"
     >
       <select

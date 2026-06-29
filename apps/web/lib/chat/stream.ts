@@ -3,7 +3,7 @@ import {
   publishInbound,
   subscribeOutboundEvents,
 } from '@meek/message-bus';
-import { ToolsConfig } from '@meek/agent-core';
+import { Logger, ToolsConfig } from '@meek/agent-core';
 
 import { getWebChannelAdapter } from '@/lib/channels/web/web-channel.adapter';
 import { normalizeWebInbound } from '@/lib/channels/web/normalize-web-inbound';
@@ -89,8 +89,9 @@ export async function handleChatStream(
 
         const { messages, chatOptions = {} } = envelope.payload;
         const toolMessageCount = messages.filter((message) => message.role === 'tool').length;
-        console.info(
-          `[API] 收到流式聊天请求 requestId=${requestId} messages=${messages.length} ` +
+        Logger.info(
+          'API',
+          `收到流式聊天请求 requestId=${requestId} messages=${messages.length} ` +
             `tool=${toolMessageCount} vendor=${vendor ?? '默认'} tools=${chatOptions.enableTools ?? ToolsConfig.enableMCPTools} ` +
             `prompts=${chatOptions.enablePrompts} maxToolRounds=${chatOptions.maxToolCallRounds} ` +
             `autoCompact=${chatOptions.enableAutoCompact} skipMemory=${chatOptions.skipMemory === true}`
@@ -124,7 +125,7 @@ export async function handleChatStream(
         unsubscribeOutbound?.();
         webAdapter.unregisterSink(requestId);
         const errMessage = error instanceof Error ? error.message : String(error);
-        console.error(`[API] publishInbound 失败 requestId=${requestId}:`, error);
+        Logger.error('API', `publishInbound 失败 requestId=${requestId}`, error);
         writeRaw(`event: error\ndata: ${JSON.stringify({ requestId, error: errMessage })}\n\n`);
         end();
       }

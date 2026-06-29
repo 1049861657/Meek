@@ -3,6 +3,7 @@ import {
   MemoryConfig,
   isHindsightMemoryConfigured,
   listSystemToolDescriptors,
+  Logger,
 } from '@meek/agent-core';
 import type {
   FeatureConfigApiResponse,
@@ -24,14 +25,14 @@ export function buildPublicFeatureConfig(): PublicFeatureConfig {
 
 export function handleGetFeatureConfig(): FeatureConfigApiResponse {
   try {
-    console.info('[API] 请求特性配置');
+    Logger.info('API', '请求特性配置');
     return {
       success: true,
       config: buildPublicFeatureConfig(),
     };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[API] 获取特性配置失败:', message);
+    Logger.error('API', `获取特性配置失败: ${message}`);
     return {
       error: '获取特性配置失败',
       message,

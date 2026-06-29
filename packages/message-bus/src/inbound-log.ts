@@ -1,3 +1,4 @@
+import { Logger } from '@meek/shared/logger';
 import type { AgentMessageEnvelope, AgentMessageEnvelopeSerialized } from './channel.types.js';
 import { formatInboundLogFields } from './inbound-log-fields.js';
 
@@ -22,20 +23,19 @@ export function logInboundDequeue(
     extras.push(`permissionMode=${options.permissionMode}`);
   }
   const suffix = extras.length > 0 ? ` ${extras.join(' ')}` : '';
-  console.info(`[BUS] inbound processing ${formatInboundLogFields(envelope)}${suffix}`);
+  Logger.info('BUS', `inbound processing ${formatInboundLogFields(envelope)}${suffix}`);
 }
 
 /** 幂等重复，跳过入队 */
 export function logInboundSkippedDuplicate(idempotencyKey: string, requestId: string): void {
-  console.info(
-    `[BUS] inbound skipped duplicate idempotencyKey=${idempotencyKey} requestId=${requestId}`
-  );
+  Logger.info('BUS', `inbound skipped duplicate idempotencyKey=${idempotencyKey} requestId=${requestId}`);
 }
 
 /** Envelope 已写入 Inbound 队列 */
 export function logInboundPublished(envelope: AgentMessageEnvelope): void {
-  console.info(
-    `[BUS] publishInbound requestId=${envelope.channelMeta.requestId} traceId=${envelope.trace.traceId} channel=${envelope.channel}`
+  Logger.info(
+    'BUS',
+    `publishInbound requestId=${envelope.channelMeta.requestId} traceId=${envelope.trace.traceId} channel=${envelope.channel}`
   );
 }
 
@@ -47,8 +47,9 @@ export function logInboundDeadLetter(
   attemptsMade: number
 ): void {
   const fields = envelope ? formatInboundLogFields(envelope) : `jobId=${jobId}`;
-  console.error(
-    `[BUS] inbound dead-letter ${fields} attemptsMade=${attemptsMade} error=${error.message}`
+  Logger.error(
+    'BUS',
+    `inbound dead-letter ${fields} attemptsMade=${attemptsMade} error=${error.message}`
   );
 }
 
@@ -59,7 +60,8 @@ export function logInboundJobFailed(
   maxAttempts: number,
   error: Error
 ): void {
-  console.error(
-    `[BUS] inbound job failed jobId=${jobId} attempt=${attemptsMade}/${maxAttempts}: ${error.message}`
+  Logger.error(
+    'BUS',
+    `inbound job failed jobId=${jobId} attempt=${attemptsMade}/${maxAttempts}: ${error.message}`
   );
 }

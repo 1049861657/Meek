@@ -1,5 +1,6 @@
 import { resolvePrincipal } from '@/lib/chat/resolve-principal';
 import { handleMcpOAuthAuthorize } from '@/lib/mcp/mcp-oauth-handlers';
+import { Logger } from '@meek/agent-core';
 import { resolveRequestPublicOrigin } from '@meek/shared';
 
 export const runtime = 'nodejs';
@@ -34,7 +35,7 @@ export async function GET(
     return Response.json({ authorizationUrl: result.authorizationUrl });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[API] OAuth authorize 失败:', message);
+    Logger.error('API', `OAuth authorize 失败: ${message}`);
     return Response.json(
       { ok: false, error: '获取 OAuth 授权 URL 失败', message },
       { status: 500 }

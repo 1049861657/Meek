@@ -1,27 +1,41 @@
 import { createServer, type Server } from 'node:http';
 import { cleanupExpiredAgentOutputs } from '@meek/agent-core/context';
 import { ensureSeedFollowDefault, initConfigPlane } from '@meek/config-plane';
-import { getRedisUrl } from '@meek/shared';
-import { startChannels } from './channels/bootstrap.js';
+import { getRedisUrl, resolveDefaultWorkerPort } from '@meek/shared';
+import { Logger } from '@meek/shared/logger';
+import { startChannels, stopChannels } from './channels/bootstrap.js';
 import { ensureWorkerRuntime } from './lib/runtime-bootstrap.js';
 import { handleChannelStatusGet } from './http/channel-status-api.js';
 import { handleInternalApi } from './http/internal-api.js';
-import { startMessageBus } from './message-bus/bootstrap.js';
+import { startMessageBus, type MessageBusHandle } from './message-bus/bootstrap.js';
 
-const WORKER_PORT = 4001;
+const SHUTDOWN_TIMEOUT_MS = 10_000;
 
-async function main(): Promise<void> {
-  getRedisUrl();
+function listenServer(server: Server, port: number, host: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const onListenError = (error: NodeJS.ErrnoException) => {
+      if (error.code === 'EADDRINUSE') {
+        Logger.error(
+          'WORKER',
+          `端口 ${port} 已被占用（可能有残留 Worker 进程）。请执行: netstat -ano | findstr :${port}`
+        );
+      }
+      reject(error);
+    };
 
-  await cleanupExpiredAgentOutputs();
-  await initConfigPlane();
-  await ensureSeedFollowDefault();
-  await ensureWorkerRuntime();
+    server.once('error', onListenError);
+    server.listen(port, host, () => {
+      server.off('error', onListenError);
+      server.on('error', (error: Error) => {
+        Logger.error('WORKER', 'HTTP server error', error);
+      });
+      resolve();
+    });
+  });
+}
 
-  const messageBus = startMessageBus();
-  startChannels();
-
-  const server: Server = createServer((req, res) => {
+function createHttpServer(): Server {
+  return createServer((req, res) => {
     void (async () => {
       const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
       const pathname = url.pathname;
@@ -45,34 +59,68 @@ async function main(): Promise<void> {
       res.end();
     })().catch((error: unknown) => {
       const message = error instanceof Error ? error.message : String(error);
-      console.error('[WORKER] HTTP 处理失败:', message);
+      Logger.error('WORKER', `HTTP 处理失败: ${message}`);
       if (!res.headersSent) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: false, error: message }));
       }
     });
   });
+}
 
-  server.listen(WORKER_PORT, '127.0.0.1', () => {
-    console.log(`Worker health at http://127.0.0.1:${WORKER_PORT}/health`);
-  });
+async function main(): Promise<void> {
+  getRedisUrl();
 
-  const shutdown = async (signal: string): Promise<void> => {
-    console.log(`Received ${signal}, shutting down worker...`);
-    await new Promise<void>((resolve, reject) => {
-      server.close((err) => (err ? reject(err) : resolve()));
+  await cleanupExpiredAgentOutputs();
+  await initConfigPlane();
+  await ensureSeedFollowDefault();
+  await ensureWorkerRuntime();
+
+  const workerPort = resolveDefaultWorkerPort();
+  const server = createHttpServer();
+  await listenServer(server, workerPort, '127.0.0.1');
+  Logger.info('WORKER', `health at http://127.0.0.1:${workerPort}/health`);
+
+  const messageBus = startMessageBus();
+  startChannels();
+
+  let shuttingDown = false;
+
+  const shutdown = (signal: string): void => {
+    if (shuttingDown) {
+      return;
+    }
+    shuttingDown = true;
+    Logger.info('WORKER', `Received ${signal}, shutting down worker...`);
+
+    const forceExit = setTimeout(() => {
+      Logger.error('WORKER', 'Shutdown timeout, forcing exit');
+      process.exit(1);
+    }, SHUTDOWN_TIMEOUT_MS);
+    forceExit.unref();
+
+    stopChannels();
+    server.close(() => {
+      void closeMessageBus(messageBus, forceExit);
     });
-    await messageBus.close();
-    process.exit(0);
   };
 
-  process.on('SIGTERM', () => void shutdown('SIGTERM'));
-  process.on('SIGINT', () => void shutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
-try {
-  void main();
-} catch (err: unknown) {
-  console.error('Worker startup failed:', err);
-  process.exit(1);
+async function closeMessageBus(messageBus: MessageBusHandle, forceExit: NodeJS.Timeout): Promise<void> {
+  try {
+    await messageBus.close();
+    clearTimeout(forceExit);
+    process.exit(0);
+  } catch (error: unknown) {
+    Logger.error('WORKER', 'Shutdown failed', error);
+    process.exit(1);
+  }
 }
+
+void main().catch((error: unknown) => {
+  Logger.error('WORKER', 'Worker startup failed', error);
+  process.exit(1);
+});

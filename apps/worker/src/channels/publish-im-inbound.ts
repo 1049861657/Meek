@@ -1,4 +1,5 @@
 import { publishInbound } from '@meek/message-bus';
+import { Logger } from '@meek/shared/logger';
 
 import type { DingtalkBotMessageDownstream } from './dingtalk/dingtalk-event.types.js';
 import {
@@ -23,10 +24,10 @@ export async function publishFeishuInboundFromEvent(
     await publishInbound(envelope);
   } catch (error: unknown) {
     if (error instanceof FeishuInboundSkipError) {
-      console.debug(`[FEISHU] ${error.message}`);
+      Logger.debug('FEISHU', error.message);
       return;
     }
-    console.error('[FEISHU] 入站事件处理失败:', error);
+    Logger.error('FEISHU', '入站事件处理失败', error);
   }
 }
 
@@ -42,9 +43,9 @@ export async function publishDingtalkInboundFromDownstream(
     await publishInbound(envelope);
   } catch (error: unknown) {
     if (error instanceof DingtalkInboundSkipError) {
-      console.debug(`[DINGTALK] ${error.message}`);
+      Logger.debug('DINGTALK', error.message);
       return;
     }
-    console.error('[DINGTALK] 入站事件处理失败:', error);
+    Logger.error('DINGTALK', '入站事件处理失败', error);
   }
 }

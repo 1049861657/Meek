@@ -1,3 +1,5 @@
+import { Logger } from '@meek/agent-core';
+
 import { handleContextPreview, type ContextPreviewBody } from '@/lib/chat/context-preview';
 import { resolvePrincipal } from '@/lib/chat/resolve-principal';
 
@@ -12,7 +14,7 @@ export async function POST(req: Request): Promise<Response> {
     return Response.json(result.body, { status: result.status });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[API] 上下文预览失败:', message);
+    Logger.error('API', `上下文预览失败: ${message}`);
     return Response.json({ error: message }, { status: 500 });
   }
 }

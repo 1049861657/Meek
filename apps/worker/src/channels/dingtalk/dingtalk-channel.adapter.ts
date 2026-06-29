@@ -1,4 +1,5 @@
 import type { ChunkResponse } from '@meek/agent-core';
+import { Logger } from '@meek/shared/logger';
 import type {
   AgentOutboundEnvelope,
   DingtalkChannelMetaSerialized,
@@ -54,7 +55,7 @@ export class DingtalkChannelAdapter implements ChannelAdapter {
 
     const context = this.replyContexts.get(envelope.requestId);
     if (!context) {
-      console.warn(`[DINGTALK] 出站缺少 reply 上下文 requestId=${envelope.requestId}`);
+      Logger.warn('DINGTALK', `出站缺少 reply 上下文 requestId=${envelope.requestId}`);
       return;
     }
 
@@ -98,8 +99,9 @@ export class DingtalkChannelAdapter implements ChannelAdapter {
     }
 
     if (isSessionWebhookExpired(meta.sessionWebhookExpiredTime)) {
-      console.error(
-        `[DINGTALK] sessionWebhook 已过期 msgId=${meta.msgId} conversationId=${meta.conversationId}`
+      Logger.error(
+        'DINGTALK',
+        `sessionWebhook 已过期 msgId=${meta.msgId} conversationId=${meta.conversationId}`
       );
       return;
     }
@@ -121,12 +123,14 @@ export class DingtalkChannelAdapter implements ChannelAdapter {
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${await response.text()}`);
       }
-      console.info(
-        `[DINGTALK] sessionWebhook markdown 回复 conversationId=${meta.conversationId} msgId=${meta.msgId} title=${title}`
+      Logger.info(
+        'DINGTALK',
+        `sessionWebhook markdown 回复 conversationId=${meta.conversationId} msgId=${meta.msgId} title=${title}`
       );
     } catch (error: unknown) {
-      console.error(
-        `[DINGTALK] sessionWebhook 回复失败 msgId=${meta.msgId} conversationId=${meta.conversationId}:`,
+      Logger.error(
+        'DINGTALK',
+        `sessionWebhook 回复失败 msgId=${meta.msgId} conversationId=${meta.conversationId}`,
         error
       );
     }

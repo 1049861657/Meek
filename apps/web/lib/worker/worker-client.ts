@@ -1,5 +1,7 @@
+import { resolveWorkerHttpBase } from '@meek/shared';
+
 /** Web 调 Worker 内部 API（与 apps/worker 健康检查端口一致） */
-const WORKER_HTTP_BASE = 'http://127.0.0.1:4001';
+const WORKER_HTTP_BASE = resolveWorkerHttpBase();
 
 type WorkerApiSuccess<T> = { ok: true } & T;
 type WorkerApiFailure = { ok: false; error: string };

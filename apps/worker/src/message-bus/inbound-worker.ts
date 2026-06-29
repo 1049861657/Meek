@@ -1,5 +1,6 @@
 import type { ChunkResponse } from '@meek/agent-core';
 import { resolveProfile } from '@meek/config-plane';
+import { Logger } from '@meek/shared/logger';
 import type {
   AgentMessageEnvelopeSerialized,
   AgentOutboundEnvelope,
@@ -103,7 +104,7 @@ async function runHarnessForEnvelope(
 
   const service = await getHarnessProvider(configUserId, vendor);
   if (!service) {
-    console.warn(`[BUS] Inbound Worker 跳过：无可用 AI 服务 requestId=${requestId}`);
+    Logger.warn('BUS', `Inbound Worker 跳过：无可用 AI 服务 requestId=${requestId}`);
     await routeInboundError(envelope, requestId, INBOUND_AI_UNAVAILABLE_MESSAGE);
     return;
   }
@@ -180,7 +181,7 @@ async function processWebInboundJob(
       return;
     }
     const errMessage = error instanceof Error ? error.message : String(error);
-    console.error(`[BUS] Inbound Worker 处理失败 requestId=${requestId}:`, error);
+    Logger.error('BUS', `Inbound Worker 处理失败 requestId=${requestId}`, error);
     await routeInboundError(envelope, requestId, errMessage);
   } finally {
     unsubscribeAbort();
@@ -198,7 +199,7 @@ async function processFeishuInboundJob(
     await runHarnessForEnvelope(envelope, requestId);
   } catch (error: unknown) {
     const errMessage = error instanceof Error ? error.message : String(error);
-    console.error(`[BUS] Inbound Worker 飞书处理失败 requestId=${requestId}:`, error);
+    Logger.error('BUS', `Inbound Worker 飞书处理失败 requestId=${requestId}`, error);
     await routeInboundError(envelope, requestId, errMessage);
   } finally {
     feishuAdapter.endReply(requestId);
@@ -216,7 +217,7 @@ async function processDingtalkInboundJob(
     await runHarnessForEnvelope(envelope, requestId);
   } catch (error: unknown) {
     const errMessage = error instanceof Error ? error.message : String(error);
-    console.error(`[BUS] Inbound Worker 钉钉处理失败 requestId=${requestId}:`, error);
+    Logger.error('BUS', `Inbound Worker 钉钉处理失败 requestId=${requestId}`, error);
     await routeInboundError(envelope, requestId, errMessage);
   } finally {
     dingtalkAdapter.endReply(requestId);
@@ -239,7 +240,8 @@ export async function processInboundJob(
     await processDingtalkInboundJob(envelope);
     return;
   }
-  console.warn(
-    `[BUS] Inbound Worker 跳过未知 channel=${String((envelope as { channel?: string }).channel)}`
+  Logger.warn(
+    'BUS',
+    `Inbound Worker 跳过未知 channel=${String((envelope as { channel?: string }).channel)}`
   );
 }

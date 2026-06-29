@@ -12,6 +12,7 @@ import {
   partitionMcpServerIdsForPersistence,
   type AgentProfileRecord,
 } from '@meek/config-plane';
+import { Logger } from '@meek/agent-core';
 import { parseImPermissionMode } from '@meek/agent-core/permission';
 import { ConfigChannelId, prisma } from '@meek/db';
 import type { ChannelId } from '@meek/shared';
@@ -238,7 +239,7 @@ export async function handleUpdateProfile(
     }
 
     await prisma.agentProfile.update({ where: { profileId }, data });
-    console.info(`[ADMIN] 更新渠道 Profile ${profileId}`);
+    Logger.info('ADMIN', `更新渠道 Profile ${profileId}`);
     return reloadSuccess(skippedMcpServers.length > 0 ? { skippedMcpServers } : undefined);
   } catch (error: unknown) {
     return adminError(500, '更新 Profile 失败', getErrorMessage(error));
@@ -297,7 +298,7 @@ export async function handleCreateRoute(body: unknown): Promise<Response> {
         enabled,
       },
     });
-    console.info(`[ADMIN] 创建 Route ${row.id} channel=${channel}`);
+    Logger.info('ADMIN', `创建 Route ${row.id} channel=${channel}`);
     return reloadSuccess();
   } catch (error: unknown) {
     return adminError(500, '创建 Route 失败', getErrorMessage(error));
@@ -352,7 +353,7 @@ export async function handleUpdateRoute(routeId: string, body: unknown): Promise
         channel: existing.channel as 'dingtalk' | 'feishu',
         boundUserId,
       });
-      console.info(`[ADMIN] 更新 Route ${routeId} boundUserId=${boundUserId}`);
+      Logger.info('ADMIN', `更新 Route ${routeId} boundUserId=${boundUserId}`);
       return reloadSuccess();
     }
 
@@ -364,7 +365,7 @@ export async function handleUpdateRoute(routeId: string, body: unknown): Promise
     }
 
     await prisma.routeRule.update({ where: { id: routeId }, data });
-    console.info(`[ADMIN] 更新 Route ${routeId}`);
+    Logger.info('ADMIN', `更新 Route ${routeId}`);
     return reloadSuccess();
   } catch (error: unknown) {
     return adminError(500, '更新 Route 失败', getErrorMessage(error));
@@ -381,7 +382,7 @@ export async function handleDeleteRoute(routeId: string): Promise<Response> {
       return adminError(404, '未找到', `Route ${routeId} 不存在`);
     }
     await prisma.routeRule.delete({ where: { id: routeId } });
-    console.info(`[ADMIN] 删除 Route ${routeId}`);
+    Logger.info('ADMIN', `删除 Route ${routeId}`);
     return reloadSuccess();
   } catch (error: unknown) {
     return adminError(500, '删除 Route 失败', getErrorMessage(error));

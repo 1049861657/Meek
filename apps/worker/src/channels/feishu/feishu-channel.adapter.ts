@@ -1,4 +1,5 @@
 import type { ChunkResponse } from '@meek/agent-core';
+import { Logger } from '@meek/shared/logger';
 import type {
   AgentOutboundEnvelope,
   DoneOutboundPayload,
@@ -48,7 +49,7 @@ export class FeishuChannelAdapter implements ChannelAdapter {
 
     const context = this.replyContexts.get(envelope.requestId);
     if (!context) {
-      console.warn(`[FEISHU] 出站缺少 reply 上下文 requestId=${envelope.requestId}`);
+      Logger.warn('FEISHU', `出站缺少 reply 上下文 requestId=${envelope.requestId}`);
       return;
     }
 
@@ -100,10 +101,10 @@ export class FeishuChannelAdapter implements ChannelAdapter {
           content: JSON.stringify({ text }),
         },
       });
-      console.info(`[FEISHU] message.reply chatId=${context.chatId} messageId=${messageId}`);
+      Logger.info('FEISHU', `message.reply chatId=${context.chatId} messageId=${messageId}`);
     } catch (error: unknown) {
       const errMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[FEISHU] message.reply 失败 messageId=${messageId}:`, error);
+      Logger.error('FEISHU', `message.reply 失败 messageId=${messageId}`, error);
       throw new Error(errMessage);
     }
   }

@@ -1,5 +1,6 @@
 import type { AgentOutboundEnvelope } from '@meek/message-bus';
 import { publishOutboundEvent } from '@meek/message-bus';
+import { Logger } from '@meek/shared/logger';
 
 import { getChannelAdapter } from '../channels/registry.js';
 
@@ -12,7 +13,7 @@ export async function routeOutboundEnvelope(envelope: AgentOutboundEnvelope): Pr
 
   const adapter = getChannelAdapter(envelope.channel);
   if (!adapter) {
-    console.warn(`[BUS] 出站路由失败：未注册 channel=${envelope.channel}`);
+    Logger.warn('BUS', `出站路由失败：未注册 channel=${envelope.channel}`);
     return;
   }
   adapter.sendOutbound(envelope);

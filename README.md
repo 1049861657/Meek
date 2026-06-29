@@ -22,7 +22,7 @@ pnpm db:migrate
 pnpm dev
 ```
 
-`pnpm dev` 并行启动 **Web**（http://localhost:3000）与 **Worker**（健康检查 http://localhost:4001/health）。
+`pnpm dev` 从根目录 `.env` 加载 `PORT` / `WORKER_PORT`（经 Turbo 传给 Web；Worker 另用 `node --env-file`）。默认 Web `http://localhost:3000`、Worker `http://localhost:4001/health`。
 
 ### 常用命令
 
@@ -46,7 +46,7 @@ Meek/
 │   ├── db/           # Prisma schema + client
 │   └── shared/       # 跨进程共享工具
 ├── prisma.config.ts  # Prisma 7 配置（schema 在 packages/db）
-└── todos/            # M0～M5 + T1/T2 任务书
+└── todos/            # M0～M5 + T1 任务书
 ```
 
 ## 迁移进度

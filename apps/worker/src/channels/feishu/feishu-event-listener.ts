@@ -1,4 +1,5 @@
 import * as Lark from '@larksuiteoapi/node-sdk';
+import { Logger } from '@meek/shared/logger';
 
 import { publishFeishuInboundFromEvent } from '../publish-im-inbound.js';
 import type { FeishuReceiveMessageEvent } from './feishu-event.types.js';
@@ -30,12 +31,12 @@ export function startFeishuEventListener(): void {
   const credentials = readFeishuCredentials();
   if (!credentials) {
     linkStatus = 'skipped';
-    console.info('[FEISHU] 未配置 FEISHU_APP_ID/FEISHU_APP_SECRET，跳过飞书长连接');
+    Logger.info('FEISHU', '未配置 FEISHU_APP_ID/FEISHU_APP_SECRET，跳过飞书长连接');
     return;
   }
 
   if (wsClient) {
-    console.warn('[FEISHU] 飞书长连接已启动，跳过重复初始化');
+    Logger.warn('FEISHU', '飞书长连接已启动，跳过重复初始化');
     return;
   }
 
@@ -58,9 +59,24 @@ export function startFeishuEventListener(): void {
       }),
     });
     linkStatus = 'connected';
-    console.info('[FEISHU] 飞书长连接已启动（im.message.receive_v1）');
+    Logger.info('FEISHU', '飞书长连接已启动（im.message.receive_v1）');
   } catch (error: unknown) {
     linkStatus = 'disconnected';
-    console.error('[FEISHU] 飞书长连接启动失败:', error);
+    Logger.error('FEISHU', '飞书长连接启动失败', error);
   }
+}
+
+export function stopFeishuEventListener(): void {
+  if (!wsClient) {
+    return;
+  }
+
+  try {
+    wsClient.close();
+  } catch (error: unknown) {
+    Logger.error('FEISHU', '飞书长连接关闭失败', error);
+  }
+
+  wsClient = null;
+  linkStatus = 'skipped';
 }

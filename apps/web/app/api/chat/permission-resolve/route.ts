@@ -1,3 +1,5 @@
+import { Logger } from '@meek/agent-core';
+
 import {
   handlePermissionResolve,
   type PermissionResolveBody,
@@ -12,7 +14,7 @@ export async function POST(req: Request): Promise<Response> {
     return Response.json(result.body, { status: result.status });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[API] permission-resolve 失败:', message);
+    Logger.error('API', `permission-resolve 失败: ${message}`);
     return Response.json({ success: false, error: message }, { status: 500 });
   }
 }

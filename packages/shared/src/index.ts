@@ -37,3 +37,7 @@ export {
   resolveMcpOAuthRedirectUrl,
   resolveRequestPublicOrigin,
 } from './web-origin.js';
+export {
+  resolveDefaultWorkerPort,
+  resolveWorkerHttpBase,
+} from './worker-origin.js';

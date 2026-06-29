@@ -1,3 +1,5 @@
+import { Logger } from '@meek/agent-core';
+
 import { handleMcpOAuthCallback } from '@/lib/mcp/mcp-oauth-handlers';
 
 export const runtime = 'nodejs';
@@ -31,7 +33,7 @@ export async function GET(req: Request): Promise<Response> {
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[API] OAuth callback 失败:', message);
+    Logger.error('API', `OAuth callback 失败: ${message}`);
     return redirectToMcp({
       oauth: 'error',
       message,

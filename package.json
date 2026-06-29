@@ -7,9 +7,9 @@
     "node": ">=24.7"
   },
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "node --env-file-if-exists=.env ./node_modules/turbo/bin/turbo run dev",
     "build": "turbo run build",
-    "start": "turbo run start",
+    "start": "node --env-file-if-exists=.env ./node_modules/turbo/bin/turbo run start",
     "lint": "turbo run lint",
     "db:generate": "turbo run db:generate",
     "db:migrate": "prisma migrate deploy",
@@ -18,11 +18,11 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@next/env": "^16.2.9",
-    "eslint": "^10.5.0",
+    "eslint": "^10.6.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "prisma": "^7.8.0",
-    "turbo": "^2.9.18",
+    "turbo": "^2.10.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.1"
+    "typescript-eslint": "^8.62.0"
   }
 }

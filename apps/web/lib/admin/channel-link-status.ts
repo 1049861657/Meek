@@ -1,6 +1,8 @@
+import { resolveWorkerHttpBase } from '@meek/shared';
+
 import type { ChannelStatusMap } from '@/lib/admin/types';
 
-const WORKER_HTTP_BASE = 'http://127.0.0.1:4001';
+const WORKER_HTTP_BASE = resolveWorkerHttpBase();
 
 const SKIPPED_STATUS: ChannelStatusMap = {
   dingtalk: 'skipped',

@@ -1,4 +1,5 @@
 import { ConfigService } from '@meek/config-plane';
+import { Logger } from '@meek/agent-core';
 import type { QuickMessage, QuickMessagesPayload } from '@meek/shared';
 
 export async function getQuickMessageCategories(messages: QuickMessage[]): Promise<string[]> {
@@ -16,7 +17,7 @@ export interface QuickMessagesHttpResult {
 
 export async function handleGetQuickMessages(): Promise<QuickMessagesHttpResult> {
   try {
-    console.info('[API] 请求快捷消息配置');
+    Logger.info('API', '请求快捷消息配置');
     const messages = await getQuickMessagesConfig();
     const categories = await getQuickMessageCategories(messages);
     return {
@@ -25,7 +26,7 @@ export async function handleGetQuickMessages(): Promise<QuickMessagesHttpResult>
     };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[API] 获取快捷消息配置失败:', message);
+    Logger.error('API', `获取快捷消息配置失败: ${message}`);
     return {
       status: 500,
       body: {

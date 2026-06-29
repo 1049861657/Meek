@@ -18,7 +18,7 @@ import {
   CONFIG_PROFILE_WEB_DEFAULT,
   ROUTE_MATCH_ALL,
 } from './config-plane.types.js';
-import { logInfo } from './logger.js';
+import { logError, logInfo } from './logger.js';
 
 export interface ConfigPlaneSnapshot {
   profiles: Map<string, AgentProfileRecord>;
@@ -150,7 +150,7 @@ export async function resolveChannelSnapshot(): Promise<ConfigPlaneSnapshot> {
     return snapshot;
   } catch (error) {
     if (lastGoodChannelSnapshot !== null) {
-      console.error('[CONFIG] channel snapshot DB error, falling back to last good:', error);
+      logError('CONFIG', 'channel snapshot DB error, falling back to last good', error);
       return lastGoodChannelSnapshot;
     }
     throw error;

@@ -43,7 +43,9 @@ let rootEnvLoaded = false;
 
 /**
  * 从 monorepo 根目录加载 .env*（官方 @next/env）。
- * Next 在 next.config 调用；Worker 用 `node --env-file=../../.env` 即可。
+ *
+ * - Web：`PORT` 须在 `next dev` 启动前进入进程环境（Next 先绑端口再读配置）；根目录 `pnpm dev` 用 `node --env-file-if-exists=.env turbo …` 注入，经 Turbo `passThroughEnv` 传给 `next dev`。勿用 `node --env-file` 直接包 `next`（子进程 NODE_OPTIONS 报错）。
+ * - Worker：`package.json` 用 `node --env-file=../../.env`（须在模块图加载前注入，因 `@meek/db` 在 import 时读 DATABASE_URL）。
  */
 export function loadRootEnv(fromDir: string = process.cwd()): void {
   if (rootEnvLoaded) {

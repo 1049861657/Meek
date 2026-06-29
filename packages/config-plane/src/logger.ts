@@ -1,11 +1,13 @@
+import { Logger } from '@meek/shared/logger';
+
 export function logInfo(scope: string, message: string): void {
-  console.info(`[${scope}] ${message}`);
+  Logger.info(scope, message);
 }
 
 export function logWarn(scope: string, message: string): void {
-  console.warn(`[${scope}] ${message}`);
+  Logger.warn(scope, message);
 }
 
 export function logError(scope: string, message: string, error?: unknown): void {
-  console.error(`[${scope}] ${message}`, error);
+  Logger.error(scope, message, error);
 }

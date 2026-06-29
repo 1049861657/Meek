@@ -30,10 +30,10 @@
     "@meek/shared": "workspace:*",
     "@vectorize-io/hindsight-client": "^0.8.3",
     "lru-cache": "^11.5.1",
-    "openai": "^6.44.0"
+    "openai": "^6.45.0"
   },
   "devDependencies": {
-    "@types/node": "^25.9.3",
+    "@types/node": "^26.0.1",
     "typescript": "^6.0.3"
   }
 }

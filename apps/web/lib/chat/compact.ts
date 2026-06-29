@@ -1,3 +1,4 @@
+import { Logger } from '@meek/agent-core';
 import { getProviderForUser, type InternalMessage } from '@meek/agent-core/provider';
 
 import { loadAiProvidersConfig } from '@/lib/ai/provider-config';
@@ -68,14 +69,15 @@ export async function handleCompactChat(
   const requestId = generateRequestId();
   const inputChars = countInputChars(messages);
   const wallStarted = Date.now();
-  console.info(
-    `[API] 收到压缩请求 requestId=${requestId} messages=${messages.length} inputChars=${inputChars} ` +
+  Logger.info(
+    'API',
+    `收到压缩请求 requestId=${requestId} messages=${messages.length} inputChars=${inputChars} ` +
       `vendor=${vendor ?? '默认'} compactModel=${compactModel ?? '(默认)'}`
   );
 
   const compacted = await service.compactMessages(messages, compactModel);
   const elapsedMs = Date.now() - wallStarted;
-  console.info(`[API] 压缩完成 requestId=${requestId} elapsedMs=${elapsedMs}`);
+  Logger.info('API', `压缩完成 requestId=${requestId} elapsedMs=${elapsedMs}`);
 
   return {
     status: 200,

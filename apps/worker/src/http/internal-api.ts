@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import type { MCPServer } from '@meek/mcp-runtime';
+import { Logger } from '@meek/shared/logger';
 
 import { handleMcpOAuthAuthorize, handleMcpOAuthFinish } from '../lib/mcp-oauth-handlers.js';
 import {
@@ -337,7 +338,7 @@ export async function handleInternalApi(
     return true;
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[WORKER] Internal API 失败:', message);
+    Logger.error('WORKER', `Internal API 失败: ${message}`);
     sendJson(res, 500, { ok: false, error: message });
     return true;
   }

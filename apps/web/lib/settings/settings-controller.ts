@@ -1,6 +1,7 @@
 import {
   buildAssembledSystemPreview,
   buildSystemPromptSectionPreviews,
+  Logger,
   ToolsConfig,
   type PromptPipelineOptions,
 } from '@meek/agent-core';
@@ -65,7 +66,7 @@ export async function handleUpdateProviders(userId: string, body: unknown): Prom
       throw new Error('保存配置失败');
     }
     await loadAiProvidersConfig(userId);
-    console.info(`[SETTINGS] 已更新 AI 提供商配置 userId=${userId}`);
+    Logger.info('SETTINGS', `已更新 AI 提供商配置 userId=${userId}`);
     return Response.json({ success: true, message: '提供商配置已更新' });
   } catch (error: unknown) {
     return settingsError(500, '更新配置失败', getErrorMessage(error));
@@ -76,7 +77,7 @@ export async function handleResetProviders(userId: string): Promise<Response> {
   try {
     await ConfigService.resetAIProvidersConfig(userId);
     await loadAiProvidersConfig(userId);
-    console.info(`[SETTINGS] 已重置 AI 提供商配置 userId=${userId}`);
+    Logger.info('SETTINGS', `已重置 AI 提供商配置 userId=${userId}`);
     return Response.json({ success: true, message: '已恢复为默认提供商配置' });
   } catch (error: unknown) {
     return settingsError(500, '重置失败', getErrorMessage(error));
@@ -106,7 +107,7 @@ export async function handleResetMcpServers(userId: string): Promise<Response> {
     if (!reload.ok) {
       throw new Error(reload.error);
     }
-    console.info(`[SETTINGS] 已重置 MCP 服务器配置 userId=${userId}`);
+    Logger.info('SETTINGS', `已重置 MCP 服务器配置 userId=${userId}`);
     return Response.json({ success: true, message: '已恢复为默认MCP服务器配置' });
   } catch (error: unknown) {
     return settingsError(500, '重置失败', getErrorMessage(error));
@@ -132,7 +133,7 @@ export async function handleSaveToolPrompt(userId: string, body: unknown): Promi
   }
   try {
     await ConfigService.saveSetting('mcpToolPrompt', prompt, userId);
-    console.info(`[SETTINGS] 工具提示词保存成功 userId=${userId}`);
+    Logger.info('SETTINGS', `工具提示词保存成功 userId=${userId}`);
     return Response.json({ success: true, message: '工具提示词保存成功' });
   } catch (error: unknown) {
     return settingsError(500, getErrorMessage(error));

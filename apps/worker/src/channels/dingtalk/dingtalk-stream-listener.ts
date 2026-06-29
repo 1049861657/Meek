@@ -1,3 +1,4 @@
+import { Logger } from '@meek/shared/logger';
 import { DWClient, TOPIC_ROBOT } from 'dingtalk-stream';
 
 import { publishDingtalkInboundFromDownstream } from '../publish-im-inbound.js';
@@ -44,12 +45,12 @@ export function startDingtalkStreamListener(): void {
   const credentials = readDingtalkCredentials();
   if (!credentials) {
     linkStatus = 'skipped';
-    console.info('[DINGTALK] 未配置 DINGTALK_CLIENT_ID/DINGTALK_CLIENT_SECRET，跳过钉钉 Stream');
+    Logger.info('DINGTALK', '未配置 DINGTALK_CLIENT_ID/DINGTALK_CLIENT_SECRET，跳过钉钉 Stream');
     return;
   }
 
   if (streamClient) {
-    console.warn('[DINGTALK] 钉钉 Stream 已启动，跳过重复初始化');
+    Logger.warn('DINGTALK', '钉钉 Stream 已启动，跳过重复初始化');
     return;
   }
 
@@ -68,12 +69,27 @@ export function startDingtalkStreamListener(): void {
     .connect()
     .then(() => {
       linkStatus = 'connected';
-      console.info('[DINGTALK] 钉钉 Stream 已连接');
+      Logger.info('DINGTALK', '钉钉 Stream 已连接');
     })
     .catch((error: unknown) => {
       linkStatus = 'disconnected';
-      console.error('[DINGTALK] 钉钉 Stream 连接失败:', error);
+      Logger.error('DINGTALK', '钉钉 Stream 连接失败', error);
     });
 
-  console.info('[DINGTALK] 钉钉 Stream 已启动（/v1.0/im/bot/messages/get）');
+  Logger.info('DINGTALK', '钉钉 Stream 已启动（/v1.0/im/bot/messages/get）');
+}
+
+export function stopDingtalkStreamListener(): void {
+  if (!streamClient) {
+    return;
+  }
+
+  try {
+    streamClient.disconnect();
+  } catch (error: unknown) {
+    Logger.error('DINGTALK', '钉钉 Stream 关闭失败', error);
+  }
+
+  streamClient = null;
+  linkStatus = 'skipped';
 }
