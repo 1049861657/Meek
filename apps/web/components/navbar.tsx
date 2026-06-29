@@ -22,16 +22,16 @@ interface ClientInfo {
 
 const NAV_LINKS: NavLink[] = [
   { href: '/', label: '首页', match: (path) => path === '/' },
-  { href: '/ai', label: 'AI聊天', match: (path) => path === '/ai' || path.startsWith('/ai/') },
-  { href: '/info', label: 'MCP服务', match: (path) => path === '/info' || path.startsWith('/info/') },
+  { href: '/chat', label: '聊天', match: (path) => path === '/chat' || path.startsWith('/chat/') },
+  { href: '/mcp', label: 'MCP服务', match: (path) => path === '/mcp' || path.startsWith('/mcp/') },
   {
     href: '/settings',
-    label: '配置管理',
+    label: '模型配置',
     match: (path) => path === '/settings' || path.startsWith('/settings/'),
   },
   {
     href: '/admin',
-    label: '高级配置',
+    label: '系统管理',
     match: (path) => path === '/admin' || path.startsWith('/admin/'),
     superAdminOnly: true,
   },

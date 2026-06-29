@@ -80,14 +80,14 @@
 
 ## 完成检查清单
 
-> Runtime 联机验收移交 [M6-hardening.md](./M6-hardening.md)（建议 M3 Info UI 就绪后执行；代码路径已就绪）。
+> Runtime 联机验收：**按需**（代码路径已就绪；问题单独提修）。
 
-- [ ] 同时连接 2+ MCP 服，工具名不冲突 → **M6**
-- [ ] Info 页手动添加后，echo / large-json / product-list 三服均可连接并 call tool → **M6**
-- [ ] OAuth 远程服 authorize → callback 成功 → **M6**
-- [ ] Info API 返回连接状态、Tools、Resources、Prompts → **M6**（API 已实现）
-- [ ] Agent 聊天可调用远程与 stdio MCP 工具 → **M6**
-- [ ] stdio 服仅在 worker 进程内运行 → **M6**（架构已就绪）
+- [ ] 同时连接 2+ MCP 服，工具名不冲突 → **按需**
+- [ ] Info 页手动添加后，echo / large-json / product-list 三服均可连接并 call tool → **按需**
+- [ ] OAuth 远程服 authorize → callback 成功 → **按需**
+- [ ] Info API 返回连接状态、Tools、Resources、Prompts → **按需**（API 已实现）
+- [ ] Agent 聊天可调用远程与 stdio MCP 工具 → **按需**
+- [ ] stdio 服仅在 worker 进程内运行 → **按需**（架构已就绪）
 
 ## 参考对照
 

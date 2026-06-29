@@ -159,7 +159,7 @@ export function McpModal({ open, onClose, internals }: ChatModalProps): React.Re
             <p className="mcp-servers-empty">
               暂无已启用的 MCP 服务
               <br />
-              请先在 <a href="/info">MCP服务</a> 页连接并启用 MCP
+              请先在 <a href="/mcp">MCP服务</a> 页连接并启用 MCP
             </p>
           ) : (
             servers.map((server) => {
@@ -196,7 +196,7 @@ export function McpModal({ open, onClose, internals }: ChatModalProps): React.Re
                   </label>
                   <a
                     className="mcp-server-tools-link"
-                    href={`/info?serverId=${encodeURIComponent(server.id)}&tab=tools`}
+                    href={`/mcp?serverId=${encodeURIComponent(server.id)}&tab=tools`}
                     title="在 MCP 服务页配置工具"
                   >
                     {formatToolRatio(server)}

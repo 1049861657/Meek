@@ -2,9 +2,9 @@ import { handleMcpOAuthCallback } from '@/lib/mcp/mcp-oauth-handlers';
 
 export const runtime = 'nodejs';
 
-function redirectToInfo(params: Record<string, string>): Response {
+function redirectToMcp(params: Record<string, string>): Response {
   const query = new URLSearchParams(params).toString();
-  const location = query.length > 0 ? `/info?${query}` : '/info';
+  const location = query.length > 0 ? `/mcp?${query}` : '/mcp';
   return new Response(null, {
     status: 302,
     headers: { Location: location },
@@ -25,14 +25,14 @@ export async function GET(req: Request): Promise<Response> {
 
   try {
     const result = await handleMcpOAuthCallback(code, state);
-    return redirectToInfo({
+    return redirectToMcp({
       serverId: result.serverId,
       oauth: 'ok',
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     console.error('[API] OAuth callback 失败:', message);
-    return redirectToInfo({
+    return redirectToMcp({
       oauth: 'error',
       message,
     });

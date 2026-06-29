@@ -46,12 +46,12 @@ Meek/
 │   ├── db/           # Prisma schema + client
 │   └── shared/       # 跨进程共享工具
 ├── prisma.config.ts  # Prisma 7 配置（schema 在 packages/db）
-└── todos/            # M0～M6 迁移任务书
+└── todos/            # M0～M5 + T1/T2 任务书
 ```
 
 ## 迁移进度
 
-见 [`todos/README.md`](todos/README.md)。当前阶段：**M2 MCP 平台**（M1 / MS1 已完成）。
+见 [`todos/README.md`](todos/README.md)。当前阶段：**T1 路由/命名债已偿还**（M0～M5 / MS5 已完成）。
 
 ## 参考
 

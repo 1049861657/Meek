@@ -646,7 +646,7 @@ export function useAdminApp({
 
   const onLoginClick = useCallback((): void => {
     openAuthModal({
-      lead: '登录后管理高级配置',
+      lead: '登录后进行系统管理',
       onSuccess: () => {
         void bootstrap();
       },

@@ -39,9 +39,9 @@
 | MCP-Client | Meek |
 |------------|------|
 | `frontend/index.html` | `apps/web/app/page.tsx` |
-| `frontend/ai.html` | `apps/web/app/ai/` |
+| `frontend/ai.html` | `apps/web/app/chat/` |
 | `frontend/settings.html` | `apps/web/app/settings/` |
-| `frontend/info.html` | `apps/web/app/info/` |
+| `frontend/info.html` | `apps/web/app/mcp/` |
 | `frontend/admin.html` | `apps/web/app/admin/` |
 
 ## 聊天页（`frontend/src/chat/`）

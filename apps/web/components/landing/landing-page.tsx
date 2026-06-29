@@ -103,10 +103,10 @@ export function LandingPage(): ReactElement {
             连接 AI 大模型与工具能力，释放智能应用潜力的桥梁
           </p>
           <div className="landing-hero__cta">
-            <Link href="/ai" className="landing-cta landing-cta--primary">
+            <Link href="/chat" className="landing-cta landing-cta--primary">
               开始 AI 对话
             </Link>
-            <Link href="/info" className="landing-cta landing-cta--secondary">
+            <Link href="/mcp" className="landing-cta landing-cta--secondary">
               查看服务状态
             </Link>
           </div>

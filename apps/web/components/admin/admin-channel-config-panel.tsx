@@ -101,7 +101,7 @@ export function AdminChannelConfigPanel({
   const poolEmpty =
     providers.length === 0 ? (
       <p className="channel-config-empty">
-        绑定账号尚未配置 AI 供应商，请先在「配置管理」中配置。
+        绑定账号尚未配置 AI 供应商，请先在「模型配置」中配置。
       </p>
     ) : null;
 

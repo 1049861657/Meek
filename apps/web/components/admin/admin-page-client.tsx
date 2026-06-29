@@ -42,7 +42,7 @@ export function AdminPageClient(): React.ReactElement {
   if (viewMode === 'loading') {
     return (
       <div className="admin-page">
-        <PageLoadingSpinner message="正在加载高级配置…" />
+        <PageLoadingSpinner message="正在加载系统管理…" />
       </div>
     );
   }
@@ -56,7 +56,7 @@ export function AdminPageClient(): React.ReactElement {
         >
           <div className="w-full max-w-[400px] rounded-xl border border-[var(--color-border)] bg-white px-7 py-8 shadow-[0_8px_28px_rgb(0_0_0/0.06)]">
             <header className="text-center">
-              <h1 className="m-0 text-[22px] font-semibold tracking-tight">高级配置</h1>
+              <h1 className="m-0 text-[22px] font-semibold tracking-tight">系统管理</h1>
               <p className="mt-2 text-sm text-[var(--color-text-muted)]">
                 管理用户账号、IM 渠道绑定与 guest 默认配置归属
               </p>
@@ -94,7 +94,7 @@ export function AdminPageClient(): React.ReactElement {
           <div className="w-full max-w-[400px] rounded-xl border border-[var(--color-border)] bg-white px-7 py-8 text-center shadow-[0_8px_28px_rgb(0_0_0/0.06)]">
             <h1 className="m-0 text-lg font-semibold">无权限</h1>
             <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-              高级配置仅超级管理员可访问
+              系统管理仅超级管理员可访问
             </p>
           </div>
         </div>
@@ -112,7 +112,7 @@ export function AdminPageClient(): React.ReactElement {
         ) : null}
 
         <header className="page-hero">
-          <h1 className="page-hero__title">高级配置</h1>
+          <h1 className="page-hero__title">系统管理</h1>
           <p className="page-hero__sub">管理用户账号、IM 渠道绑定与 guest 默认配置归属</p>
         </header>
 
@@ -120,7 +120,7 @@ export function AdminPageClient(): React.ReactElement {
           id="section-tabs"
           className="section-tabs"
           role="tablist"
-          aria-label="高级配置分区"
+          aria-label="系统管理分区"
         >
           <button
             type="button"

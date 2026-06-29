@@ -77,7 +77,7 @@ export function getChannelConfigSaveValidationError(
   form: Pick<ChannelConfigFormPayload, 'vendor' | 'defaultModel'>,
 ): string | null {
   if (providers.length === 0) {
-    return '绑定账号尚未配置 AI 供应商，请先在「配置管理」中配置';
+    return '绑定账号尚未配置 AI 供应商，请先在「模型配置」中配置';
   }
   if (!form.defaultModel) {
     return '请选择对话模型';

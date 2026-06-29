@@ -2,7 +2,7 @@
 name: meek-migrate
 description: >-
   Migrate MCP-Client landed source into Meek (Next.js 16 + Worker) with behavior
-  parity. Use when the user says 迁移, Meek, M0-M6, 复刻, MCP-Client 参考, or asks to
+  parity. Use when the user says 迁移, Meek, M0-M5, 复刻, MCP-Client 参考, or asks to
   implement a migration task with optional 优化/改进/重构. After each batch: readonly
   generalPurpose gate (not Bugbot), adjudicate all proposals; gate items append as Mx-yy-Dnn
   sub-items under parent tasks and complete same batch (see delivery.md).

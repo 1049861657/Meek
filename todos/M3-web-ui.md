@@ -14,7 +14,7 @@
 
 用 **React + Next.js App Router** 全量重写 5 个页面、聊天页 **9 个 Modal**、共享 Design System；**行为 / API 路径 / 存储键** 与参考产品一致，**禁止**拷贝 JS 文件。
 
-交付 MS3：**5 页 + storage-contract 契约 + 聊天 guest 全功能 + Info 页可联调**；Settings/Admin 写操作与 Authed 会话在 M4 门控通过后收尾（M6 E2E）。
+交付 MS3：**5 页 + storage-contract 契约 + 聊天 guest 全功能 + Info 页可联调**；Settings/Admin 写操作与 Authed 会话在 M4 门控通过后收尾。
 
 ---
 
@@ -96,15 +96,15 @@ apps/web/
 | 路由 | `page.tsx` | Client 子树 |
 |------|------------|---------------|
 | `/` | RSC | M3-06 Landing |
-| `/ai` | RSC 壳 | `ChatPanel` |
-| `/info` | RSC 壳 | `InfoPageClient` |
+| `/ai` → `/chat`（T1） | RSC 壳 | `ChatPanel` |
+| `/info` → `/mcp`（T1） | RSC 壳 | `InfoPageClient` |
 | `/settings` | RSC 壳 | `SettingsPageClient` |
 | `/admin` | RSC 壳 | `AdminPageClient` |
 
 | 路由 | `loading.tsx` | `error.tsx` |
 |------|---------------|-------------|
-| `/ai` | 通用 spinner | 有 |
-| `/info` | Info 加载壳 | 有 |
+| `/ai` → `/chat`（T1） | 通用 spinner | 有 |
+| `/info` → `/mcp`（T1） | Info 加载壳 | 有 |
 | `/settings` | 通用 | 有 |
 | `/admin` | 通用 | 有 |
 | 全局 | — | `app/error.tsx` |
@@ -342,7 +342,7 @@ apps/web/
 - [x] **M3-08-06** SSE：`process-sse-stream` 多 tool 卡片；`permission-resolve-client`；`stop()` + `AbortSignal`
 - [x] **M3-08-07** Info：OAuth `info-api` authorize；`reload-config`；`ToolTestDrawer`
 - [x] **M3-08-08** `chat-markdown` + 9 Modal `dynamic()` lazy；`pnpm build` 通过
-- [x] **M3-08-09** M4 门控项登记 → `M6-02-04`
+- [x] **M3-08-09** M4 门控项登记（M4 已验收；运行时问题按需修）
 - [x] **M3-08-10** **MS3 签收**：M3-00～M3-07 全勾选；`/` `/ai` `/info` `/settings` `/admin` 可访问
 
 ---
