@@ -62,7 +62,7 @@ export function ChatToolbar({
       <div className="chat-toolbar__actions">
         <button
           type="button"
-          className="chat-toolbar__btn"
+          className="chat-toolbar__btn chat-toolbar__btn--mcp"
           title="MCP 服务器工具"
           aria-label="MCP 服务器工具"
           disabled={isStreaming}
@@ -75,7 +75,7 @@ export function ChatToolbar({
         </button>
         <button
           type="button"
-          className="chat-toolbar__btn"
+          className="chat-toolbar__btn chat-toolbar__btn--history"
           title="历史记录"
           aria-label="历史记录"
           disabled={isStreaming}
@@ -85,7 +85,7 @@ export function ChatToolbar({
         </button>
         <button
           type="button"
-          className="chat-toolbar__btn"
+          className="chat-toolbar__btn chat-toolbar__btn--compact"
           title="请求上下文"
           aria-label="请求上下文"
           disabled={isStreaming}
@@ -95,7 +95,7 @@ export function ChatToolbar({
         </button>
         <button
           type="button"
-          className="chat-toolbar__btn"
+          className="chat-toolbar__btn chat-toolbar__btn--clear"
           title="清除对话"
           aria-label="清除对话"
           disabled={isStreaming}
@@ -105,7 +105,7 @@ export function ChatToolbar({
         </button>
         <button
           type="button"
-          className="chat-toolbar__btn"
+          className="chat-toolbar__btn chat-toolbar__btn--settings"
           title="设置"
           aria-label="设置"
           disabled={isStreaming}

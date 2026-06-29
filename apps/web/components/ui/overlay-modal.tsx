@@ -11,6 +11,8 @@ export interface OverlayModalProps {
   className?: string;
   panelClassName?: string;
   wide?: boolean;
+  /** 为 true 时不套用通用 ui-modal-panel，仅使用 panelClassName（聊天专用模态） */
+  customPanel?: boolean;
   closeOnBackdrop?: boolean;
 }
 
@@ -22,6 +24,7 @@ export function OverlayModal({
   className,
   panelClassName,
   wide = false,
+  customPanel = false,
   closeOnBackdrop = true,
 }: OverlayModalProps): React.ReactElement | null {
   const handleBackdropClick = useCallback(
@@ -59,8 +62,8 @@ export function OverlayModal({
     >
       <div
         className={cn(
-          'ui-modal-panel',
-          wide && 'ui-modal-panel--wide',
+          !customPanel && 'ui-modal-panel',
+          !customPanel && wide && 'ui-modal-panel--wide',
           panelClassName,
         )}
         role="dialog"

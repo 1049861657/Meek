@@ -33,22 +33,13 @@ export function QuickMessageBubbles({
       return;
     }
 
-    let cancelled = false;
-    void loadLocalQuickMessages()
-      .then(({ messages }) => {
-        if (cancelled || messages.length === 0) {
-          return;
-        }
-        const picked = pickRandomMessages(messages, BUBBLE_COUNT);
-        setLabels(picked.map((item) => item.content));
-      })
-      .catch((error: unknown) => {
-        console.error('加载随机快捷消息失败:', error);
-      });
-
-    return () => {
-      cancelled = true;
-    };
+    const { messages } = loadLocalQuickMessages();
+    if (messages.length === 0) {
+      setLabels([]);
+      return;
+    }
+    const picked = pickRandomMessages(messages, BUBBLE_COUNT);
+    setLabels(picked.map((item) => item.content));
   }, [mode, visible]);
 
   if (!visible || labels.length === 0) {
@@ -63,14 +54,21 @@ export function QuickMessageBubbles({
   return (
     <div className={containerClass}>
       {labels.map((label, index) => (
-        <button
+        <div
           key={`${mode}-${index}-${label}`}
-          type="button"
+          role="button"
+          tabIndex={0}
           className={bubbleClass}
           onClick={() => onSelect(label)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              onSelect(label);
+            }
+          }}
         >
           {label}
-        </button>
+        </div>
       ))}
     </div>
   );

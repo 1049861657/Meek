@@ -10,10 +10,10 @@
 
 
 .chat-page {
-  @apply m-0 min-h-screen bg-[var(--color-page-bg)] font-sans text-[var(--color-text)] antialiased;
+  @apply m-0 flex h-[calc(100vh-var(--spacing-navbar))] max-w-none flex-col overflow-hidden bg-[var(--color-page-bg)] font-sans text-[var(--color-text)] antialiased p-0;
 }
 
-.chat-page button:not(.navbar *):not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.mcp-action-chip):not(.mcp-footer-btn):not(.history-action-btn):not(.history-link-btn):not(.app-confirm-btn):not(.context-footer-btn):not(.settings-nav-item):not(.ui-toggle):not(.settings-chip):not(.settings-btn-ghost):not(.settings-text-link):not(.settings-modal-close):not(.settings-seg-btn):not(.ui-seg-btn):not(.settings-stepper-btn):not(.ui-stepper-btn):not(.fb-select__trigger):not(.fb-select__option):not(.ui-chip):not(.qm-btn-add):not(.qm-cat-add-btn):not(.qm-cat-item):not(.qm-cat-menu-btn):not(.qm-icon-btn):not(.qm-status-pill):not(.qm-result-seg-btn):not(.qm-btn-ghost):not(.qm-btn-primary):not(.qm-modal-close):not(.qm-ctx-btn):not(.md-mode-tab):not(.md-btn-primary):not(.md-close) {
+.chat-page button:not(.navbar *):not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.mcp-action-chip):not(.mcp-footer-btn):not(.history-action-btn):not(.history-link-btn):not(.app-confirm-btn):not(.context-footer-btn):not(.settings-nav-item):not(.ui-toggle):not(.settings-chip):not(.settings-btn-ghost):not(.settings-text-link):not(.settings-modal-close):not(.settings-seg-btn):not(.ui-seg-btn):not(.settings-stepper-btn):not(.ui-stepper-btn):not(.fb-select__trigger):not(.fb-select__option):not(.ui-chip):not(.qm-btn-add):not(.qm-cat-add-btn):not(.qm-cat-item):not(.qm-cat-menu-btn):not(.qm-icon-btn):not(.qm-status-pill):not(.qm-result-seg-btn):not(.qm-btn-ghost):not(.qm-btn-primary):not(.qm-modal-close):not(.qm-ctx-btn):not(.md-mode-tab):not(.md-btn-primary):not(.md-close):not(.quick-message-bubble):not(.appended-quick-bubble) {
   @apply m-0 cursor-pointer border-0 p-0 font-[inherit];
 }
 
@@ -3641,12 +3641,8 @@
 
 /* ── Meek 组件类名适配（React 结构与参考 DOM 差异） ── */
 @layer components {
-  .chat-page {
-    @apply flex min-h-[calc(100vh-var(--spacing-navbar))] max-w-none flex-col p-0;
-  }
-
   .chat-shell {
-    @apply flex-col gap-0 px-4 pb-4 pt-2;
+    @apply mx-auto flex h-[calc(100vh-var(--spacing-navbar))] w-[98%] max-w-[1600px] flex-col gap-0 overflow-hidden px-4 pb-4 pt-2;
   }
 
   .chat-panel {
@@ -3677,20 +3673,28 @@
     @apply relative flex size-9 shrink-0 items-center justify-center rounded-full text-white shadow-sm transition-[transform,background-color,box-shadow] duration-150;
   }
 
-  .chat-toolbar__btn:nth-child(1) {
+  .chat-toolbar__btn--mcp {
     @apply bg-[#5c6bc0] hover:bg-[#3949ab];
   }
 
-  .chat-toolbar__btn:nth-child(2) {
+  .chat-toolbar__btn--history {
     @apply bg-[#2196f3] hover:bg-[#1976d2];
   }
 
-  .chat-toolbar__btn:nth-child(3) {
+  .chat-toolbar__btn--compact {
     @apply bg-[#607d8b] hover:bg-[#455a64];
   }
 
-  .chat-toolbar__btn:nth-child(4) {
+  .chat-toolbar__btn--clear {
+    @apply bg-[#f44336] hover:bg-[#d32f2f];
+  }
+
+  .chat-toolbar__btn--settings {
     @apply bg-[#ff9800] hover:bg-[#f57c00];
+  }
+
+  .chat-toolbar__btn svg {
+    @apply size-4;
   }
 
   .chat-toolbar__btn:hover:not(:disabled) {
@@ -3722,11 +3726,20 @@
   }
 
   .chat-composer__actions {
-    @apply absolute bottom-[30px] right-2.5 flex gap-2;
+    @apply absolute bottom-[30px] right-3 z-10 flex gap-2;
   }
 
   .chat-composer__icon-btn {
-    @apply flex size-9 items-center justify-center rounded-full text-white shadow-sm transition-[transform,background-color] duration-150;
+    @apply flex size-9 shrink-0 items-center justify-center rounded-full text-white shadow-sm transition-[transform,background-color,box-shadow] duration-150;
+  }
+
+  .chat-composer__icon-btn svg {
+    @apply size-[18px];
+  }
+
+  .chat-composer__icon-btn--new-session,
+  .chat-composer__icon-btn--quick {
+    @apply bg-[#f0f0f0] text-[#444] hover:bg-[#e5e5e5];
   }
 
   .chat-composer__icon-btn--send {
@@ -3737,8 +3750,12 @@
     @apply bg-[#ef4444] hover:bg-[#dc2626];
   }
 
-  .chat-composer__icon-btn:not(.chat-composer__icon-btn--send):not(.chat-composer__icon-btn--stop) {
-    @apply bg-[#f0f0f0] text-[#444];
+  .chat-composer__icon-btn:hover:not(:disabled) {
+    @apply scale-105 shadow-md;
+  }
+
+  .chat-composer__icon-btn:disabled {
+    @apply cursor-not-allowed scale-100 opacity-45;
   }
 
   .chat-message--user {

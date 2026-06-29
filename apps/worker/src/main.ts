@@ -17,7 +17,7 @@ function listenServer(server: Server, port: number, host: string): Promise<void>
       if (error.code === 'EADDRINUSE') {
         Logger.error(
           'WORKER',
-          `端口 ${port} 已被占用（可能有残留 Worker 进程）。请执行: netstat -ano | findstr :${port}`
+          `端口 ${port} 已被占用（可能有残留 Worker 进程）。请执行: npx kill-port ${port}`
         );
       }
       reject(error);

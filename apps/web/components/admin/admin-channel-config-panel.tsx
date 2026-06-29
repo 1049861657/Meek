@@ -401,39 +401,39 @@ export function AdminChannelConfigPanel({
             </div>
           </div>
         </div>
+        <footer className="channel-config-actions">
+          <div className="channel-config-actions__btns">
+            <button
+              type="button"
+              className="channel-config-btn channel-config-btn--secondary channel-cfg-fill-defaults"
+              data-channel={channel}
+              disabled={writeDisabled}
+              onClick={fillDefaults}
+            >
+              恢复默认配置
+            </button>
+            <button
+              type="button"
+              className="channel-config-btn channel-config-btn--primary channel-cfg-save"
+              data-channel={channel}
+              disabled={writeDisabled}
+              onClick={() => onSave(form)}
+            >
+              保存配置
+            </button>
+          </div>
+          {okMessage ? (
+            <p className="save-feedback save-feedback--ok" data-config-ok={channel}>
+              {okMessage}
+            </p>
+          ) : null}
+          {errMessage ? (
+            <p className="save-feedback save-feedback--err" data-config-err={channel}>
+              {errMessage}
+            </p>
+          ) : null}
+        </footer>
       </div>
-      <footer className="channel-config-actions">
-        <div className="channel-config-actions__btns">
-          <button
-            type="button"
-            className="channel-config-btn channel-config-btn--secondary channel-cfg-fill-defaults"
-            data-channel={channel}
-            disabled={writeDisabled}
-            onClick={fillDefaults}
-          >
-            恢复默认配置
-          </button>
-          <button
-            type="button"
-            className="channel-config-btn channel-config-btn--primary channel-cfg-save"
-            data-channel={channel}
-            disabled={writeDisabled}
-            onClick={() => onSave(form)}
-          >
-            保存配置
-          </button>
-        </div>
-        {okMessage ? (
-          <p className="save-feedback save-feedback--ok" data-config-ok={channel}>
-            {okMessage}
-          </p>
-        ) : null}
-        {errMessage ? (
-          <p className="save-feedback save-feedback--err" data-config-err={channel}>
-            {errMessage}
-          </p>
-        ) : null}
-      </footer>
     </section>
   );
 }

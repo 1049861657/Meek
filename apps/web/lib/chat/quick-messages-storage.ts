@@ -1,5 +1,3 @@
-import { fetchJson } from '@/lib/api/fetch-json';
-
 import { CHAT_QUICK_MESSAGES_KEY, type QuickMessagesStorage } from './storage-contract';
 
 export interface QuickMessageItem {
@@ -17,44 +15,47 @@ export interface QuickMessagesData {
 
 export type QuickBubbleMode = 'random' | 'appended';
 
-function parseQuickMessagesResponse(data: unknown): QuickMessagesData {
+const EMPTY_QUICK_MESSAGES: QuickMessagesData = {
+  messages: [],
+  categories: [],
+};
+
+function parseLocalQuickMessages(data: unknown): QuickMessagesData {
   if (!data || typeof data !== 'object') {
-    throw new Error('响应格式无效');
+    throw new Error('本地快捷消息格式无效');
   }
   const payload = data as { messages?: unknown; categories?: unknown };
   if (!Array.isArray(payload.messages)) {
-    throw new Error('响应缺少 messages');
+    throw new Error('本地快捷消息缺少 messages');
   }
   if (!Array.isArray(payload.categories)) {
-    throw new Error('响应缺少 categories');
+    throw new Error('本地快捷消息缺少 categories');
   }
   return {
     messages: payload.messages as QuickMessageItem[],
     categories: payload.categories.filter(
-      (item): item is string => typeof item === 'string' && item.trim().length > 0
+      (item): item is string => typeof item === 'string' && item.trim().length > 0,
     ),
   };
 }
 
 export function persistLocalQuickMessages(
   messages: QuickMessageItem[],
-  categories: string[]
+  categories: string[],
 ): void {
   const payload: QuickMessagesStorage = { messages, categories };
   localStorage.setItem(CHAT_QUICK_MESSAGES_KEY, JSON.stringify(payload));
 }
 
-export async function loadLocalQuickMessages(): Promise<QuickMessagesData> {
+/** 从 localStorage 读取快捷消息；无数据时返回空列表 */
+export function loadLocalQuickMessages(): QuickMessagesData {
   try {
     const raw = localStorage.getItem(CHAT_QUICK_MESSAGES_KEY);
     if (raw) {
-      return parseQuickMessagesResponse(JSON.parse(raw));
+      return parseLocalQuickMessages(JSON.parse(raw));
     }
   } catch {
-    /* 本地损坏则回落服务端种子 */
+    /* 损坏时回落空数据 */
   }
-
-  const seed = parseQuickMessagesResponse(await fetchJson('/api/config/quick-messages'));
-  persistLocalQuickMessages(seed.messages, seed.categories);
-  return seed;
+  return EMPTY_QUICK_MESSAGES;
 }

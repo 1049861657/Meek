@@ -17,8 +17,6 @@ export type {
   PermissionFeatureConfig,
   PublicFeatureConfig,
   PublicMemoryFeatureConfig,
-  QuickMessage,
-  QuickMessagesPayload,
   RecoveryFeatureConfig,
   SystemToolDescriptor,
   ToolsFeatureConfig,

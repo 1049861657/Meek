@@ -107,18 +107,3 @@ export interface FeatureConfigApiFailure {
 }
 
 export type FeatureConfigApiResponse = FeatureConfigApiSuccess | FeatureConfigApiFailure;
-
-/** 快捷消息（种子只读） */
-export interface QuickMessage {
-  id?: string;
-  sortId: number;
-  content: string;
-  result: string;
-  category: string;
-}
-
-/** GET /api/config/quick-messages 响应体 */
-export interface QuickMessagesPayload {
-  messages: QuickMessage[];
-  categories: string[];
-}

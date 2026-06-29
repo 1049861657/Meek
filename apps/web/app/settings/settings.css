@@ -210,17 +210,6 @@
 
 .settings-default-select {
   width: 100%;
-  padding: 8px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: #fff;
-  color: var(--color-text);
-  font-size: 0.875rem;
-}
-
-.settings-default-select:focus {
-  outline: 2px solid var(--color-brand-light);
-  border-color: var(--color-brand);
 }
 
 .settings-main {

@@ -1101,7 +1101,7 @@
 }
 
 .admin-shell.admin-shell--connected {
-  @apply px-6 py-7 pb-12 min-[900px]:px-8;
+  @apply mx-auto w-full max-w-[1440px] px-6 py-7 pb-12 min-[900px]:px-8;
 }
 
 body.admin-page:not(.admin-page--connected) {

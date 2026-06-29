@@ -54,13 +54,12 @@ export function ChatComposer({
 
   return (
     <div className="chat-composer-area">
-      <form className="chat-composer" onSubmit={handleSubmit}>
+      <form className="message-input-container" onSubmit={handleSubmit}>
         <textarea
-          className="chat-composer__input"
+          id="message"
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder="请输入您想询问 AI 的问题…"
-          rows={3}
           disabled={disabled && !isStreaming}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
@@ -69,10 +68,10 @@ export function ChatComposer({
             }
           }}
         />
-        <div className="chat-composer__actions">
+        <div className="input-buttons">
           <button
             type="button"
-            className="chat-composer__icon-btn"
+            className="control-button new-session-button"
             title="新建会话"
             aria-label="新建会话"
             disabled={isStreaming}
@@ -82,7 +81,7 @@ export function ChatComposer({
           </button>
           <button
             type="button"
-            className="chat-composer__icon-btn"
+            className="control-button quick-messages-button"
             title="快捷消息"
             aria-label="快捷消息"
             disabled={isStreaming}
@@ -98,7 +97,7 @@ export function ChatComposer({
           {isStreaming ? (
             <button
               type="button"
-              className="chat-composer__icon-btn chat-composer__icon-btn--stop"
+              className="control-button stop-button"
               title="停止生成"
               aria-label="停止生成"
               onClick={onStop}
@@ -108,7 +107,7 @@ export function ChatComposer({
           ) : (
             <button
               type="submit"
-              className="chat-composer__icon-btn chat-composer__icon-btn--send"
+              className="control-button send-button"
               title="发送"
               aria-label="发送"
               disabled={disabled || !text.trim()}

@@ -1,16 +1,13 @@
 /**
- * 配置服务：DB Setting / AIProvider / QuickMessage 读写单入口。
+ * 配置服务：DB Setting / AIProvider 读写单入口。
  * MCP 配置委托 @meek/mcp-runtime；静态默认值仍来自 agent-core feature-config。
  */
 import { prisma, ProviderType } from '@meek/db';
 import type { AIProviderConfig, AIProvidersConfigType } from '@meek/agent-core/provider';
 import { McpConfigService } from '@meek/mcp-runtime';
 import type { MCPConfigType } from '@meek/mcp-runtime';
-import type { QuickMessage } from '@meek/shared';
 
 import { logError, logInfo } from './logger.js';
-
-const QUICK_MESSAGE_CATEGORIES_KEY = 'quickMessageCategories';
 
 export class ConfigService {
   static async getSetting(key: string, userId?: string): Promise<unknown | null> {
@@ -179,43 +176,5 @@ export class ConfigService {
 
   static async resetMCPConfig(userId: string): Promise<void> {
     await McpConfigService.resetMCPConfig(userId);
-  }
-
-  static async getQuickMessageCategories(messages: QuickMessage[]): Promise<string[]> {
-    const stored = await ConfigService.getSetting(QUICK_MESSAGE_CATEGORIES_KEY);
-    const fromMessages = messages
-      .map((msg) => msg.category)
-      .filter(
-        (category): category is string =>
-          typeof category === 'string' && category.trim().length > 0
-      );
-    const base = Array.isArray(stored)
-      ? stored.filter(
-          (item): item is string => typeof item === 'string' && item.trim().length > 0
-        )
-      : [];
-    const merged = [...base];
-    for (const category of fromMessages) {
-      if (!merged.includes(category)) {
-        merged.push(category);
-      }
-    }
-    return merged;
-  }
-
-  static async getQuickMessagesConfig(): Promise<QuickMessage[]> {
-    try {
-      const messages = await prisma.quickMessage.findMany({ orderBy: { sortId: 'asc' } });
-      return messages.map((msg) => ({
-        id: msg.id,
-        sortId: msg.sortId,
-        content: msg.content,
-        result: msg.result,
-        category: msg.category,
-      }));
-    } catch (error) {
-      logError('ConfigService', '获取快捷消息配置失败:', error);
-      throw error;
-    }
   }
 }

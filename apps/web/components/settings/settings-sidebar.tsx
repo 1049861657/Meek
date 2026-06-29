@@ -96,7 +96,7 @@ export function SettingsSidebar({
           </label>
           <DropdownSelect
             id="default-provider"
-            className="field-select settings-default-select"
+            className="settings-default-select"
             value={defaultProvider}
             options={defaultOptions}
             placeholder="请选择"
