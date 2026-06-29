@@ -3,7 +3,7 @@ import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { PrismaClient } from './generated/prisma/client';
+import { PrismaClient } from './generated/prisma/client.js';
 
 const PKG_DIR = dirname(fileURLToPath(import.meta.url));
 
@@ -27,4 +27,4 @@ class PrismaInstance {
 
 export const prisma = PrismaInstance.getInstance();
 
-export { PrismaClient } from './generated/prisma/client';
+export { PrismaClient } from './generated/prisma/client.js';

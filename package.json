@@ -8,9 +8,10 @@
   },
   "scripts": {
     "dev": "turbo run dev",
-    "build": "pnpm db:generate && turbo run build",
+    "build": "turbo run build",
+    "start": "turbo run start",
     "lint": "turbo run lint",
-    "db:generate": "prisma generate",
+    "db:generate": "turbo run db:generate",
     "db:migrate": "prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev"
   },

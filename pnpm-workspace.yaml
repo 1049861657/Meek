@@ -7,7 +7,7 @@ allowBuilds:
   esbuild: false
   msgpackr-extract: false
   prisma: false
-  protobufjs: set this to true or false
+  protobufjs: false
   sharp: false
 minimumReleaseAgeExclude:
   - openai@6.44.0

@@ -3,6 +3,9 @@ import type { NextConfig } from 'next';
 
 loadRootEnv();
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  // Native addons used by @meek/db — must not be bundled into the server runtime.
+  serverExternalPackages: ['better-sqlite3', '@prisma/adapter-better-sqlite3'],
+};
 
 export default nextConfig;

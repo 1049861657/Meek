@@ -1,13 +1,25 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "dangerouslyDisablePackageManagerCheck": true,
+  "globalEnv": ["DATABASE_URL", "REDIS_URL"],
+  "globalDependencies": [".env"],
   "tasks": {
+    "db:generate": {
+      "cache": false,
+      "outputs": ["src/generated/**"]
+    },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**"]
+      "dependsOn": ["^build", "^db:generate"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "dev": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^db:generate"],
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "dependsOn": ["build", "^build"],
       "cache": false,
       "persistent": true
     },

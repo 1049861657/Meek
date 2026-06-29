@@ -18,12 +18,22 @@ cp .env.example .env
 # Windows: copy .env.example .env
 
 pnpm install
-pnpm db:generate
 pnpm db:migrate
 pnpm dev
 ```
 
 `pnpm dev` 并行启动 **Web**（http://localhost:3000）与 **Worker**（健康检查 http://localhost:4001/health）。
+
+### 常用命令
+
+| 命令 | 用途 | 说明 |
+|------|------|------|
+| `pnpm dev` | 本地开发 | Turbo 先构建依赖包 + 生成 Prisma，再启动 web/worker |
+| `pnpm build` | 生产构建 | 全量编译 packages → apps，Turbo 缓存 `dist/` 与 `.next/` |
+| `pnpm start` | 生产预览 | 等价于 build 完成后启动 web + worker（无需单独 `look`） |
+| `pnpm db:generate` | 生成 Prisma Client | 仅 `@meek/db` 执行，由 Turbo 编排 |
+| `pnpm db:migrate` | 应用迁移 | 使用根目录 `prisma.config.ts` |
+| `pnpm lint` | 代码检查 | 全仓库 ESLint |
 
 ### 目录结构
 

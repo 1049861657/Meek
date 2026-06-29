@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node --env-file=../../.env --import tsx/esm --watch src/main.ts",
     "build": "tsc && tsc -p tsconfig.mcp-servers.json",
-    "start": "node dist/main.js",
+    "start": "node --env-file=../../.env dist/main.js",
     "lint": "eslint src"
   },
   "dependencies": {

@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "prebuild": "prisma generate --schema=prisma/schema.prisma",
+    "db:generate": "prisma generate --schema=prisma/schema.prisma",
     "build": "tsc",
     "lint": "eslint src"
   },

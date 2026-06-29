@@ -4,7 +4,7 @@ export type {
   MemoryIdentityScope,
   PermissionMode,
   ResolvedProfile,
-} from './agent-types';
+} from './agent-types.js';
 export type {
   ChatFeatureConfig,
   ContextFeatureConfig,
@@ -22,18 +22,18 @@ export type {
   RecoveryFeatureConfig,
   SystemToolDescriptor,
   ToolsFeatureConfig,
-} from './feature-config.types';
+} from './feature-config.types.js';
 export {
   closeRedisConnections,
   getIdempotencyRedisConnection,
   getQueueConnectionOptions,
   getRedisUrl,
   getWorkerConnectionOptions,
-} from './redis-connection';
+} from './redis-connection.js';
 export {
   MCP_OAUTH_CALLBACK_PATH,
   resolveDefaultWebOrigin,
   resolveDefaultWebPort,
   resolveMcpOAuthRedirectUrl,
   resolveRequestPublicOrigin,
-} from './web-origin';
+} from './web-origin.js';
