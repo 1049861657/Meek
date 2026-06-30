@@ -298,7 +298,7 @@ export function useChatStream(): UseChatStreamResult {
     const orchestrator = new ChatOrchestrator(
       createInitialOrchestratorState(),
       sessionStore,
-      () => guestData.saveMessageHistory()
+      (entries) => guestData.saveMessageHistory(entries)
     );
 
     guestDataRef.current = guestData;

@@ -19,64 +19,82 @@ interface AssistantMessageViewProps {
       permissionSessionKey: string;
     }
   ) => void;
-  onOpenPlanning?: () => void;
+  onOpenPlanning?: (items?: PlanningItemState[]) => void;
 }
 
-/** Assistant 消息：reasoning / tool / markdown / usage / 耗时 */
+/** Assistant 消息 — 对齐 chat-shell-ui addAIMessage DOM 结构 */
 export function AssistantMessageView({
   message,
   onResolvePermission,
   onOpenPlanning,
 }: AssistantMessageViewProps): React.ReactElement {
   const showThinking =
-    message.isStreaming && !message.content && message.toolCalls.length === 0;
+    message.isStreaming &&
+    !message.content &&
+    !message.reasoning &&
+    message.toolCalls.length === 0;
+  const showCursor = message.isStreaming && !showThinking;
+  const showFooter =
+    !message.isStreaming ||
+    Boolean(message.tokenUsage) ||
+    typeof message.elapsedSeconds === 'number';
 
   return (
-    <article
-      className={`chat-message chat-message--assistant ${message.isError ? 'chat-message--error' : ''} ${message.isStreaming ? 'chat-message--streaming' : ''}`}
-    >
-      <div className="chat-message__bubble">
-        {showThinking ? (
-          <div className="chat-message__thinking">
-            <span className="chat-message__thinking-spinner" aria-hidden="true" />
-            AI 正在思考…
+    <article className="chat-message ai" data-ai-message="true">
+      <div className="avatar" aria-hidden="true">
+        AI
+      </div>
+      <div className="ai-message-wrap">
+        <div className="chat-bubble">
+          <div className="ai-bubble-inner">
+            {showThinking ? (
+              <div className="ai-thinking">
+                <div className="thinking-spinner" aria-hidden="true" />
+                AI正在思考中...
+              </div>
+            ) : null}
+
+            {message.reasoning ? (
+              <ReasoningBlock reasoning={message.reasoning} isStreaming={message.isStreaming} />
+            ) : null}
+
+            {message.toolCalls.map((tool) => (
+              <ToolCallCard
+                key={tool.id}
+                tool={tool}
+                planningItems={message.planningItems}
+                onOpenPlanning={onOpenPlanning}
+                onResolvePermission={(toolCallId, decision, alwaysAllow) => {
+                  if (!tool.permission) {
+                    return;
+                  }
+                  void onResolvePermission?.(toolCallId, decision, {
+                    alwaysAllowSession: alwaysAllow,
+                    codeName: tool.permission.codeName,
+                    permissionSessionKey: tool.permission.permissionSessionKey,
+                  });
+                }}
+              />
+            ))}
+
+            {message.content ? <ChatMarkdown content={message.content} /> : null}
+
+            {showCursor ? <span className="cursor" aria-hidden="true" /> : null}
+          </div>
+        </div>
+
+        {showFooter ? (
+          <div className="ai-message-footer">
+            {typeof message.elapsedSeconds === 'number' ? (
+              <span className="ai-message-meta message-time">
+                {formatMessageTimeWithElapsed(message.elapsedSeconds)}
+              </span>
+            ) : (
+              <span className="ai-message-meta message-time" />
+            )}
+            {message.tokenUsage ? <TokenUsageBadge usage={message.tokenUsage} /> : null}
           </div>
         ) : null}
-
-        {message.contextCompacted ? (
-          <p className="chat-message__notice">上下文已自动压缩</p>
-        ) : null}
-
-        {message.reasoning ? <ReasoningBlock reasoning={message.reasoning} /> : null}
-
-        {message.toolCalls.map((tool) => (
-          <ToolCallCard
-            key={tool.id}
-            tool={tool}
-            onOpenPlanning={onOpenPlanning}
-            onResolvePermission={(toolCallId, decision, alwaysAllow) => {
-              if (!tool.permission) {
-                return;
-              }
-              void onResolvePermission?.(toolCallId, decision, {
-                alwaysAllowSession: alwaysAllow,
-                codeName: tool.permission.codeName,
-                permissionSessionKey: tool.permission.permissionSessionKey,
-              });
-            }}
-          />
-        ))}
-
-        {message.content ? <ChatMarkdown content={message.content} /> : null}
-
-        <footer className="chat-message__meta">
-          {message.tokenUsage ? <TokenUsageBadge usage={message.tokenUsage} /> : null}
-          {typeof message.elapsedSeconds === 'number' ? (
-            <span className="chat-message__time">
-              {formatMessageTimeWithElapsed(message.elapsedSeconds)}
-            </span>
-          ) : null}
-        </footer>
       </div>
     </article>
   );

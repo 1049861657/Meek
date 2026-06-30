@@ -80,6 +80,19 @@ function headersToRecord(
   return Object.keys(result).length > 0 ? result : undefined;
 }
 
+/** Guest 只读：不调用 switch 写接口，用列表行合并当前详情（对齐 MCP-Client selectServerViewLocally） */
+function mergeLocalServerSelection(data: InfoData, serverId: string): InfoData | null {
+  const server = data.availableServers?.find((item) => item.id === serverId);
+  if (!server) {
+    return null;
+  }
+  return {
+    ...data,
+    currentServerId: serverId,
+    server,
+  };
+}
+
 function formToPayload(form: ServerFormState): Record<string, unknown> {
   const payload: Record<string, unknown> = {
     name: form.name.trim(),
@@ -150,17 +163,18 @@ export function useInfoApp(): UseInfoAppResult {
   const [formState, setFormState] = useState<ServerFormState>(DEFAULT_FORM);
   const [expandedTools, setExpandedTools] = useState<Set<number>>(new Set());
   const [testTarget, setTestTarget] = useState<ToolTestTarget | null>(null);
-  const urlIntentApplied = useRef(false);
   const oauthHandled = useRef(false);
 
-  const applyPageInfo = useCallback((data: InfoData) => {
+  const applyPageInfo = useCallback((data: InfoData, options?: { initialTab?: InfoTab }) => {
     setCurrentData(data);
     setTestTarget(null);
     setExpandedTools(new Set());
 
     if (data.currentServerId) {
       setView('detail');
-      if (!isServerConnected(data.server.status)) {
+      if (options?.initialTab) {
+        setActiveTab(options.initialTab);
+      } else if (!isServerConnected(data.server.status)) {
         setActiveTab('general');
       }
     } else {
@@ -172,60 +186,47 @@ export function useInfoApp(): UseInfoAppResult {
     setShellReady(true);
   }, []);
 
-  const selectServerViewLocally = useCallback((serverId: string) => {
-    setCurrentData((prev) => {
-      if (!prev?.availableServers) {
-        return prev;
+  const applyLocalServerSwitch = useCallback(
+    (base: InfoData, serverId: string, options?: { initialTab?: InfoTab }): boolean => {
+      const localData = mergeLocalServerSelection(base, serverId);
+      if (!localData) {
+        return false;
       }
-      const server = prev.availableServers.find((item) => item.id === serverId);
-      if (!server) {
-        return prev;
-      }
-      return {
-        ...prev,
-        currentServerId: serverId,
-        server,
-      };
-    });
-    setView('detail');
-    setLoading(false);
-    setShellReady(true);
-  }, []);
-
-  const applyUrlIntent = useCallback(
-    async (data: InfoData) => {
-      if (urlIntentApplied.current) {
-        return;
-      }
-
-      const serverId = searchParams.get('serverId') ?? '';
-      const tab = searchParams.get('tab') ?? '';
-      if (!serverId || !data.availableServers?.some((server) => server.id === serverId)) {
-        return;
-      }
-
-      urlIntentApplied.current = true;
-
-      let nextData = data;
-      if (data.currentServerId !== serverId) {
-        try {
-          nextData = await switchServerApi(serverId);
-          applyPageInfo(nextData);
-        } catch (error) {
-          if (isUnauthorizedError(error)) {
-            selectServerViewLocally(serverId);
-            return;
-          }
-          showApiError(error, '切换服务器失败');
-          return;
-        }
-      }
-
-      if (tab === 'tools' && isServerConnected(nextData.server.status)) {
-        setActiveTab('tools');
-      }
+      applyPageInfo(localData, options?.initialTab ? { initialTab: options.initialTab } : undefined);
+      return true;
     },
-    [applyPageInfo, searchParams, selectServerViewLocally],
+    [applyPageInfo],
+  );
+
+  const resolveDeepLinkTarget = useCallback(
+    (data: InfoData): { serverId: string; initialTab?: InfoTab } | null => {
+      const urlServerId = searchParams.get('serverId') ?? '';
+      const urlTab = searchParams.get('tab') ?? '';
+      const servers = data.availableServers ?? [];
+
+      let serverId: string | null = null;
+      if (urlServerId && servers.some((server) => server.id === urlServerId)) {
+        serverId = urlServerId;
+      } else if (data.currentServerId) {
+        serverId = data.currentServerId;
+      } else {
+        serverId = servers[0]?.id ?? null;
+      }
+
+      if (!serverId) {
+        return null;
+      }
+
+      const server =
+        data.currentServerId === serverId && data.server.id === serverId
+          ? data.server
+          : servers.find((item) => item.id === serverId);
+      const initialTab =
+        urlTab === 'tools' && server && isServerConnected(server.status) ? ('tools' as const) : undefined;
+
+      return { serverId, ...(initialTab ? { initialTab } : {}) };
+    },
+    [searchParams],
   );
 
   const loadInfo = useCallback(
@@ -238,36 +239,46 @@ export function useInfoApp(): UseInfoAppResult {
         }
 
         const data = await fetchInfoData();
+        const servers = data.availableServers ?? [];
 
-        if (data.availableServers && data.availableServers.length > 0) {
-          const firstServer = data.availableServers[0];
-          if (data.currentServerId) {
-            applyPageInfo(data);
-            await applyUrlIntent(data);
-          } else if (firstServer) {
-            try {
-              const switched = await switchServerApi(firstServer.id);
-              applyPageInfo(switched);
-              await applyUrlIntent(switched);
-            } catch (error) {
-              if (isUnauthorizedError(error)) {
-                selectServerViewLocally(firstServer.id);
-                await applyUrlIntent({
-                  ...data,
-                  currentServerId: firstServer.id,
-                  server: firstServer,
-                });
-                return;
-              }
-              throw error;
-            }
-          }
-        } else {
+        if (servers.length === 0) {
           setCurrentData(data);
           setView('empty');
           setLoading(false);
           setShellReady(true);
+          return;
         }
+
+        const target = resolveDeepLinkTarget(data);
+        if (!target) {
+          setCurrentData(data);
+          setView('empty');
+          setLoading(false);
+          setShellReady(true);
+          return;
+        }
+
+        let pageData = data;
+        if (data.currentServerId !== target.serverId) {
+          try {
+            pageData = await switchServerApi(target.serverId);
+          } catch (error) {
+            if (isUnauthorizedError(error)) {
+              const switched = applyLocalServerSwitch(
+                data,
+                target.serverId,
+                target.initialTab ? { initialTab: target.initialTab } : undefined,
+              );
+              if (!switched) {
+                applyPageInfo(data);
+              }
+              return;
+            }
+            throw error;
+          }
+        }
+
+        applyPageInfo(pageData, target.initialTab ? { initialTab: target.initialTab } : undefined);
       } catch (error) {
         const message = error instanceof Error ? error.message : '获取服务信息失败';
         setLoadError(message);
@@ -275,7 +286,7 @@ export function useInfoApp(): UseInfoAppResult {
         setShellReady(false);
       }
     },
-    [applyPageInfo, applyUrlIntent, selectServerViewLocally],
+    [applyPageInfo, applyLocalServerSwitch, resolveDeepLinkTarget],
   );
 
   useEffect(() => {
@@ -327,7 +338,11 @@ export function useInfoApp(): UseInfoAppResult {
         applyPageInfo(data);
       } catch (error) {
         if (isUnauthorizedError(error)) {
-          selectServerViewLocally(serverId);
+          if (currentData) {
+            applyLocalServerSwitch(currentData, serverId);
+          } else {
+            setLoading(false);
+          }
           return;
         }
         const message = error instanceof Error ? error.message : '切换服务器失败';
@@ -335,7 +350,7 @@ export function useInfoApp(): UseInfoAppResult {
         setLoading(false);
       }
     },
-    [applyPageInfo, selectServerViewLocally],
+    [applyLocalServerSwitch, applyPageInfo, currentData],
   );
 
   const connectServer = useCallback(

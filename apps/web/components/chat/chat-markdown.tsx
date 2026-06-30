@@ -13,12 +13,17 @@ const ChatMarkdownInner = dynamic(
 interface ChatMarkdownProps {
   content: string;
   className?: string;
+  bare?: boolean;
 }
 
 /** Markdown lazy 渲染 — 对齐 markdown-stack.js warm + parse */
-export function ChatMarkdown({ content, className }: ChatMarkdownProps): React.ReactElement {
+export function ChatMarkdown({
+  content,
+  className,
+  bare = false,
+}: ChatMarkdownProps): React.ReactElement {
   if (!content.trim()) {
     return <></>;
   }
-  return <ChatMarkdownInner content={content} className={className} />;
+  return <ChatMarkdownInner content={content} className={className} bare={bare} />;
 }

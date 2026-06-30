@@ -28,6 +28,7 @@ export function SettingsPageClient(): React.ReactElement {
     setDefaultModel,
     updateModel,
     saveProviders,
+    savingProviders,
     copyProvider,
     importProvider,
     toggleApiKeyVisibility,
@@ -109,7 +110,7 @@ export function SettingsPageClient(): React.ReactElement {
             id="save-providers"
             variant="primary"
             data-requires-auth
-            disabled={providersData.providers.length === 0}
+            disabled={providersData.providers.length === 0 || savingProviders}
             onClick={() => void saveProviders()}
           >
             保存配置

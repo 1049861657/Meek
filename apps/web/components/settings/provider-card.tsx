@@ -103,7 +103,12 @@ export function ProviderCard({
           <div className="form-section-title">API 配置</div>
           <div className="form-grid">
             <div className="form-row">
-              <label htmlFor={`provider-api-url-${index}`}>API URL</label>
+              <div className="form-row-label-line">
+                <label htmlFor={`provider-api-url-${index}`}>API URL</label>
+                <p className="field-hint api-url-hint">
+                  如果无法访问请检查是否添加 /v1 后缀
+                </p>
+              </div>
               <input
                 type="text"
                 id={`provider-api-url-${index}`}

@@ -132,94 +132,36 @@ const outboundEnvelopeBaseSchema = {
   requestId: z.string().min(1),
 };
 
+const outboundChannelSchema = z.enum(['web', 'feishu', 'dingtalk']);
+
 const agentOutboundEnvelopeSchema = z.discriminatedUnion('kind', [
   z.object({
     ...outboundEnvelopeBaseSchema,
-    channel: z.literal('web'),
+    channel: outboundChannelSchema,
     kind: z.literal('chunk'),
     payload: chunkPayloadSchema,
   }),
   z.object({
     ...outboundEnvelopeBaseSchema,
-    channel: z.literal('web'),
+    channel: outboundChannelSchema,
     kind: z.literal('context_compacted'),
     payload: contextCompactedPayloadSchema,
   }),
   z.object({
     ...outboundEnvelopeBaseSchema,
-    channel: z.literal('web'),
+    channel: outboundChannelSchema,
     kind: z.literal('usage'),
     payload: usageOutboundPayloadSchema,
   }),
   z.object({
     ...outboundEnvelopeBaseSchema,
-    channel: z.literal('web'),
+    channel: outboundChannelSchema,
     kind: z.literal('done'),
     payload: doneOutboundPayloadSchema,
   }),
   z.object({
     ...outboundEnvelopeBaseSchema,
-    channel: z.literal('web'),
-    kind: z.literal('error'),
-    payload: errorOutboundPayloadSchema,
-  }),
-  z.object({
-    ...outboundEnvelopeBaseSchema,
-    channel: z.literal('feishu'),
-    kind: z.literal('chunk'),
-    payload: chunkPayloadSchema,
-  }),
-  z.object({
-    ...outboundEnvelopeBaseSchema,
-    channel: z.literal('feishu'),
-    kind: z.literal('context_compacted'),
-    payload: contextCompactedPayloadSchema,
-  }),
-  z.object({
-    ...outboundEnvelopeBaseSchema,
-    channel: z.literal('feishu'),
-    kind: z.literal('usage'),
-    payload: usageOutboundPayloadSchema,
-  }),
-  z.object({
-    ...outboundEnvelopeBaseSchema,
-    channel: z.literal('feishu'),
-    kind: z.literal('done'),
-    payload: doneOutboundPayloadSchema,
-  }),
-  z.object({
-    ...outboundEnvelopeBaseSchema,
-    channel: z.literal('feishu'),
-    kind: z.literal('error'),
-    payload: errorOutboundPayloadSchema,
-  }),
-  z.object({
-    ...outboundEnvelopeBaseSchema,
-    channel: z.literal('dingtalk'),
-    kind: z.literal('chunk'),
-    payload: chunkPayloadSchema,
-  }),
-  z.object({
-    ...outboundEnvelopeBaseSchema,
-    channel: z.literal('dingtalk'),
-    kind: z.literal('context_compacted'),
-    payload: contextCompactedPayloadSchema,
-  }),
-  z.object({
-    ...outboundEnvelopeBaseSchema,
-    channel: z.literal('dingtalk'),
-    kind: z.literal('usage'),
-    payload: usageOutboundPayloadSchema,
-  }),
-  z.object({
-    ...outboundEnvelopeBaseSchema,
-    channel: z.literal('dingtalk'),
-    kind: z.literal('done'),
-    payload: doneOutboundPayloadSchema,
-  }),
-  z.object({
-    ...outboundEnvelopeBaseSchema,
-    channel: z.literal('dingtalk'),
+    channel: outboundChannelSchema,
     kind: z.literal('error'),
     payload: errorOutboundPayloadSchema,
   }),

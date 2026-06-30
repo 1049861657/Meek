@@ -1,14 +1,15 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useRef } from 'react';
 
+import type { PlanningItemState } from '@/lib/chat/chat-ui-types';
 import { useChatStream } from '@/hooks/use-chat-stream';
 
 import { ChatComposer } from './chat-composer';
 import { ChatModalsHost } from './modals/chat-modals-host';
 import { ChatToolbar, type ChatToolbarAction } from './chat-toolbar';
 import { MessageList } from './message-list';
-import { PlanningPanel } from './planning-panel';
+import { PlanningPanel, type PlanningPanelHandle } from './planning-panel';
 
 /** 聊天页 Client 岛 — 对齐 chat-shell + ai.html 布局 */
 export function ChatPanel(): React.ReactElement {
@@ -35,14 +36,17 @@ export function ChatPanel(): React.ReactElement {
     internals,
   } = chat;
 
-  const [planningForced, setPlanningForced] = useState(false);
+  const planningPanelRef = useRef<PlanningPanelHandle>(null);
 
   const isStreaming = status === 'streaming' || status === 'loading';
   const disabled = !configReady || (status === 'loading' && !isStreaming);
 
-  const handleOpenPlanning = useCallback((): void => {
-    setPlanningForced(true);
-  }, []);
+  const handleOpenPlanning = useCallback(
+    (items?: PlanningItemState[]): void => {
+      planningPanelRef.current?.openSnapshot(items ?? planningItems);
+    },
+    [planningItems]
+  );
 
   const handleToolbarAction = useCallback(
     (action: ChatToolbarAction): void => {
@@ -62,12 +66,6 @@ export function ChatPanel(): React.ReactElement {
   return (
     <div className="chat-shell">
       <div className="chat-panel">
-        {!configReady ? (
-          <header className="chat-panel__header">
-            <span className="chat-panel__badge">加载配置…</span>
-          </header>
-        ) : null}
-
         {error ? (
           <div className="chat-panel__error" role="alert">
             {error}
@@ -76,6 +74,7 @@ export function ChatPanel(): React.ReactElement {
 
         <MessageList
           messages={messages}
+          configReady={configReady}
           contextCompacted={contextCompacted}
           isStreaming={isStreaming}
           quickBubbleMode={quickBubbleMode}
@@ -86,9 +85,7 @@ export function ChatPanel(): React.ReactElement {
           onOpenPlanning={handleOpenPlanning}
         />
 
-        {planningItems.length > 0 || planningForced ? (
-          <PlanningPanel items={planningItems} />
-        ) : null}
+        <PlanningPanel ref={planningPanelRef} items={planningItems} />
 
         <div className="chat-panel__footer">
           <ChatToolbar

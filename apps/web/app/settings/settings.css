@@ -339,6 +339,26 @@
   color: var(--color-text-muted);
 }
 
+.form-row-label-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.form-row-label-line label {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.api-url-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--color-text-light);
+}
+
 .form-row input,
 .form-row select {
   width: 100%;

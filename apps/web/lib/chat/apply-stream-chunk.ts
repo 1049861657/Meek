@@ -30,6 +30,8 @@ function findToolCall(
   return toolCalls[toolCalls.length - 1];
 }
 
+const TODO_TOOL_NAME = 'todo';
+
 function upsertToolCall(
   toolCalls: ToolCallState[],
   toolInfo: {
@@ -39,6 +41,23 @@ function upsertToolCall(
     source?: 'system' | 'mcp';
   }
 ): ToolCallState[] {
+  if (toolInfo.name === TODO_TOOL_NAME) {
+    const existingTodo = toolCalls.find((tool) => tool.name === TODO_TOOL_NAME);
+    if (existingTodo) {
+      return toolCalls.map((tool) =>
+        tool.name === TODO_TOOL_NAME
+          ? {
+              ...tool,
+              id: toolInfo.id ?? tool.id,
+              revision: (tool.revision ?? 1) + 1,
+              args: formatArgs(toolInfo.args),
+              source: toolInfo.source ?? tool.source,
+            }
+          : tool
+      );
+    }
+  }
+
   const id = toolInfo.id ?? `tool-${toolCalls.length}`;
   const existing = toolCalls.find((tool) => tool.id === id);
   if (existing) {
@@ -55,6 +74,18 @@ function upsertToolCall(
       status: 'running',
     },
   ];
+}
+
+function syncPlanningItemsToTodo(
+  toolCalls: ToolCallState[],
+  items: PlanningItemState[]
+): ToolCallState[] {
+  if (!toolCalls.some((tool) => tool.name === TODO_TOOL_NAME)) {
+    return toolCalls;
+  }
+  return toolCalls.map((tool) =>
+    tool.name === TODO_TOOL_NAME ? { ...tool, planningItems: items } : tool
+  );
 }
 
 function updateToolCall(
@@ -88,7 +119,7 @@ export function applyStreamChunk(
   }
 
   if (typeof jsonData.reasoning_content === 'string' && jsonData.reasoning_content.length > 0) {
-    next = { ...next, reasoning: jsonData.reasoning_content };
+    next = { ...next, reasoning: (next.reasoning ?? '') + jsonData.reasoning_content };
   }
 
   const toolCall = jsonData.tool_call;
@@ -254,10 +285,13 @@ export function applyStreamChunk(
 
   const planningUpdate = jsonData.planning_update;
   if (planningUpdate && typeof planningUpdate === 'object') {
-    const items = (planningUpdate as { items?: unknown[] }).items ?? [];
+    const items = ((planningUpdate as { items?: unknown[] }).items ?? []).map(
+      (item) => ({ ...(item as PlanningItemState) })
+    );
     next = {
       ...next,
-      planningItems: items.map((item) => ({ ...(item as PlanningItemState) })),
+      planningItems: items,
+      toolCalls: syncPlanningItemsToTodo(next.toolCalls, items),
     };
   }
 

@@ -1,4 +1,4 @@
-﻿@import 'tailwindcss';
+@import 'tailwindcss';
 
 .hidden {
   @apply !hidden;
@@ -13,7 +13,7 @@
   @apply m-0 flex h-[calc(100vh-var(--spacing-navbar))] max-w-none flex-col overflow-hidden bg-[var(--color-page-bg)] font-sans text-[var(--color-text)] antialiased p-0;
 }
 
-.chat-page button:not(.navbar *):not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.mcp-action-chip):not(.mcp-footer-btn):not(.history-action-btn):not(.history-link-btn):not(.app-confirm-btn):not(.context-footer-btn):not(.settings-nav-item):not(.ui-toggle):not(.settings-chip):not(.settings-btn-ghost):not(.settings-text-link):not(.settings-modal-close):not(.settings-seg-btn):not(.ui-seg-btn):not(.settings-stepper-btn):not(.ui-stepper-btn):not(.fb-select__trigger):not(.fb-select__option):not(.ui-chip):not(.qm-btn-add):not(.qm-cat-add-btn):not(.qm-cat-item):not(.qm-cat-menu-btn):not(.qm-icon-btn):not(.qm-status-pill):not(.qm-result-seg-btn):not(.qm-btn-ghost):not(.qm-btn-primary):not(.qm-modal-close):not(.qm-ctx-btn):not(.md-mode-tab):not(.md-btn-primary):not(.md-close):not(.quick-message-bubble):not(.appended-quick-bubble) {
+.chat-page button:not(.navbar *):not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.mcp-action-chip):not(.mcp-footer-btn):not(.history-action-btn):not(.history-link-btn):not(.app-confirm-btn):not(.context-footer-btn):not(.settings-nav-item):not(.ui-toggle):not(.settings-chip):not(.settings-btn-ghost):not(.settings-text-link):not(.settings-modal-close):not(.settings-seg-btn):not(.ui-seg-btn):not(.settings-stepper-btn):not(.ui-stepper-btn):not(.fb-select__trigger):not(.fb-select__option):not(.ui-chip):not(.qm-btn-add):not(.qm-cat-add-btn):not(.qm-cat-item):not(.qm-cat-menu-btn):not(.qm-icon-btn):not(.qm-status-pill):not(.qm-result-seg-btn):not(.qm-btn-ghost):not(.qm-btn-primary):not(.qm-modal-close):not(.qm-ctx-btn):not(.md-mode-tab):not(.md-btn-primary):not(.md-close):not(.quick-message-bubble):not(.appended-quick-bubble):not(.tool-permission-gate__deny):not(.tool-permission-gate__approve):not(.plan-fab):not(.plan-dock__action) {
   @apply m-0 cursor-pointer border-0 p-0 font-[inherit];
 }
 
@@ -335,11 +335,33 @@
   }
 
   .reasoning-content {
-    @apply max-h-[300px] overflow-y-auto border-t border-[var(--color-ai-accent-border)] bg-white/80 p-3 text-[0.9em] leading-normal text-[#434d6b] transition-[max-height,padding] duration-300;
+    @apply max-h-[300px] overflow-y-auto overflow-x-hidden border-t border-[var(--color-ai-accent-border)] bg-white/80 p-3 text-[0.9em] leading-normal text-[#434d6b] transition-[max-height] duration-300 ease-out;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(15 23 42 / 0.18) transparent;
+  }
+
+  .reasoning-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .reasoning-content::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgb(15 23 42 / 0.18);
+  }
+
+  .reasoning-content::-webkit-scrollbar-track {
+    background: transparent;
   }
 
   .reasoning-container.collapsed .reasoning-content {
-    @apply max-h-0 overflow-hidden border-t-0 py-0;
+    @apply max-h-0 overflow-hidden border-t-0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .reasoning-container.collapsed .reasoning-header {
+    @apply border-b-0;
   }
 
   /* 鈹€鈹€ 涓婁笅鏂囨彁绀?鈹€鈹€ */
@@ -508,11 +530,15 @@
   }
 
   .tool-source-icon-wrap {
-    @apply inline-flex size-7 shrink-0 items-center justify-center rounded-lg border border-[var(--tool-accent-border)] bg-[var(--tool-accent-soft)] text-[var(--tool-accent)];
+    @apply inline-flex size-7 shrink-0 items-center justify-center self-center rounded-lg border border-[var(--tool-accent-border)] bg-[var(--tool-accent-soft)] text-[var(--tool-accent)];
+  }
+
+  .tool-source-icon-wrap svg {
+    @apply block shrink-0;
   }
 
   .tool-source-badge {
-    @apply shrink-0 rounded-md border border-[var(--tool-accent-border)] bg-transparent px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase text-[var(--tool-accent)];
+    @apply inline-flex h-7 shrink-0 items-center self-center rounded-md border border-[var(--tool-accent-border)] bg-transparent px-1.5 text-[10px] font-bold leading-none tracking-wider uppercase text-[var(--tool-accent)];
   }
 
   .tool-call-name-row {
@@ -3806,6 +3832,18 @@
 
   .chat-messages__empty {
     @apply mx-auto my-6 text-center text-sm text-[var(--color-text-light)];
+  }
+
+  .chat-messages__loading {
+    @apply mx-auto my-auto flex min-h-[280px] flex-col items-center justify-center gap-3 px-6 py-10 text-center;
+  }
+
+  .chat-messages__loading-title {
+    @apply m-0 text-sm font-medium text-[var(--color-text-muted)];
+  }
+
+  .chat-messages__loading-hint {
+    @apply m-0 max-w-[280px] text-xs leading-relaxed text-[var(--color-text-light)];
   }
 }
 

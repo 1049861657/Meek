@@ -5,6 +5,9 @@ import { useRef } from 'react';
 import type { ChatMessage } from '@/lib/chat/chat-ui-types';
 import type { QuickBubbleMode } from '@/lib/chat/quick-messages-storage';
 import { useChatAutoScroll } from '@/hooks/use-chat-auto-scroll';
+import { getTimeString } from '@/lib/chat/time';
+
+import { Spinner } from '@/components/ui/spinner';
 
 import { AssistantMessageView } from './assistant-message';
 import { ContextCompactNotice } from './context-compact-notice';
@@ -12,6 +15,7 @@ import { QuickMessageBubbles } from './quick-message-bubbles';
 
 interface MessageListProps {
   messages: ChatMessage[];
+  configReady?: boolean;
   contextCompacted?: boolean;
   isStreaming?: boolean;
   quickBubbleMode?: QuickBubbleMode | null;
@@ -25,12 +29,13 @@ interface MessageListProps {
       permissionSessionKey: string;
     }
   ) => void;
-  onOpenPlanning?: () => void;
+  onOpenPlanning?: (items?: PlanningItemState[]) => void;
 }
 
 /** 消息列表 + scrollToBottom — 对齐 chat-shell-ui scrollToBottom */
 export function MessageList({
   messages,
+  configReady = true,
   contextCompacted = false,
   isStreaming = false,
   quickBubbleMode = null,
@@ -47,13 +52,26 @@ export function MessageList({
   });
 
   const showRandomBubbles =
-    quickBubbleMode === 'random' && messages.length === 0 && Boolean(onQuickBubbleSelect);
+    configReady &&
+    quickBubbleMode === 'random' &&
+    messages.length === 0 &&
+    Boolean(onQuickBubbleSelect);
   const showAppendedBubbles =
-    quickBubbleMode === 'appended' && messages.length > 0 && Boolean(onQuickBubbleSelect);
+    configReady &&
+    quickBubbleMode === 'appended' &&
+    messages.length > 0 &&
+    Boolean(onQuickBubbleSelect);
 
   return (
-    <div ref={containerRef} className="chat-messages" aria-live="polite">
-      {messages.length === 0 && quickBubbleMode !== 'random' ? (
+    <div ref={containerRef} id="chat-messages" className="chat-messages" aria-live="polite">
+      {!configReady ? (
+        <div className="chat-messages__loading" role="status" aria-live="polite">
+          <Spinner size="md" />
+          <p className="chat-messages__loading-title">正在初始化聊天…</p>
+          <p className="chat-messages__loading-hint">加载模型配置、MCP 服务与会话</p>
+        </div>
+      ) : null}
+      {configReady && messages.length === 0 && quickBubbleMode !== 'random' ? (
         <p className="chat-messages__empty">发送消息开始对话</p>
       ) : null}
       {showRandomBubbles ? (
@@ -65,8 +83,16 @@ export function MessageList({
       ) : null}
       {messages.map((message) =>
         message.role === 'user' ? (
-          <article key={message.id} className="chat-message chat-message--user">
-            <div className="chat-message__bubble">{message.content}</div>
+          <article key={message.id} className="chat-message user">
+            <div className="avatar" aria-hidden="true">
+              U
+            </div>
+            <div className="user-message-wrap">
+              <div className="chat-bubble">
+                <div className="user-message-text">{message.content}</div>
+              </div>
+              <div className="user-message-meta">{getTimeString()}</div>
+            </div>
           </article>
         ) : (
           <AssistantMessageView

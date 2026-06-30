@@ -80,3 +80,21 @@ export async function reloadProvidersConfig(): Promise<void> {
     headers: { 'Content-Type': 'application/json' },
   });
 }
+
+export type ProviderProbeLevel = 'ok' | 'warn' | 'fail';
+
+export interface ProviderProbeResponse {
+  skipped?: boolean;
+  level?: ProviderProbeLevel;
+  message?: string;
+  providerName?: string;
+  model?: string;
+  method?: 'models' | 'completion';
+}
+
+export async function probeDefaultProvider(): Promise<ProviderProbeResponse> {
+  return (await requestSettingsJson('/api/settings/providers/probe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  })) as ProviderProbeResponse;
+}

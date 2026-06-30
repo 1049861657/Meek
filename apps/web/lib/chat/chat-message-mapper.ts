@@ -13,6 +13,7 @@ import {
   formatStoredToolArgs,
   formatStoredToolResult,
   mergeHistoricalTodoCalls,
+  normalizePlanningItems,
   resolveToolSource,
 } from './tool-renderers';
 import type { HistoryEntry, StoredToolCall } from './storage-contract';
@@ -30,6 +31,8 @@ function storedToolToState(tc: StoredToolCall): ToolCallState {
     result: hasResult ? formatStoredToolResult(tc.result, tc.isError) : undefined,
     resultError: tc.isError,
     executionTime: tc.executionTime,
+    planningItems: tc.name === 'todo' ? normalizePlanningItems(tc.planningItems) : undefined,
+    revision: tc.revision,
     progressSteps: tc.progressSteps?.map((step) => ({
       progress: step.isDone ? 1 : 0,
       total: 1,

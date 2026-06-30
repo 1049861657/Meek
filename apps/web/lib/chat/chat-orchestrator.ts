@@ -74,7 +74,7 @@ export class ChatOrchestrator {
   constructor(
     public state: ChatOrchestratorState,
     private readonly sessionStore: ChatSessionStore,
-    private readonly persistGuestHistory: () => void
+    private readonly persistGuestHistory: (entries: HistoryEntry[]) => void
   ) {}
 
   resetStreamRuntime(): void {
@@ -151,7 +151,7 @@ export class ChatOrchestrator {
     }
 
     persistMessageHistoryGuest({ isAuthed: () => this.sessionStore.isAuthed() }, () => {
-      this.persistGuestHistory();
+      this.persistGuestHistory(this.state.messageHistory);
     });
 
     return entries;

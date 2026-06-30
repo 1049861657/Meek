@@ -13,6 +13,7 @@ import type { RequestPrincipal } from '@/lib/chat/resolve-principal';
 import { loadMcpConfig } from '@/lib/mcp/mcp-config';
 import { workerMcpReloadConfig } from '@/lib/worker/worker-client';
 
+import { probeProviderModel, resolveDefaultProbeTarget } from '@/lib/settings/provider-probe';
 import { PROVIDER_TYPES } from './provider-types';
 
 function settingsError(status: number, error: string, details?: string): Response {
@@ -81,6 +82,28 @@ export async function handleResetProviders(userId: string): Promise<Response> {
     return Response.json({ success: true, message: '已恢复为默认提供商配置' });
   } catch (error: unknown) {
     return settingsError(500, '重置失败', getErrorMessage(error));
+  }
+}
+
+export async function handleProbeDefaultProvider(userId: string): Promise<Response> {
+  try {
+    const config = await ConfigService.getAIProvidersConfig(userId);
+    if (!config) {
+      return settingsError(404, '未找到提供商配置');
+    }
+
+    const target = resolveDefaultProbeTarget(config);
+    if (!target) {
+      return Response.json({
+        skipped: true,
+        message: '未配置默认模型，已跳过连通检测',
+      });
+    }
+
+    const result = await probeProviderModel(target.provider, target.model);
+    return Response.json(result);
+  } catch (error: unknown) {
+    return settingsError(500, '连通检测失败', getErrorMessage(error));
   }
 }
 

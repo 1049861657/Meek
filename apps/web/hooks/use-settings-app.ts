@@ -19,6 +19,7 @@ import {
   fetchProviderTypes,
   fetchProvidersData,
   getFallbackProviderTypes,
+  probeDefaultProvider,
   reloadProvidersConfig,
   saveProvidersData,
 } from '@/lib/settings/settings-api';
@@ -81,6 +82,7 @@ export interface UseSettingsAppResult {
     patch: Partial<ModelEntry>,
   ) => void;
   saveProviders: () => Promise<void>;
+  savingProviders: boolean;
   copyProvider: (index: number) => Promise<void>;
   importProvider: () => Promise<void>;
   toggleApiKeyVisibility: (index: number) => void;
@@ -89,6 +91,7 @@ export interface UseSettingsAppResult {
 
 export function useSettingsApp(): UseSettingsAppResult {
   const [loading, setLoading] = useState(true);
+  const [savingProviders, setSavingProviders] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [apiGateActive, setApiGateActive] = useState(!isSettingsApiReady());
   const [providersData, setProvidersData] = useState<ProvidersData>(EMPTY_PROVIDERS_DATA);
@@ -347,6 +350,7 @@ export function useSettingsApp(): UseSettingsAppResult {
       return;
     }
 
+    setSavingProviders(true);
     try {
       assertSettingsWriteReady();
 
@@ -358,16 +362,33 @@ export function useSettingsApp(): UseSettingsAppResult {
         }
       }
 
-      const applied = await saveAndReload(normalized);
+      await saveProvidersData(normalized);
       setProvidersData(normalized);
+
+      const [applied, probe] = await Promise.all([
+        reloadProvidersConfig()
+          .then(() => true)
+          .catch(() => false),
+        probeDefaultProvider().catch((probeError: unknown) => {
+          console.error('默认模型连通检测失败:', probeError);
+          return null;
+        }),
+      ]);
+
       showToast(
         applied ? '配置保存成功' : '配置已保存，但需要重启服务器才能应用更改',
         applied ? 'success' : 'error',
       );
+
+      if (probe?.level === 'fail' && probe.message) {
+        showToast(`连通检测失败：${probe.message}`, 'error');
+      }
     } catch (error) {
       showApiError(error, '保存配置失败');
+    } finally {
+      setSavingProviders(false);
     }
-  }, [apiGateActive, providersData, saveAndReload]);
+  }, [apiGateActive, providersData]);
 
   const copyProvider = useCallback(
     async (index: number) => {
@@ -442,6 +463,7 @@ export function useSettingsApp(): UseSettingsAppResult {
       setDefaultModel,
       updateModel,
       saveProviders,
+      savingProviders,
       copyProvider,
       importProvider,
       toggleApiKeyVisibility,
@@ -464,6 +486,7 @@ export function useSettingsApp(): UseSettingsAppResult {
       setDefaultModel,
       updateModel,
       saveProviders,
+      savingProviders,
       copyProvider,
       importProvider,
       toggleApiKeyVisibility,

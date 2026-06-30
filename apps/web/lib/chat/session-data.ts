@@ -336,19 +336,21 @@ export class ChatSessionData {
     }
   }
 
-  saveMessageHistory(): void {
-    if (this.messageHistory.length === 0 || !this.idb.db.isReady || !this.sessionId) {
+  saveMessageHistory(source?: HistoryEntry[]): void {
+    const history = source ?? this.messageHistory;
+    if (history.length === 0 || !this.idb.db.isReady || !this.sessionId) {
       return;
     }
+    this.messageHistory = history;
 
     let startIdx = 0;
-    for (let i = this.messageHistory.length - 1; i >= 0; i--) {
-      if (this.messageHistory[i]?.role === 'user') {
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i]?.role === 'user') {
         startIdx = i;
         break;
       }
     }
-    const turnMessages = this.messageHistory.slice(startIdx);
+    const turnMessages = history.slice(startIdx);
     const provider = this.deps.getProvider();
 
     for (const msg of turnMessages) {

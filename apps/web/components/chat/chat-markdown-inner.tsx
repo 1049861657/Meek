@@ -6,15 +6,17 @@ import remarkGfm from 'remark-gfm';
 interface ChatMarkdownInnerProps {
   content: string;
   className?: string;
+  bare?: boolean;
 }
 
 export function ChatMarkdownInner({
   content,
   className,
+  bare = false,
 }: ChatMarkdownInnerProps): React.ReactElement {
-  return (
-    <div className={`chat-markdown ${className ?? ''}`.trim()}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-    </div>
-  );
+  const markdown = <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>;
+  if (bare) {
+    return markdown;
+  }
+  return <div className={(className || 'markdown-content').trim()}>{markdown}</div>;
 }

@@ -61,6 +61,7 @@ export interface PlanningItemState {
   id?: string;
   content?: string;
   status?: string;
+  activeForm?: string;
   [key: string]: unknown;
 }
 

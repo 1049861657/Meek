@@ -88,7 +88,6 @@ export function McpModal({ open, onClose, internals }: ChatModalProps): React.Re
       let skippedNoToolsNames: string[] = [];
 
       if (selectedIds.length > 0) {
-        showToast('正在检测 MCP 连通性…', 'info');
         const probeResult = await probeMcpServers(selectedIds);
         reachableIds = Array.isArray(probeResult.reachableIds)
           ? probeResult.reachableIds.filter((id): id is string => typeof id === 'string')
