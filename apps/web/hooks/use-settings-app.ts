@@ -15,13 +15,15 @@ import {
   isSettingsApiReady,
   SETTINGS_API_GATE_MESSAGE,
 } from '@/lib/settings/settings-api-gate';
+import type { ProviderConnectivityStatus } from '@meek/connectivity';
 import {
+  fetchProviderConnectivityStatus,
   fetchProviderTypes,
   fetchProvidersData,
   getFallbackProviderTypes,
-  probeDefaultProvider,
   reloadProvidersConfig,
   saveProvidersData,
+  watchProviderConnectivity,
 } from '@/lib/settings/settings-api';
 import type { ModelEntry, Provider, ProviderTypeOption, ProvidersData } from '@/lib/settings/types';
 import { EMPTY_PROVIDERS_DATA } from '@/lib/settings/types';
@@ -83,6 +85,7 @@ export interface UseSettingsAppResult {
   ) => void;
   saveProviders: () => Promise<void>;
   savingProviders: boolean;
+  connectivityStatus: ProviderConnectivityStatus;
   copyProvider: (index: number) => Promise<void>;
   importProvider: () => Promise<void>;
   toggleApiKeyVisibility: (index: number) => void;
@@ -100,6 +103,33 @@ export function useSettingsApp(): UseSettingsAppResult {
   );
   const [activeProviderIndex, setActiveProviderIndex] = useState(0);
   const [visibleApiKeys, setVisibleApiKeys] = useState<Record<number, boolean>>({});
+  const [connectivityStatus, setConnectivityStatus] = useState<ProviderConnectivityStatus>({
+    state: 'idle',
+  });
+
+  const refreshConnectivityStatus = useCallback(async (): Promise<void> => {
+    if (!isSettingsApiReady()) {
+      return;
+    }
+    try {
+      const status = await fetchProviderConnectivityStatus();
+      setConnectivityStatus(status);
+    } catch (error) {
+      console.error('加载连通状态失败:', error);
+    }
+  }, []);
+
+  const watchConnectivityAfterSave = useCallback((): void => {
+    void watchProviderConnectivity(setConnectivityStatus)
+      .then((outcome) => {
+        if (outcome?.state === 'fail' && outcome.message) {
+          showToast(`连通检测失败：${outcome.message}`, 'error');
+        }
+      })
+      .catch((error: unknown) => {
+        console.error('连通检测监听失败:', error);
+      });
+  }, []);
 
   const loadSettings = useCallback(async () => {
     setLoading(true);
@@ -126,6 +156,7 @@ export function useSettingsApp(): UseSettingsAppResult {
       const data = await fetchProvidersData();
       setProviderTypes(types.length > 0 ? types : getFallbackProviderTypes());
       setProvidersData(data);
+      await refreshConnectivityStatus();
     } catch (error) {
       const message = error instanceof Error ? error.message : '加载配置失败';
       setLoadError(message);
@@ -134,7 +165,7 @@ export function useSettingsApp(): UseSettingsAppResult {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [refreshConnectivityStatus]);
 
   useEffect(() => {
     void loadSettings();
@@ -364,31 +395,17 @@ export function useSettingsApp(): UseSettingsAppResult {
 
       await saveProvidersData(normalized);
       setProvidersData(normalized);
-
-      const [applied, probe] = await Promise.all([
-        reloadProvidersConfig()
-          .then(() => true)
-          .catch(() => false),
-        probeDefaultProvider().catch((probeError: unknown) => {
-          console.error('默认模型连通检测失败:', probeError);
-          return null;
-        }),
-      ]);
-
-      showToast(
-        applied ? '配置保存成功' : '配置已保存，但需要重启服务器才能应用更改',
-        applied ? 'success' : 'error',
-      );
-
-      if (probe?.level === 'fail' && probe.message) {
-        showToast(`连通检测失败：${probe.message}`, 'error');
-      }
+      showToast('配置保存成功', 'success');
+      void reloadProvidersConfig().catch((error: unknown) => {
+        console.error('重新加载提供商配置失败:', error);
+      });
+      watchConnectivityAfterSave();
     } catch (error) {
       showApiError(error, '保存配置失败');
     } finally {
       setSavingProviders(false);
     }
-  }, [apiGateActive, providersData]);
+  }, [apiGateActive, providersData, watchConnectivityAfterSave]);
 
   const copyProvider = useCallback(
     async (index: number) => {
@@ -464,6 +481,7 @@ export function useSettingsApp(): UseSettingsAppResult {
       updateModel,
       saveProviders,
       savingProviders,
+      connectivityStatus,
       copyProvider,
       importProvider,
       toggleApiKeyVisibility,
@@ -487,6 +505,7 @@ export function useSettingsApp(): UseSettingsAppResult {
       updateModel,
       saveProviders,
       savingProviders,
+      connectivityStatus,
       copyProvider,
       importProvider,
       toggleApiKeyVisibility,

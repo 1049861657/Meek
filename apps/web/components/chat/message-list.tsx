@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import type { ChatMessage } from '@/lib/chat/chat-ui-types';
 import type { QuickBubbleMode } from '@/lib/chat/quick-messages-storage';
 import { useChatAutoScroll } from '@/hooks/use-chat-auto-scroll';
-import { getTimeString } from '@/lib/chat/time';
+import { formatMessageTime } from '@/lib/chat/time';
 
 import { Spinner } from '@/components/ui/spinner';
 
@@ -91,7 +91,7 @@ export function MessageList({
               <div className="chat-bubble">
                 <div className="user-message-text">{message.content}</div>
               </div>
-              <div className="user-message-meta">{getTimeString()}</div>
+              <div className="user-message-meta">{formatMessageTime(message.timestamp)}</div>
             </div>
           </article>
         ) : (

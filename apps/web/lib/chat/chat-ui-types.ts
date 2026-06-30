@@ -44,6 +44,7 @@ export interface UserMessage {
   id: string;
   role: 'user';
   content: string;
+  timestamp?: number;
 }
 
 export interface TokenUsageDisplayState {
@@ -74,6 +75,7 @@ export interface AssistantMessage {
   isStreaming: boolean;
   isError?: boolean;
   contextCompacted?: boolean;
+  timestamp?: number;
   elapsedSeconds?: number;
   tokenUsage?: TokenUsageDisplayState;
   planningItems?: PlanningItemState[];
@@ -88,6 +90,7 @@ export function createAssistantMessage(id: string): AssistantMessage {
     content: '',
     toolCalls: [],
     isStreaming: true,
+    timestamp: Date.now(),
   };
 }
 
@@ -96,5 +99,6 @@ export function createUserMessage(id: string, content: string): UserMessage {
     id,
     role: 'user',
     content,
+    timestamp: Date.now(),
   };
 }

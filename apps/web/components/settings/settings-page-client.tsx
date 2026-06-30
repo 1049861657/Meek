@@ -29,11 +29,23 @@ export function SettingsPageClient(): React.ReactElement {
     updateModel,
     saveProviders,
     savingProviders,
+    connectivityStatus,
     copyProvider,
     importProvider,
     toggleApiKeyVisibility,
     retryLoad,
   } = app;
+
+  const connectivityTitle =
+    connectivityStatus.state === 'pending'
+      ? '正在检测连通性…'
+      : connectivityStatus.state === 'ok'
+        ? '连通正常'
+        : connectivityStatus.state === 'fail'
+          ? connectivityStatus.message ?? '连通失败'
+          : connectivityStatus.state === 'skipped'
+            ? connectivityStatus.message ?? '已跳过检测'
+            : '尚未检测';
 
   if (loading) {
     return (
@@ -86,6 +98,15 @@ export function SettingsPageClient(): React.ReactElement {
                 providerTypes={providerTypes}
                 visible={index === activeProviderIndex}
                 apiKeyVisible={Boolean(visibleApiKeys[index])}
+                isDefaultProvider={provider.name === providersData.defaultProvider}
+                connectivityStatus={
+                  provider.name === providersData.defaultProvider
+                    ? connectivityStatus.state
+                    : 'idle'
+                }
+                connectivityTitle={
+                  provider.name === providersData.defaultProvider ? connectivityTitle : undefined
+                }
                 onUpdate={(patch) => updateProvider(index, patch)}
                 onCopy={() => void copyProvider(index)}
                 onDelete={() => void deleteProvider(index)}

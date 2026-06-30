@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownSelect } from '@/components/ui/dropdown-select';
 import { EmptyState } from '@/components/ui/empty-state';
 import { IconEyeOpen, IconEyeSlash } from '@/components/settings/settings-icons';
+import type { ConnectivityState } from '@meek/connectivity';
 import type { Provider, ProviderTypeOption } from '@/lib/settings/types';
 
 export interface ProviderCardProps {
@@ -12,6 +13,9 @@ export interface ProviderCardProps {
   providerTypes: ProviderTypeOption[];
   visible: boolean;
   apiKeyVisible: boolean;
+  isDefaultProvider?: boolean;
+  connectivityStatus?: ConnectivityState;
+  connectivityTitle?: string;
   onUpdate: (patch: Partial<Provider>) => void;
   onCopy: () => void;
   onDelete: () => void;
@@ -28,6 +32,9 @@ export function ProviderCard({
   providerTypes,
   visible,
   apiKeyVisible,
+  isDefaultProvider = false,
+  connectivityStatus = 'idle',
+  connectivityTitle,
   onUpdate,
   onCopy,
   onDelete,
@@ -50,7 +57,16 @@ export function ProviderCard({
     >
       <header className="provider-card-header">
         <div className="provider-card-title-row">
-          <h3>{provider.name || '新提供商'}</h3>
+          <h3>
+            {provider.name || '新提供商'}
+            {isDefaultProvider ? (
+              <span
+                className={`provider-connectivity-dot provider-connectivity-dot--${connectivityStatus}`}
+                title={connectivityTitle ?? '默认提供商连通状态'}
+                aria-label={connectivityTitle ?? '默认提供商连通状态'}
+              />
+            ) : null}
+          </h3>
           <button
             type="button"
             className="btn-ghost btn-sm copy-provider"

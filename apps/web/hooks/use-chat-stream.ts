@@ -7,7 +7,7 @@ import {
   ChatOrchestrator,
   createInitialOrchestratorState,
 } from '@/lib/chat/chat-orchestrator';
-import { historyEntriesToChatMessages } from '@/lib/chat/chat-message-mapper';
+import { historyEntriesToChatMessages } from '@/lib/chat/message-view-model';
 import {
   buildChatSettingsFromState,
   loadChatSettings,

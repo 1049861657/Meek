@@ -1,10 +1,11 @@
 import { ConfigService } from '@meek/config-plane';
 import {
+  commitProviderConfig,
+  forceCommitProviderConfig,
   getProviderForUser,
   initializeProviders,
   installMemoryPort,
   invalidateProviderCache,
-  setAiProvidersConfig,
   setChatStore,
   setMcpClientResolver,
   type AIProvider,
@@ -18,16 +19,27 @@ import { bootstrapMcpConfig, loadMcpConfig } from './mcp-config-bootstrap.js';
 import { createMcpClientPort } from './mcp-adapter.js';
 import { wireMcpConnectionService } from './mcp-connection-bridge.js';
 
-export async function loadAiProvidersConfig(
-  configUserId: string | null
+export async function syncAiProvidersConfigPort(
+  configUserId: string | null,
 ): Promise<AIProvidersConfigType> {
   const config = await ConfigService.getAIProvidersConfig(configUserId ?? undefined);
-  setAiProvidersConfig(config);
+  if (commitProviderConfig(configUserId, config)) {
+    invalidateProviderCache(configUserId ?? undefined);
+  }
+  return config;
+}
+
+export async function applyAiProvidersConfigUpdate(
+  configUserId: string | null,
+): Promise<AIProvidersConfigType> {
+  const config = await ConfigService.getAIProvidersConfig(configUserId ?? undefined);
+  forceCommitProviderConfig(configUserId, config);
+  invalidateProviderCache(configUserId ?? undefined);
   return config;
 }
 
 export async function resolveDefaultModel(configUserId: string | null): Promise<string> {
-  const config = await loadAiProvidersConfig(configUserId);
+  const config = await syncAiProvidersConfigPort(configUserId);
   const defaultName =
     (config.defaultProvider ?? '').trim() || (config.providers?.[0]?.name ?? '');
   const provider =
@@ -49,7 +61,8 @@ export async function ensureWorkerRuntime(configUserId: string | null = null): P
     McpReachabilityService.partitionForPersistence(serverIds, configUserId, enableTools)
   );
   wireMcpConnectionService();
-  await loadAiProvidersConfig(configUserId);
+  const seedConfig = await ConfigService.getAIProvidersConfig(undefined);
+  forceCommitProviderConfig(null, seedConfig);
   await initializeProviders();
   workerRuntimeInitialized = true;
 }
@@ -57,8 +70,7 @@ export async function ensureWorkerRuntime(configUserId: string | null = null): P
 export async function ensureWorkerRuntimeForUser(configUserId: string | null): Promise<void> {
   await ensureWorkerRuntime(configUserId);
   await loadMcpConfig(configUserId);
-  await loadAiProvidersConfig(configUserId);
-  invalidateProviderCache(configUserId ?? undefined);
+  await syncAiProvidersConfigPort(configUserId);
 }
 
 export async function getHarnessProvider(

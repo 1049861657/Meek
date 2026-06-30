@@ -76,8 +76,7 @@ export async function getCompactProviderForUser(
 export function invalidateCompactProviderCache(userId?: string): void {
   if (userId !== undefined) {
     bucketCache.delete(bucketCacheKey(userId));
-  } else {
+  } else if (bucketCache.size > 0) {
     bucketCache.clear();
   }
-  Logger.info('AI', `BFF provider cache invalidated userId=${userId ?? 'all'}`);
 }

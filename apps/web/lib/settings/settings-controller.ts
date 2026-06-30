@@ -5,15 +5,18 @@ import {
   ToolsConfig,
   type PromptPipelineOptions,
 } from '@meek/agent-core';
+import {
+  getProviderConnectivityStatus,
+  scheduleDefaultProviderProbe,
+} from '@meek/connectivity';
 import { ConfigService } from '@meek/config-plane';
 import type { AIProvidersConfigType } from '@meek/agent-core/provider';
 
-import { loadAiProvidersConfig } from '@/lib/ai/provider-config';
+import { applyAiProvidersConfigUpdate, syncAiProvidersConfigPort } from '@/lib/ai/provider-config';
 import type { RequestPrincipal } from '@/lib/chat/resolve-principal';
 import { loadMcpConfig } from '@/lib/mcp/mcp-config';
 import { workerMcpReloadConfig } from '@/lib/worker/worker-client';
 
-import { probeProviderModel, resolveDefaultProbeTarget } from '@/lib/settings/provider-probe';
 import { PROVIDER_TYPES } from './provider-types';
 
 function settingsError(status: number, error: string, details?: string): Response {
@@ -66,8 +69,9 @@ export async function handleUpdateProviders(userId: string, body: unknown): Prom
     if (!success) {
       throw new Error('保存配置失败');
     }
-    await loadAiProvidersConfig(userId);
+    await applyAiProvidersConfigUpdate(userId);
     Logger.info('SETTINGS', `已更新 AI 提供商配置 userId=${userId}`);
+    scheduleDefaultProviderProbe(userId, () => ConfigService.getAIProvidersConfig(userId));
     return Response.json({ success: true, message: '提供商配置已更新' });
   } catch (error: unknown) {
     return settingsError(500, '更新配置失败', getErrorMessage(error));
@@ -77,7 +81,7 @@ export async function handleUpdateProviders(userId: string, body: unknown): Prom
 export async function handleResetProviders(userId: string): Promise<Response> {
   try {
     await ConfigService.resetAIProvidersConfig(userId);
-    await loadAiProvidersConfig(userId);
+    await applyAiProvidersConfigUpdate(userId);
     Logger.info('SETTINGS', `已重置 AI 提供商配置 userId=${userId}`);
     return Response.json({ success: true, message: '已恢复为默认提供商配置' });
   } catch (error: unknown) {
@@ -85,31 +89,13 @@ export async function handleResetProviders(userId: string): Promise<Response> {
   }
 }
 
-export async function handleProbeDefaultProvider(userId: string): Promise<Response> {
-  try {
-    const config = await ConfigService.getAIProvidersConfig(userId);
-    if (!config) {
-      return settingsError(404, '未找到提供商配置');
-    }
-
-    const target = resolveDefaultProbeTarget(config);
-    if (!target) {
-      return Response.json({
-        skipped: true,
-        message: '未配置默认模型，已跳过连通检测',
-      });
-    }
-
-    const result = await probeProviderModel(target.provider, target.model);
-    return Response.json(result);
-  } catch (error: unknown) {
-    return settingsError(500, '连通检测失败', getErrorMessage(error));
-  }
+export function handleGetProviderConnectivityStatus(userId: string): Response {
+  return Response.json(getProviderConnectivityStatus(userId));
 }
 
 export async function handleReloadProviders(userId: string): Promise<Response> {
   try {
-    const config = await loadAiProvidersConfig(userId);
+    const config = await syncAiProvidersConfigPort(userId);
     const defaultName =
       (config.defaultProvider ?? '').trim() || (config.providers?.[0]?.name ?? '');
     return Response.json({

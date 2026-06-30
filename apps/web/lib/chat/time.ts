@@ -64,8 +64,36 @@ export function formatElapsedSecondsLabel(timeInSeconds: number | undefined): st
   return Number.isNaN(seconds) ? '0秒' : `${seconds}秒`;
 }
 
+export function formatMessageTime(value: string | number | undefined): string {
+  if (value === undefined || value === null || value === '') {
+    return '';
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+  return date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+}
+
 export function formatMessageTimeWithElapsed(
-  elapsedSeconds: number | undefined
+  elapsedSeconds: number | undefined,
+  timestamp?: number,
 ): string {
-  return `${getFullTimeString()} · ${formatElapsedSecondsLabel(elapsedSeconds)}`;
+  const timeText =
+    timestamp !== undefined ? formatMessageTime(timestamp) : getFullTimeString();
+  if (!timeText) {
+    return formatElapsedSecondsLabel(elapsedSeconds);
+  }
+  if (elapsedSeconds === undefined) {
+    return timeText;
+  }
+  return `${timeText} · ${formatElapsedSecondsLabel(elapsedSeconds)}`;
 }

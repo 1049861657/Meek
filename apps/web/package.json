@@ -14,6 +14,7 @@
     "@meek/agent-core": "workspace:*",
     "@meek/chat-store": "workspace:*",
     "@meek/config-plane": "workspace:*",
+    "@meek/connectivity": "workspace:*",
     "@meek/db": "workspace:*",
     "@meek/mcp-runtime": "workspace:*",
     "@meek/message-bus": "workspace:*",

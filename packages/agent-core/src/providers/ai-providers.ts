@@ -80,10 +80,9 @@ export async function getProviderForUser(
 export function invalidateProviderCache(userId?: string): void {
   if (userId !== undefined) {
     bucketCache.delete(bucketCacheKey(userId));
-  } else {
+  } else if (bucketCache.size > 0) {
     bucketCache.clear();
   }
-  Logger.info('AI', `Provider cache invalidated userId=${userId ?? 'all'}`);
 }
 
 // ---------------------------------------------------------------------------

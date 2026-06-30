@@ -1,7 +1,7 @@
 import { Logger } from '@meek/agent-core';
 import { getProviderForUser, type InternalMessage } from '@meek/agent-core/provider';
 
-import { loadAiProvidersConfig } from '@/lib/ai/provider-config';
+import { syncAiProvidersConfigPort } from '@/lib/ai/provider-config';
 import { generateRequestId } from '@/lib/ai/request-id';
 
 export interface CompactChatBody {
@@ -57,7 +57,7 @@ export async function handleCompactChat(
   const vendor = typeof body.vendor === 'string' ? body.vendor : undefined;
   const compactModel = typeof body.compactModel === 'string' ? body.compactModel : undefined;
 
-  await loadAiProvidersConfig(configUserId);
+  await syncAiProvidersConfigPort(configUserId);
   const service = await getProviderForUser(configUserId, vendor);
   if (!service) {
     return {

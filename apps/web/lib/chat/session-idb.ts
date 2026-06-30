@@ -216,6 +216,10 @@ export class ChatSessionIdb {
         const request = store.add(messageToStore);
 
         request.onsuccess = () => {
+          const generatedId = request.result;
+          if (typeof generatedId === 'number') {
+            messageToStore.id = generatedId;
+          }
           resolve(messageToStore);
         };
 

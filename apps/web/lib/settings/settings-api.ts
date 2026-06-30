@@ -1,3 +1,4 @@
+import type { ProviderConnectivityStatus } from '@meek/connectivity';
 import { FetchJsonError } from '@/lib/api/fetch-json';
 import type { ProviderTypeOption, ProvidersData } from '@/lib/settings/types';
 
@@ -81,20 +82,33 @@ export async function reloadProvidersConfig(): Promise<void> {
   });
 }
 
-export type ProviderProbeLevel = 'ok' | 'warn' | 'fail';
+export type { ProviderConnectivityStatus } from '@meek/connectivity';
 
-export interface ProviderProbeResponse {
-  skipped?: boolean;
-  level?: ProviderProbeLevel;
-  message?: string;
-  providerName?: string;
-  model?: string;
-  method?: 'models' | 'completion';
+const PROBE_POLL_INTERVAL_MS = 500;
+const PROBE_POLL_MAX_ATTEMPTS = 24;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
-export async function probeDefaultProvider(): Promise<ProviderProbeResponse> {
-  return (await requestSettingsJson('/api/settings/providers/probe', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-  })) as ProviderProbeResponse;
+export async function fetchProviderConnectivityStatus(): Promise<ProviderConnectivityStatus> {
+  return (await requestSettingsJson('/api/settings/providers/status')) as ProviderConnectivityStatus;
+}
+
+export async function watchProviderConnectivity(
+  onStatus: (status: ProviderConnectivityStatus) => void,
+): Promise<ProviderConnectivityStatus | null> {
+  for (let attempt = 0; attempt < PROBE_POLL_MAX_ATTEMPTS; attempt += 1) {
+    const status = await fetchProviderConnectivityStatus();
+    onStatus(status);
+    if (status.state !== 'pending') {
+      return status;
+    }
+    if (attempt < PROBE_POLL_MAX_ATTEMPTS - 1) {
+      await sleep(PROBE_POLL_INTERVAL_MS);
+    }
+  }
+  return null;
 }

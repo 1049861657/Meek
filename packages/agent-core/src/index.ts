@@ -189,6 +189,10 @@ export {
   providerServices,
   reloadAiProviders,
 } from './providers/ai-providers.js';
+export {
+  commitProviderConfig,
+  forceCommitProviderConfig,
+} from './providers/provider-config-sync.js';
 export type { AIProvider, AIProvidersConfigType, AIModel } from './providers/provider-types.js';
 
 // Ports

@@ -5,7 +5,7 @@ import {
   type InternalMessage,
 } from '@meek/agent-core';
 
-import { loadAiProvidersConfig } from '@/lib/ai/provider-config';
+import { syncAiProvidersConfigPort } from '@/lib/ai/provider-config';
 import { loadMcpConfig } from '@/lib/mcp/mcp-config';
 import { assembleContextMessages } from '@/lib/chat/chat-store-stub';
 import type { RequestPrincipal } from '@/lib/chat/resolve-principal';
@@ -69,7 +69,7 @@ export async function handleContextPreview(
 
   const vendor = typeof body.vendor === 'string' ? body.vendor : undefined;
   await loadMcpConfig(principal.configUserId);
-  await loadAiProvidersConfig(principal.configUserId);
+  await syncAiProvidersConfigPort(principal.configUserId);
   await initializeProviders();
   const service = await getProviderForUser(principal.configUserId, vendor);
   if (!service) {

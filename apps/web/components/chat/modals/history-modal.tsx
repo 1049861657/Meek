@@ -9,6 +9,8 @@ import { confirmModal } from '@/components/ui/confirm-dialog';
 import { showToast } from '@/components/ui/toast';
 import { CHAT_SESSION_ID_PREFIX } from '@/lib/chat/storage-contract';
 import { AUTHED_SESSIONS_GATE_MESSAGE } from '@/lib/chat/authed-sessions-gate';
+import { formatMessageTime } from '@/lib/chat/time';
+import { historyEntryToRecord } from '@/lib/chat/message-view-model';
 import type { HistoryEntry } from '@/lib/chat/storage-contract';
 import type { SessionListItem } from '@/lib/chat/session-data';
 
@@ -357,6 +359,8 @@ export function HistoryModal({ open, onClose, internals }: ChatModalProps): Reac
                 .filter((message) => message.role !== 'tool')
                 .map((message, index) => {
                   const isUser = message.role === 'user';
+                  const record = historyEntryToRecord(message);
+                  const timeHtml = formatMessageTime(record?.timestamp);
                   return (
                     <article
                       key={`${message.role}-${index}`}
@@ -376,6 +380,9 @@ export function HistoryModal({ open, onClose, internals }: ChatModalProps): Reac
                               <ChatMarkdown content={message.content ?? ''} />
                             </div>
                           )}
+                          {timeHtml ? (
+                            <time className="history-msg-time">{timeHtml}</time>
+                          ) : null}
                         </div>
                       </div>
                     </article>

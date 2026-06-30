@@ -249,6 +249,41 @@
 .provider-card-header h3 {
   margin: 0;
   font-size: 1.125rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.provider-connectivity-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: var(--color-text-light);
+}
+
+.provider-connectivity-dot--idle {
+  background: var(--color-text-light);
+  opacity: 0.45;
+}
+
+.provider-connectivity-dot--pending {
+  background: #f59e0b;
+  box-shadow: 0 0 0 3px rgb(245 158 11 / 0.2);
+}
+
+.provider-connectivity-dot--ok {
+  background: #22c55e;
+}
+
+.provider-connectivity-dot--fail {
+  background: #ef4444;
+}
+
+.provider-connectivity-dot--skipped {
+  background: var(--color-text-light);
+  opacity: 0.65;
 }
 
 .btn-ghost {

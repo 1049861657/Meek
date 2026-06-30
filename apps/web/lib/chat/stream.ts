@@ -9,7 +9,7 @@ import { getWebChannelAdapter } from '@/lib/channels/web/web-channel.adapter';
 import { normalizeWebInbound } from '@/lib/channels/web/normalize-web-inbound';
 import { SSE_KEEP_ALIVE_INTERVAL_MS } from '@/lib/channels/web/sse-config';
 import { generateRequestId } from '@/lib/ai/request-id';
-import { loadAiProvidersConfig } from '@/lib/ai/provider-config';
+import { syncAiProvidersConfigPort } from '@/lib/ai/provider-config';
 import { getProviderForUser } from '@meek/agent-core/provider';
 import {
   sanitizeWebEnabledSystemToolNames,
@@ -62,7 +62,7 @@ export async function handleChatStream(
       writeRaw(`event: begin\ndata: ${JSON.stringify({ requestId })}\n\n`);
 
       try {
-        await loadAiProvidersConfig(principal.configUserId);
+        await syncAiProvidersConfigPort(principal.configUserId);
         sanitizeWebMcpServerIds(body);
         sanitizeWebEnabledToolNames(body);
         sanitizeWebEnabledSystemToolNames(body);

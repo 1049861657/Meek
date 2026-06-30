@@ -142,11 +142,15 @@ export function stringifyToolContent(value: unknown): string {
 }
 
 /** IDB 原始记录 → messageHistory 条目 */
-export function mapIdbRecordToHistoryEntry(msg: HistoryEntry): HistoryEntry {
+export function mapIdbRecordToHistoryEntry(
+  msg: HistoryEntry & { id?: number | string; timestamp?: number },
+): HistoryEntry {
   return {
     role: msg.role,
     content: msg.content,
     turnId: msg.turnId,
+    ...(msg.id !== undefined && msg.id !== null ? { id: String(msg.id) } : {}),
+    ...(typeof msg.timestamp === 'number' ? { timestamp: msg.timestamp } : {}),
     reasoning: msg.reasoning ?? msg.reasoning_content,
     reasoning_content: msg.reasoning_content ?? msg.reasoning,
     tool_calls: msg.tool_calls,

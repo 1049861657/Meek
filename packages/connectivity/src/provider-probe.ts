@@ -3,7 +3,7 @@ import type { AIProviderConfig, AIProvidersConfigType } from '@meek/agent-core/p
 const MODELS_TIMEOUT_MS = 4_000;
 const COMPLETION_TIMEOUT_MS = 6_000;
 
-export type ProviderProbeLevel = 'ok' | 'warn' | 'fail';
+export type ProviderProbeLevel = 'ok' | 'fail';
 
 export interface ProviderProbeResult {
   level: ProviderProbeLevel;

@@ -84,6 +84,8 @@ export interface HistoryEntry {
   role: 'user' | 'assistant' | 'tool';
   content?: string;
   turnId?: string;
+  id?: string;
+  timestamp?: number;
   reasoning?: string;
   reasoning_content?: string;
   tool_calls?: unknown[];

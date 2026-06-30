@@ -5,6 +5,10 @@ export {
 } from '../providers/provider-bff.js';
 
 export { setAiProvidersConfig } from '../ports/provider-config-port.js';
+export {
+  commitProviderConfig,
+  forceCommitProviderConfig,
+} from '../providers/provider-config-sync.js';
 
 export { OpenAiCompactProvider as AiProvider } from '../providers/openai-compact-provider.js';
 

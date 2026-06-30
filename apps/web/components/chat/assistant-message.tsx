@@ -1,7 +1,7 @@
 'use client';
 
 import type { AssistantMessage } from '@/lib/chat/chat-ui-types';
-import { formatMessageTimeWithElapsed } from '@/lib/chat/time';
+import { formatMessageTime, formatMessageTimeWithElapsed } from '@/lib/chat/time';
 
 import { ChatMarkdown } from './chat-markdown';
 import { ReasoningBlock } from './reasoning-block';
@@ -37,7 +37,12 @@ export function AssistantMessageView({
   const showFooter =
     !message.isStreaming ||
     Boolean(message.tokenUsage) ||
-    typeof message.elapsedSeconds === 'number';
+    typeof message.elapsedSeconds === 'number' ||
+    typeof message.timestamp === 'number';
+  const timeLabel =
+    typeof message.elapsedSeconds === 'number'
+      ? formatMessageTimeWithElapsed(message.elapsedSeconds, message.timestamp)
+      : formatMessageTime(message.timestamp);
 
   return (
     <article className="chat-message ai" data-ai-message="true">
@@ -85,13 +90,7 @@ export function AssistantMessageView({
 
         {showFooter ? (
           <div className="ai-message-footer">
-            {typeof message.elapsedSeconds === 'number' ? (
-              <span className="ai-message-meta message-time">
-                {formatMessageTimeWithElapsed(message.elapsedSeconds)}
-              </span>
-            ) : (
-              <span className="ai-message-meta message-time" />
-            )}
+            <span className="ai-message-meta message-time">{timeLabel}</span>
             {message.tokenUsage ? <TokenUsageBadge usage={message.tokenUsage} /> : null}
           </div>
         ) : null}

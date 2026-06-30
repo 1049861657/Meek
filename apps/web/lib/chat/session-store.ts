@@ -23,6 +23,15 @@ interface ServerStoredMessage {
   content: string | null;
   toolCalls: unknown;
   reasoning: string | null;
+  createdAt?: string;
+}
+
+function resolveMessageTimestamp(row: ServerStoredMessage): number | undefined {
+  if (typeof row.createdAt !== 'string' || !row.createdAt) {
+    return undefined;
+  }
+  const value = new Date(row.createdAt).getTime();
+  return Number.isNaN(value) ? undefined : value;
 }
 
 function safeContent(message: { content?: string | null }): string {
@@ -39,7 +48,13 @@ function mapServerMessagesToEntries(rows: ServerStoredMessage[]): HistoryEntry[]
     }
 
     if (row.role === 'user') {
-      entries.push({ role: 'user', content: safeContent(row) });
+      const timestamp = resolveMessageTimestamp(row);
+      entries.push({
+        role: 'user',
+        id: row.id,
+        content: safeContent(row),
+        ...(timestamp !== undefined ? { timestamp } : {}),
+      });
       continue;
     }
 
@@ -93,14 +108,17 @@ function mapServerMessagesToEntries(rows: ServerStoredMessage[]): HistoryEntry[]
         };
       });
 
+      const timestamp = resolveMessageTimestamp(row);
       entries.push({
         role: 'assistant',
+        id: row.id,
         content: safeContent(row),
         reasoning: row.reasoning ?? undefined,
         reasoning_content: row.reasoning ?? undefined,
         tool_calls: openAiToolCalls.length > 0 ? openAiToolCalls : undefined,
         toolCalls: richToolCalls.length > 0 ? richToolCalls : undefined,
         _toolResultsExpanded: true,
+        ...(timestamp !== undefined ? { timestamp } : {}),
       });
     }
   }
